@@ -1,0 +1,171 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import AlgogiLogo from "@/components/logo/algogi-logo";
+
+export default function SiteHeader() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/services", label: "Services" },
+    { href: "/case-studies", label: "Portfolio" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+  ];
+
+  return (
+    <header className="sticky top-0 z-50 bg-dark-bg/80 backdrop-blur-md relative border-b border-transparent">
+      {/* Seamless gradient transition to hero section */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-blue/20 to-transparent" />
+      <div className="absolute -bottom-[1px] left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/15 to-transparent blur-[0.5px]" />
+      {/* Subtle shadow that blends with hero */}
+      <div className="absolute inset-0 shadow-[0_2px_20px_-5px_rgba(0,240,255,0.1)] pointer-events-none" />
+      {/* Gradient fade at bottom for seamless blend */}
+      <div className="absolute -bottom-4 left-0 right-0 h-4 bg-gradient-to-b from-dark-bg/80 to-transparent pointer-events-none" />
+      <nav className="container-custom relative z-10">
+        <div className="flex items-center justify-between min-h-[80px] py-3">
+          {/* Logo */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center"
+          >
+            <Link 
+              href="/" 
+              className="flex items-center group relative"
+            >
+              <div className="relative px-2 py-1">
+                <AlgogiLogo className="h-12 sm:h-14 md:h-16 w-auto transition-all duration-300 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-brand-blue-light/0 group-hover:bg-brand-blue-light/5 rounded-lg transition-all duration-300 -z-10 blur-sm" />
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navLinks.map((link, index) => {
+              const isActive = pathname === link.href || 
+                (link.href !== "/" && pathname.startsWith(link.href));
+              
+              return (
+                <motion.div
+                  key={link.href}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link
+                    href={link.href}
+                    className={`relative font-semibold transition-colors duration-300 group ${
+                      isActive 
+                        ? "text-brand-blue-light" 
+                        : "text-gray-300 hover:text-brand-blue-light"
+                    }`}
+                  >
+                    {link.label}
+                    <motion.span
+                      className={`absolute bottom-0 left-0 h-0.5 bg-brand-blue-light transition-all duration-300 ${
+                        isActive ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                      initial={false}
+                    />
+                  </Link>
+                </motion.div>
+              );
+            })}
+            <Link href="/contact" className="btn-primary">
+              Get Started
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-4">
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-lg text-brand-blue-light hover:bg-brand-blue/10 focus:outline-none focus:ring-2 focus:ring-brand-blue-light"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <motion.svg
+                className="w-6 h-6"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                animate={{ rotate: isMobileMenuOpen ? 90 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isMobileMenuOpen ? (
+                  <path d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </motion.svg>
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden py-4 overflow-hidden relative"
+            >
+              {/* Subtle gradient divider for mobile menu */}
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-blue/30 to-transparent" />
+              <div className="flex flex-col space-y-4">
+                {navLinks.map((link, index) => {
+                  const isActive = pathname === link.href || 
+                    (link.href !== "/" && pathname.startsWith(link.href));
+                  
+                  return (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <Link
+                        href={link.href}
+                        className={`font-semibold transition-colors py-2 block relative pl-4 ${
+                          isActive 
+                            ? "text-brand-blue-light" 
+                            : "text-gray-300 hover:text-brand-blue-light"
+                        }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {isActive && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-blue-light rounded-r" />
+                        )}
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+                <Link
+                  href="/contact"
+                  className="btn-primary text-center"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Get Started
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+    </header>
+  );
+}
+

@@ -1,0 +1,104 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  darkMode: "class",
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        dark: {
+          bg: "#0a0a0a",
+          surface: "#111111",
+          card: "#1a1a1a",
+          border: "#2a2a2a",
+        },
+        neon: {
+          blue: "#00f0ff",
+          cyan: "#00ffff",
+          purple: "#b026ff",
+          pink: "#ff00ff",
+          violet: "#8b5cf6",
+        },
+        brand: {
+          blue: "#1e40af",
+          "blue-dark": "#1e3a8a",
+          "blue-light": "#3b82f6",
+        },
+        primary: {
+          DEFAULT: "#00f0ff",
+          50: "#e6f9ff",
+          100: "#b3f0ff",
+          200: "#80e7ff",
+          300: "#4ddeff",
+          400: "#1ad5ff",
+          500: "#00f0ff",
+          600: "#00c7cc",
+          700: "#009e99",
+          800: "#007566",
+          900: "#004c33",
+        },
+        accent: {
+          DEFAULT: "#b026ff",
+          50: "#f5e6ff",
+          100: "#e6b3ff",
+          200: "#d780ff",
+          300: "#c84dff",
+          400: "#b91aff",
+          500: "#b026ff",
+          600: "#8f1fcc",
+          700: "#6e1899",
+          800: "#4d1166",
+          900: "#2c0a33",
+        },
+      },
+      fontFamily: {
+        sans: ["var(--font-geometric)", "system-ui", "sans-serif"],
+      },
+      animation: {
+        "glitch": "glitch 0.3s infinite",
+        "glow": "glow 2s ease-in-out infinite alternate",
+        "float": "float 6s ease-in-out infinite",
+        "pulse-neon": "pulse-neon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "shimmer": "shimmer 2s linear infinite",
+      },
+      keyframes: {
+        glitch: {
+          "0%, 100%": { transform: "translate(0)" },
+          "20%": { transform: "translate(-2px, 2px)" },
+          "40%": { transform: "translate(-2px, -2px)" },
+          "60%": { transform: "translate(2px, 2px)" },
+          "80%": { transform: "translate(2px, -2px)" },
+        },
+        glow: {
+          "0%": { boxShadow: "0 0 5px #00f0ff, 0 0 10px #00f0ff, 0 0 15px #00f0ff" },
+          "100%": { boxShadow: "0 0 10px #00f0ff, 0 0 20px #00f0ff, 0 0 30px #00f0ff, 0 0 40px #b026ff" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        "pulse-neon": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-1000px 0" },
+          "100%": { backgroundPosition: "1000px 0" },
+        },
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "neon-gradient": "linear-gradient(135deg, #00f0ff 0%, #b026ff 100%)",
+        "dark-gradient": "linear-gradient(180deg, #0a0a0a 0%, #111111 100%)",
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;
+
