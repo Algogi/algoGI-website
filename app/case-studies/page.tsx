@@ -124,53 +124,53 @@ function ProjectCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8, scale: 1.02 }}
       onClick={onClick}
-      className="neon-card rounded-xl p-6 border border-neon-blue/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-all duration-300 cursor-pointer group relative overflow-hidden"
+      className="neon-card rounded-xl p-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] dark:hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(0,136,204,0.25)] transition-all duration-300 cursor-pointer group relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 to-neon-blue/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 dark:from-neon-purple/5 from-neon-light-purple/10 to-neon-blue/5 dark:to-neon-blue/5 to-neon-light-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="relative z-10">
-        <div className="h-48 bg-gradient-to-br from-neon-blue/10 to-neon-purple/10 rounded-lg mb-4 flex items-center justify-center border border-neon-blue/20 group-hover:border-neon-purple/50 transition-colors">
+        <div className="h-48 bg-gradient-to-br from-neon-blue/10 dark:from-neon-blue/10 from-neon-light-blue/20 to-neon-purple/10 dark:to-neon-purple/10 to-neon-light-purple/20 rounded-lg mb-4 flex items-center justify-center border border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30 group-hover:border-neon-purple/50 dark:group-hover:border-neon-purple/50 group-hover:border-neon-light-purple/60 transition-colors">
           <motion.div
             className="flex items-center justify-center"
             whileHover={{ scale: 1.2, rotate: 5 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             {study.isTemplate ? (
-              <Wrench className="w-16 h-16 text-neon-blue" />
+              <Wrench className="w-16 h-16 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
             ) : (
-              <Bot className="w-16 h-16 text-neon-purple" />
+              <Bot className="w-16 h-16 text-neon-purple dark:text-neon-purple text-neon-light-purple" />
             )}
           </motion.div>
         </div>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-neon-purple bg-neon-purple/10 px-3 py-1 rounded-full border border-neon-purple/30">
+          <span className="text-xs font-semibold text-neon-purple dark:text-neon-purple text-neon-light-purple bg-neon-purple/10 dark:bg-neon-purple/10 bg-neon-light-purple/20 px-3 py-1 rounded-full border border-neon-purple/30 dark:border-neon-purple/30 border-neon-light-purple/40">
             {study.isTemplate ? "n8n Template" : "AI Solution"}
           </span>
           {study.isTemplate && (
-            <span className="text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-3 py-1 rounded-full border border-neon-cyan/30">
+            <span className="text-xs font-semibold text-neon-cyan dark:text-neon-cyan text-neon-light-blue bg-neon-cyan/10 dark:bg-neon-cyan/10 bg-neon-light-blue/20 px-3 py-1 rounded-full border border-neon-cyan/30 dark:border-neon-cyan/30 border-neon-light-blue/40">
               Open Source
             </span>
           )}
         </div>
-        <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-neon-blue transition-colors">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-neon-blue dark:group-hover:text-neon-blue group-hover:text-neon-light-blue transition-colors">
           {study.title}
         </h3>
-        <p className="text-gray-300 text-sm mb-4 line-clamp-3 leading-relaxed">
+        <p className="text-gray-300 dark:text-gray-300 text-gray-700 text-sm mb-4 line-clamp-3 leading-relaxed">
           {study.solution}
         </p>
         <div className="flex flex-wrap gap-2 mb-4">
           {study.techStack.map((tech, idx) => (
             <span
               key={idx}
-              className="text-xs text-gray-400 bg-dark-card px-2 py-1 rounded border border-neon-blue/10"
+              className="text-xs text-gray-400 dark:text-gray-400 text-gray-600 bg-dark-card dark:bg-dark-card bg-light-card px-2 py-1 rounded border border-neon-blue/10 dark:border-neon-blue/10 border-neon-light-blue/20"
             >
               {tech}
             </span>
           ))}
         </div>
-        <div className="pt-4 border-t border-neon-blue/20">
+        <div className="pt-4 border-t border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30">
           <motion.button
             whileHover={{ x: 5 }}
-            className="text-neon-blue font-semibold flex items-center gap-2 group-hover:text-neon-cyan transition-colors"
+            className="text-neon-blue dark:text-neon-blue text-neon-light-blue font-semibold flex items-center gap-2 group-hover:text-neon-cyan dark:group-hover:text-neon-cyan group-hover:text-neon-light-blue transition-colors"
           >
             {study.isTemplate ? "View Template" : "View Demo"} →
           </motion.button>
@@ -196,7 +196,7 @@ export default function CaseStudiesPage() {
 
   return (
     <>
-      <div className="section-padding bg-dark-bg relative overflow-hidden">
+      <div className="section-padding bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden">
         <div className="absolute inset-0 grid-background opacity-10" />
         <div className="container-custom relative z-10">
           <motion.div
@@ -205,10 +205,10 @@ export default function CaseStudiesPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
               Portfolio
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
+            <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 max-w-4xl mx-auto">
               Innovative AI solutions and free n8n templates built by AlgoGI. Explore our open-source contributions and AI agent implementations.
             </p>
           </motion.div>
@@ -229,12 +229,12 @@ export default function CaseStudiesPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center neon-card rounded-2xl p-12 border border-neon-blue/30"
+            className="text-center neon-card rounded-2xl p-12 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40"
           >
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               See our full portfolio of AI solutions and automation templates
             </h2>
-            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-300 dark:text-gray-300 text-gray-700 mb-8 max-w-2xl mx-auto">
               Explore more innovative AI solutions, workflow automation examples, and free n8n templates designed to accelerate your business.
             </p>
             <Link

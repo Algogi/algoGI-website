@@ -78,7 +78,7 @@ export default function SiteFooter() {
   ];
 
   return (
-    <footer className="bg-dark-bg border-t border-brand-blue/20 relative overflow-hidden">
+    <footer className="bg-dark-bg dark:bg-dark-bg bg-light-bg border-t border-brand-blue/20 dark:border-brand-blue/20 border-gray-300/30 relative overflow-hidden">
       <div className="absolute inset-0 grid-background opacity-10" />
       <div className="container-custom py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
@@ -91,7 +91,7 @@ export default function SiteFooter() {
 
             {/* Newsletter */}
             <div>
-              <h4 className="text-white font-bold mb-4 text-lg">Subscribe to Our Newsletter</h4>
+              <h4 className="text-gray-900 dark:text-white font-bold mb-4 text-lg">Subscribe to Our Newsletter</h4>
               <form onSubmit={handleNewsletterSubmit} className="space-y-4">
                 <input
                   type="email"
@@ -99,7 +99,7 @@ export default function SiteFooter() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="@"
                   required
-                  className="w-full px-4 py-3 bg-dark-card border border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-white placeholder-gray-500 transition-all"
+                  className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-gray-600 dark:border-gray-600 border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400 transition-all"
                 />
                 <div className="flex items-start gap-2">
                   <input
@@ -108,9 +108,9 @@ export default function SiteFooter() {
                     checked={agreedToMarketing}
                     onChange={(e) => setAgreedToMarketing(e.target.checked)}
                     required
-                    className="mt-1 w-4 h-4 rounded border-gray-600 bg-dark-card text-neon-blue focus:ring-neon-blue focus:ring-offset-dark-bg"
+                    className="mt-1 w-4 h-4 rounded border-gray-600 dark:border-gray-600 border-gray-300 bg-dark-card dark:bg-dark-card bg-light-card text-neon-blue dark:text-neon-blue text-neon-light-blue focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:ring-offset-dark-bg dark:focus:ring-offset-dark-bg focus:ring-offset-light-bg"
                   />
-                  <label htmlFor="marketing-consent" className="text-sm text-gray-400 leading-relaxed">
+                  <label htmlFor="marketing-consent" className="text-sm text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">
                     I agree to receive marketing emails from AlgoGI Technologies.
                   </label>
                 </div>
@@ -136,7 +136,7 @@ export default function SiteFooter() {
                     {submitStatus.message}
                   </motion.p>
                 )}
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-500 text-gray-500">
                   We only send interesting and relevant emails
                 </p>
               </form>
@@ -148,7 +148,7 @@ export default function SiteFooter() {
                 <Link
                   key={index}
                   href={link.href}
-                  className="text-gray-400 hover:text-neon-blue transition-colors duration-300"
+                  className="text-gray-400 dark:text-gray-400 text-gray-600 hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors duration-300"
                 >
                   {link.label}
                 </Link>
@@ -158,13 +158,13 @@ export default function SiteFooter() {
 
           {/* Middle Column - Services */}
           <div>
-            <h4 className="text-white font-bold mb-6 text-lg">Services</h4>
+            <h4 className="text-gray-900 dark:text-white font-bold mb-6 text-lg">Services</h4>
             <ul className="space-y-3">
               {services.map((service, index) => (
                 <li key={index}>
                   <Link
                     href="/services"
-                    className="text-gray-400 hover:text-neon-blue transition-colors duration-300 text-sm leading-relaxed block"
+                    className="text-gray-400 dark:text-gray-400 text-gray-600 hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors duration-300 text-sm leading-relaxed block"
                   >
                     {service}
                   </Link>
@@ -177,16 +177,16 @@ export default function SiteFooter() {
           <div className="space-y-8">
             {/* USA Contact */}
             <div>
-              <h4 className="text-white font-bold mb-4 text-lg">USA</h4>
-              <div className="space-y-3 text-sm text-gray-400">
+              <h4 className="text-gray-900 dark:text-white font-bold mb-4 text-lg">USA</h4>
+              <div className="space-y-3 text-sm text-gray-400 dark:text-gray-400 text-gray-600">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-neon-blue" />
-                  <a href="mailto:Sales@algogi.com" className="hover:text-neon-blue transition-colors">
+                  <a href="mailto:Sales@algogi.com" className="hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors">
                     Sales@algogi.com
                   </a>
                 </div>
                 <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-neon-blue mt-1 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-neon-blue dark:text-neon-blue text-neon-light-blue mt-1 flex-shrink-0" />
                   <span>
                     131 CONTINENTAL DRIVE, SUITE 305 NEWARK, New Castle, DE -19713
                   </span>
@@ -196,22 +196,22 @@ export default function SiteFooter() {
 
             {/* India Contact */}
             <div>
-              <h4 className="text-white font-bold mb-4 text-lg">India</h4>
-              <div className="space-y-3 text-sm text-gray-400">
+              <h4 className="text-gray-900 dark:text-white font-bold mb-4 text-lg">India</h4>
+              <div className="space-y-3 text-sm text-gray-400 dark:text-gray-400 text-gray-600">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-neon-blue" />
-                  <a href="mailto:Contact@algogi.com" className="hover:text-neon-blue transition-colors">
+                  <a href="mailto:Contact@algogi.com" className="hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors">
                     Contact@algogi.com
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-neon-blue" />
-                  <a href="tel:+13029300149" className="hover:text-neon-blue transition-colors">
+                  <a href="tel:+13029300149" className="hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors">
                     +1 302 930 0149
                   </a>
                 </div>
                 <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-neon-blue mt-1 flex-shrink-0" />
+                  <MapPin className="w-4 h-4 text-neon-blue dark:text-neon-blue text-neon-light-blue mt-1 flex-shrink-0" />
                   <span>
                     JBR Tech Park, Plot No. 77, 6th Rd, EPIP Zone, Whitefield, Bengaluru, Karnataka 560066
                   </span>
@@ -229,10 +229,10 @@ export default function SiteFooter() {
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-10 h-10 rounded-full bg-dark-card border border-gray-600 flex items-center justify-center hover:border-neon-blue hover:bg-neon-blue/10 transition-all duration-300"
+                  className="w-10 h-10 rounded-full bg-dark-card dark:bg-dark-card bg-light-card border border-gray-600 dark:border-gray-600 border-gray-300 flex items-center justify-center hover:border-neon-blue dark:hover:border-neon-blue hover:border-neon-light-blue hover:bg-neon-blue/10 dark:hover:bg-neon-blue/10 hover:bg-neon-light-blue/10 transition-all duration-300"
                   aria-label={social.label}
                 >
-                  <social.icon className="w-5 h-5 text-gray-400 hover:text-neon-blue transition-colors" />
+                  <social.icon className="w-5 h-5 text-gray-400 dark:text-gray-400 text-gray-600 hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors" />
                 </motion.a>
               ))}
             </div>
@@ -240,8 +240,8 @@ export default function SiteFooter() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-700 pt-8">
-          <p className="text-sm text-gray-500 text-center">
+        <div className="border-t border-gray-700 dark:border-gray-700 border-gray-300 pt-8">
+          <p className="text-sm text-gray-500 dark:text-gray-500 text-gray-500 text-center">
             All Rights reserved to AlgoGI Tech LLP 2025
           </p>
         </div>

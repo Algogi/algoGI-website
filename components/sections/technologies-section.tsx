@@ -65,8 +65,8 @@ function TechMarquee({
   return (
     <div className="relative overflow-hidden w-full py-8 -rotate-2">
       {/* Gradient overlays for fade effect */}
-      <div className="absolute left-0 top-0 bottom-0 w-40 bg-gradient-to-r from-dark-bg via-dark-bg/80 to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-40 bg-gradient-to-l from-dark-bg via-dark-bg/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-40 bg-gradient-to-r from-dark-bg dark:from-dark-bg from-light-bg via-dark-bg/80 dark:via-dark-bg/80 via-light-bg/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-40 bg-gradient-to-l from-dark-bg dark:from-dark-bg from-light-bg via-dark-bg/80 dark:via-dark-bg/80 via-light-bg/80 to-transparent z-10 pointer-events-none" />
       
       <motion.div
         className="flex gap-6"
@@ -85,11 +85,11 @@ function TechMarquee({
         {technologies.map((tech, index) => (
           <motion.div
             key={`${tech.name}-${index}`}
-            className="flex items-center gap-3 px-6 py-3 rounded-xl bg-dark-card border border-gray-600/30 text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-all duration-300 whitespace-nowrap group flex-shrink-0 grayscale hover:grayscale-0"
+            className="flex items-center gap-3 px-6 py-3 rounded-xl bg-dark-card dark:bg-dark-card bg-light-card border border-gray-600/30 dark:border-gray-600/30 border-gray-300/50 text-gray-400 dark:text-gray-400 text-gray-600 hover:border-gray-500 dark:hover:border-gray-500 hover:border-gray-400 hover:text-gray-300 dark:hover:text-gray-300 hover:text-gray-700 transition-all duration-300 whitespace-nowrap group flex-shrink-0 grayscale hover:grayscale-0"
             whileHover={{ scale: 1.1, y: -4 }}
           >
             <tech.icon className="w-6 h-6 flex-shrink-0" />
-            <span className="text-sm font-semibold text-gray-400 group-hover:text-gray-300">
+            <span className="text-sm font-semibold text-gray-400 dark:text-gray-400 text-gray-600 group-hover:text-gray-300 dark:group-hover:text-gray-300 group-hover:text-gray-700">
               {tech.name}
             </span>
           </motion.div>
@@ -106,7 +106,7 @@ export default function TechnologiesSection() {
   });
 
   return (
-    <section ref={ref} className="section-padding bg-dark-bg relative overflow-hidden">
+    <section ref={ref} className="section-padding bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden">
       <div className="absolute inset-0 grid-background opacity-10" />
       <div className="container-custom relative z-10">
         <motion.div
@@ -119,15 +119,15 @@ export default function TechnologiesSection() {
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
             transition={{ delay: 0.2 }}
-            className="text-neon-cyan font-bold text-sm uppercase tracking-widest mb-4 block"
+            className="text-neon-cyan dark:text-neon-cyan text-neon-light-blue font-bold text-sm uppercase tracking-widest mb-4 block"
           >
             Our Tech Stack
           </motion.span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            <span className="text-white">Technologies We </span>
+            <span className="text-gray-900 dark:text-white">Technologies We </span>
             <span className="text-gradient">Use</span>
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
             Cutting-edge tools and frameworks powering our innovative solutions
           </p>
         </motion.div>
@@ -145,7 +145,7 @@ export default function TechnologiesSection() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-center"
         >
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-400 dark:text-gray-400 text-gray-600 mb-6">
             And many more cutting-edge technologies tailored to your project needs
           </p>
           <motion.a

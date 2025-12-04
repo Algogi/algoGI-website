@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 
 interface Tile {
   x: number;
@@ -18,6 +19,8 @@ export default function Tiles3DBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef<number>();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -52,8 +55,10 @@ export default function Tiles3DBackground() {
         rotationX: Math.random() * Math.PI * 0.1,
         rotationY: Math.random() * Math.PI * 0.1,
         rotationZ: Math.random() * Math.PI * 0.1,
-        // Very subtle colors - muted versions
-        color: Math.random() < 0.5 ? "#4A5568" : "#374151", // Dark gray tones instead of bright colors
+        // Theme-aware colors
+        color: isLight 
+          ? (Math.random() < 0.5 ? "#D1D5DB" : "#E5E7EB") // Light gray tones for light theme
+          : (Math.random() < 0.5 ? "#4A5568" : "#374151"), // Dark gray tones for dark theme
         opacity: 0.03 + Math.random() * 0.04, // Even more subtle
         size: tileSize,
       });
@@ -72,8 +77,8 @@ export default function Tiles3DBackground() {
     function animate() {
       if (!ctx || !canvas) return;
 
-      // Clear canvas with more fade for subtlety
-      ctx.fillStyle = "rgba(10, 10, 10, 0.05)";
+      // Clear canvas with theme-aware fade
+      ctx.fillStyle = isLight ? "rgba(255, 255, 255, 0.03)" : "rgba(10, 10, 10, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const time = Date.now() * 0.001;
@@ -256,8 +261,10 @@ export default function Tiles3DBackground() {
           rotationX: Math.random() * Math.PI * 0.1,
           rotationY: Math.random() * Math.PI * 0.1,
           rotationZ: Math.random() * Math.PI * 0.1,
-          // Very subtle colors - muted versions
-          color: Math.random() < 0.5 ? "#4A5568" : "#374151", // Dark gray tones instead of bright colors
+          // Theme-aware colors
+          color: isLight 
+            ? (Math.random() < 0.5 ? "#D1D5DB" : "#E5E7EB") // Light gray tones for light theme
+            : (Math.random() < 0.5 ? "#4A5568" : "#374151"), // Dark gray tones for dark theme
           opacity: 0.03 + Math.random() * 0.04, // Even more subtle
           size: tileSize,
         });
@@ -273,7 +280,7 @@ export default function Tiles3DBackground() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, [isLight]);
 
   return (
     <canvas

@@ -48,14 +48,14 @@ export default function GlitchText({
       {isGlitching && (
         <>
           <motion.span
-            className="absolute inset-0 text-neon-pink opacity-75"
+            className="absolute inset-0 text-neon-pink dark:text-neon-pink text-neon-light-pink opacity-75"
             animate={{ x: [0, 2, -2, 0] }}
             transition={{ duration: 0.1, repeat: 3 }}
           >
             {text}
           </motion.span>
           <motion.span
-            className="absolute inset-0 text-neon-cyan opacity-75"
+            className="absolute inset-0 text-neon-cyan dark:text-neon-cyan text-neon-light-blue opacity-75"
             animate={{ x: [0, -2, 2, 0] }}
             transition={{ duration: 0.1, repeat: 3 }}
           >

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 
 interface Tile {
   x: number;
@@ -18,6 +19,8 @@ export default function SubtleTilesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef<number>();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -52,7 +55,9 @@ export default function SubtleTilesBackground() {
         rotationX: Math.random() * Math.PI * 0.1,
         rotationY: Math.random() * Math.PI * 0.1,
         rotationZ: Math.random() * Math.PI * 0.1,
-        color: Math.random() < 0.5 ? "#4A5568" : "#374151",
+        color: isLight 
+          ? (Math.random() < 0.5 ? "#D1D5DB" : "#E5E7EB") // Light gray tones for light theme
+          : (Math.random() < 0.5 ? "#4A5568" : "#374151"), // Dark gray tones for dark theme
         opacity: 0.02 + Math.random() * 0.03, // Very subtle
         size: tileSize,
       });
@@ -79,8 +84,8 @@ export default function SubtleTilesBackground() {
     function animate() {
       if (!ctx || !canvas) return;
 
-      // Clear canvas with more fade for subtlety
-      ctx.fillStyle = "rgba(10, 10, 10, 0.03)";
+      // Clear canvas with theme-aware fade
+      ctx.fillStyle = isLight ? "rgba(255, 255, 255, 0.02)" : "rgba(10, 10, 10, 0.03)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const time = Date.now() * 0.001;
@@ -214,7 +219,9 @@ export default function SubtleTilesBackground() {
           rotationX: Math.random() * Math.PI * 0.1,
           rotationY: Math.random() * Math.PI * 0.1,
           rotationZ: Math.random() * Math.PI * 0.1,
-          color: Math.random() < 0.5 ? "#4A5568" : "#374151",
+          color: isLight 
+            ? (Math.random() < 0.5 ? "#D1D5DB" : "#E5E7EB") // Light gray tones for light theme
+            : (Math.random() < 0.5 ? "#4A5568" : "#374151"), // Dark gray tones for dark theme
           opacity: 0.02 + Math.random() * 0.03,
           size: tileSize,
         });
@@ -230,7 +237,7 @@ export default function SubtleTilesBackground() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, [isLight]);
 
   return (
     <canvas

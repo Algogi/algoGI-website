@@ -5,6 +5,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import AlgogiLogo from "@/components/logo/algogi-logo";
+import ThemeToggle from "@/components/theme/theme-toggle";
 
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,14 +20,14 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-dark-bg/80 backdrop-blur-md relative border-b border-transparent">
+    <header className="sticky top-0 z-50 bg-dark-bg/80 dark:bg-dark-bg/80 bg-light-bg/80 backdrop-blur-md relative border-b border-transparent dark:border-transparent border-gray-200/30">
       {/* Seamless gradient transition to hero section */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-blue/20 to-transparent" />
-      <div className="absolute -bottom-[1px] left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/15 to-transparent blur-[0.5px]" />
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-blue/20 dark:via-neon-blue/20 via-neon-light-blue/30 to-transparent" />
+      <div className="absolute -bottom-[1px] left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/15 dark:via-neon-purple/15 via-neon-light-purple/20 to-transparent blur-[0.5px]" />
       {/* Subtle shadow that blends with hero */}
-      <div className="absolute inset-0 shadow-[0_2px_20px_-5px_rgba(0,240,255,0.1)] pointer-events-none" />
+      <div className="absolute inset-0 shadow-[0_2px_20px_-5px_rgba(0,240,255,0.1)] dark:shadow-[0_2px_20px_-5px_rgba(0,240,255,0.1)] shadow-[0_2px_20px_-5px_rgba(0,136,204,0.15)] pointer-events-none" />
       {/* Gradient fade at bottom for seamless blend */}
-      <div className="absolute -bottom-4 left-0 right-0 h-4 bg-gradient-to-b from-dark-bg/80 to-transparent pointer-events-none" />
+      <div className="absolute -bottom-4 left-0 right-0 h-4 bg-gradient-to-b from-dark-bg/80 dark:from-dark-bg/80 from-light-bg/80 to-transparent pointer-events-none" />
       <nav className="container-custom relative z-10">
         <div className="flex items-center justify-between min-h-[80px] py-3">
           {/* Logo */}
@@ -63,8 +64,8 @@ export default function SiteHeader() {
                     href={link.href}
                     className={`relative font-semibold transition-colors duration-300 group ${
                       isActive 
-                        ? "text-brand-blue-light" 
-                        : "text-gray-300 hover:text-brand-blue-light"
+                        ? "text-brand-blue-light dark:text-brand-blue-light" 
+                        : "text-gray-300 dark:text-gray-300 text-gray-700 hover:text-brand-blue-light dark:hover:text-brand-blue-light hover:text-brand-blue"
                     }`}
                   >
                     {link.label}
@@ -78,6 +79,7 @@ export default function SiteHeader() {
                 </motion.div>
               );
             })}
+            <ThemeToggle />
             <Link href="/contact" className="btn-primary">
               Get Started
             </Link>
@@ -85,6 +87,7 @@ export default function SiteHeader() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center gap-4">
+            <ThemeToggle />
             <motion.button
               whileTap={{ scale: 0.9 }}
               className="p-2 rounded-lg text-brand-blue-light hover:bg-brand-blue/10 focus:outline-none focus:ring-2 focus:ring-brand-blue-light"
@@ -140,8 +143,8 @@ export default function SiteHeader() {
                         href={link.href}
                         className={`font-semibold transition-colors py-2 block relative pl-4 ${
                           isActive 
-                            ? "text-brand-blue-light" 
-                            : "text-gray-300 hover:text-brand-blue-light"
+                            ? "text-brand-blue-light dark:text-brand-blue-light" 
+                            : "text-gray-300 dark:text-gray-300 text-gray-700 hover:text-brand-blue-light dark:hover:text-brand-blue-light hover:text-brand-blue"
                         }`}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

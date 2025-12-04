@@ -15,8 +15,10 @@
     @apply bg-dark-bg text-white antialiased transition-colors duration-300;
   }
 
-  body.light {
-    @apply bg-white text-gray-900;
+  html.light body {
+    background-color: #ffffff;
+    color: #111827;
+    @apply antialiased transition-colors duration-300;
   }
 
   * {
@@ -32,12 +34,25 @@
     @apply bg-dark-surface;
   }
 
+  html.light ::-webkit-scrollbar-track {
+    background-color: #f9fafb;
+  }
+
   ::-webkit-scrollbar-thumb {
     @apply bg-neon-blue/30 rounded-full;
   }
 
+  html.light ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 136, 204, 0.4);
+    @apply rounded-full;
+  }
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-neon-blue/50;
+  }
+
+  html.light ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 136, 204, 0.6);
   }
 }
 
@@ -47,10 +62,30 @@
     @apply hover:scale-105 hover:shadow-[0_0_30px_rgba(0,240,255,0.5)];
     @apply before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700;
   }
+
+  html.light .btn-primary {
+    background: linear-gradient(135deg, #0088cc 0%, #8b1aff 100%);
+    color: #ffffff;
+    --tw-ring-color: #0088cc;
+    --tw-ring-offset-color: #ffffff;
+    box-shadow: 0 0 30px rgba(0, 136, 204, 0.4);
+  }
   
   .btn-secondary {
     @apply relative bg-transparent text-neon-blue px-8 py-4 rounded-lg font-bold text-lg border-2 border-neon-blue transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2 focus:ring-offset-dark-bg;
     @apply hover:bg-neon-blue/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:scale-105;
+  }
+
+  html.light .btn-secondary {
+    color: #0088cc;
+    border-color: #0088cc;
+    --tw-ring-color: #0088cc;
+    --tw-ring-offset-color: #ffffff;
+  }
+  
+  html.light .btn-secondary:hover {
+    background-color: rgba(0, 136, 204, 0.1);
+    box-shadow: 0 0 20px rgba(0, 136, 204, 0.25);
   }
   
   .section-padding {
@@ -149,12 +184,28 @@
     @apply hover:border-neon-blue/50 hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] transition-all duration-300;
   }
 
+  html.light .neon-card {
+    background-color: #ffffff;
+    border-color: rgba(0, 136, 204, 0.3);
+  }
+  
+  html.light .neon-card:hover {
+    border-color: rgba(0, 136, 204, 0.6);
+    box-shadow: 0 0 30px rgba(0, 136, 204, 0.15);
+  }
+
   /* Grid background */
   .grid-background {
     background-image: 
       linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
     background-size: 50px 50px;
+  }
+
+  html.light .grid-background {
+    background-image: 
+      linear-gradient(rgba(0, 136, 204, 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 136, 204, 0.15) 1px, transparent 1px);
   }
 }
 
@@ -163,8 +214,18 @@
     @apply text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink;
   }
 
+  html.light .text-gradient {
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(to right, #0088cc, #8b1aff, #cc00cc);
+  }
+
   .text-gradient-reverse {
     @apply text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-purple to-neon-blue;
+  }
+
+  html.light .text-gradient-reverse {
+    @apply text-transparent bg-clip-text;
+    background-image: linear-gradient(to right, #cc00cc, #8b1aff, #0088cc);
   }
 
   /* 3D transform utilities */
@@ -379,5 +440,104 @@
 
 .datepicker-popper .react-datepicker {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 240, 255, 0.3) !important;
+}
+
+/* React DatePicker Light Theme Styles */
+html.light .react-datepicker {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 136, 204, 0.3) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 30px rgba(0, 136, 204, 0.2) !important;
+}
+
+html.light .react-datepicker__header {
+  background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%) !important;
+  border-bottom: 1px solid rgba(0, 136, 204, 0.2) !important;
+}
+
+html.light .react-datepicker__current-month {
+  color: #111827 !important;
+}
+
+html.light .react-datepicker__day-name {
+  color: #6b7280 !important;
+}
+
+html.light .react-datepicker__day {
+  color: #374151 !important;
+}
+
+html.light .react-datepicker__day:hover {
+  background: rgba(0, 136, 204, 0.1) !important;
+  color: #0088cc !important;
+}
+
+html.light .react-datepicker__day--selected,
+html.light .react-datepicker__day--keyboard-selected {
+  background: linear-gradient(135deg, #0088cc 0%, #8b1aff 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 15px rgba(0, 136, 204, 0.4) !important;
+}
+
+html.light .react-datepicker__day--today {
+  border: 2px solid rgba(0, 136, 204, 0.5) !important;
+}
+
+html.light .react-datepicker__day--disabled {
+  color: #9ca3af !important;
+}
+
+html.light .react-datepicker__day--outside-month {
+  color: #d1d5db !important;
+}
+
+html.light .react-datepicker__time-container {
+  border-left: 1px solid rgba(0, 136, 204, 0.2) !important;
+}
+
+html.light .react-datepicker__time-container .react-datepicker__time {
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%) !important;
+}
+
+html.light .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+  scrollbar-color: rgba(0, 136, 204, 0.2) transparent !important;
+}
+
+html.light .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 136, 204, 0.2) !important;
+}
+
+html.light .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 136, 204, 0.3) !important;
+}
+
+html.light .react-datepicker__time-list-item {
+  color: #4b5563 !important;
+}
+
+html.light .react-datepicker__time-list-item:hover {
+  background: rgba(0, 136, 204, 0.1) !important;
+  color: #0088cc !important;
+}
+
+html.light .react-datepicker__time-list-item--selected {
+  background: linear-gradient(135deg, #0088cc 0%, #8b1aff 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0, 136, 204, 0.3) !important;
+}
+
+html.light .react-datepicker__navigation {
+  background: rgba(0, 136, 204, 0.08) !important;
+}
+
+html.light .react-datepicker__navigation:hover {
+  background: rgba(0, 136, 204, 0.15) !important;
+}
+
+html.light .react-datepicker__navigation-icon::before {
+  border-color: #0088cc !important;
+}
+
+html.light .datepicker-popper .react-datepicker {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 40px rgba(0, 136, 204, 0.2) !important;
 }
 

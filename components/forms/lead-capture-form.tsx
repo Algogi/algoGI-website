@@ -99,12 +99,12 @@ export default function LeadCaptureForm() {
       onSubmit={handleSubmit}
       className="neon-card max-w-2xl mx-auto relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-neon-purple/5 opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 dark:from-neon-blue/5 from-neon-light-blue/10 to-neon-purple/5 dark:to-neon-purple/5 to-neon-light-purple/10 opacity-50" />
       <div className="relative z-10">
-        <h3 className="text-3xl font-bold text-white mb-2">
+        <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Send your <span className="text-gradient">project brief</span>
         </h3>
-        <p className="text-gray-400 mb-8">
+        <p className="text-gray-400 dark:text-gray-400 text-gray-600 mb-8">
           Tell us about your product, timeline, and what success looks like.
         </p>
 
@@ -118,7 +118,7 @@ export default function LeadCaptureForm() {
           >
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-300 mb-2"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-300 text-gray-700 mb-2"
             >
               Name *
             </label>
@@ -129,7 +129,7 @@ export default function LeadCaptureForm() {
               required
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none transition-all duration-200 hover:border-neon-blue/50 text-white placeholder-gray-500"
+              className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
             />
           </motion.div>
 
@@ -141,7 +141,7 @@ export default function LeadCaptureForm() {
           >
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-300 mb-2"
+              className="block text-sm font-medium text-gray-300 dark:text-gray-300 text-gray-700 mb-2"
             >
               Work Email *
             </label>
@@ -152,7 +152,7 @@ export default function LeadCaptureForm() {
               required
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none transition-all duration-200 hover:border-neon-blue/50 text-white placeholder-gray-500"
+              className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
             />
           </motion.div>
         </div>
@@ -165,7 +165,7 @@ export default function LeadCaptureForm() {
         >
           <label
             htmlFor="company"
-            className="block text-sm font-medium text-gray-300 mb-2"
+            className="block text-sm font-medium text-gray-300 dark:text-gray-300 text-gray-700 mb-2"
           >
             Company *
           </label>
@@ -176,7 +176,7 @@ export default function LeadCaptureForm() {
             required
             value={formData.company}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none transition-all duration-200 hover:border-neon-blue/50 text-white placeholder-gray-500"
+            className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
           />
         </motion.div>
       </div>
@@ -189,7 +189,7 @@ export default function LeadCaptureForm() {
       >
         <label
           htmlFor="projectDescription"
-          className="block text-sm font-medium text-gray-300 mb-2"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-300 text-gray-700 mb-2"
         >
           What are you looking to build? *
         </label>
@@ -201,7 +201,7 @@ export default function LeadCaptureForm() {
           value={formData.projectDescription}
           onChange={handleChange}
           placeholder="Describe your product, goals, and what success looks like..."
-          className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none resize-none transition-all duration-200 hover:border-neon-blue/50 text-white placeholder-gray-500"
+          className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none resize-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
         />
       </motion.div>
 
@@ -213,7 +213,7 @@ export default function LeadCaptureForm() {
       >
         <label
           htmlFor="budgetTimeline"
-          className="block text-sm font-medium text-gray-300 mb-2"
+          className="block text-sm font-medium text-gray-300 dark:text-gray-300 text-gray-700 mb-2"
         >
           Budget & timeline (rough is fine) *
         </label>
@@ -225,7 +225,7 @@ export default function LeadCaptureForm() {
           value={formData.budgetTimeline}
           onChange={handleChange}
           placeholder="Share your budget range and timeline expectations..."
-          className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none resize-none transition-all duration-200 hover:border-neon-blue/50 text-white placeholder-gray-500"
+          className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none resize-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
         />
       </motion.div>
 
@@ -241,9 +241,9 @@ export default function LeadCaptureForm() {
             name="openToCall"
             checked={formData.openToCall}
             onChange={handleChange}
-            className="w-5 h-5 mr-3 bg-dark-card border border-neon-blue/30 rounded focus:ring-2 focus:ring-neon-blue text-neon-blue cursor-pointer flex-shrink-0"
+            className="w-5 h-5 mr-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue text-neon-blue dark:text-neon-blue text-neon-light-blue cursor-pointer flex-shrink-0"
           />
-          <span className="text-gray-300 group-hover:text-white transition-colors">
+          <span className="text-gray-300 dark:text-gray-300 text-gray-700 group-hover:text-white dark:group-hover:text-white group-hover:text-gray-900 transition-colors">
             I&apos;m open to a quick call this week
           </span>
         </label>
@@ -255,7 +255,7 @@ export default function LeadCaptureForm() {
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3 }}
-          className="mb-6 p-5 bg-dark-card/50 rounded-lg border border-neon-blue/20"
+          className="mb-6 p-5 bg-dark-card/50 dark:bg-dark-card/50 bg-light-card/50 rounded-lg border border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30"
         >
           <label
             htmlFor="preferredCallTime"
