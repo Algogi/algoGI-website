@@ -117,7 +117,7 @@ export default function ParticlesBackground() {
         angularVelocity,
         orbitRadius,
         orbitCenter,
-        speed: particleType === 'fast' ? 0.4 : particleType === 'orbital' ? 0 : 0.25,
+        speed: particleType === 'orbital' ? 0 : 0.25,
         type: particleType,
         depth,
       });
