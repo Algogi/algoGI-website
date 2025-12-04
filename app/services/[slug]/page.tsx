@@ -16,7 +16,7 @@ export default function ServiceDetailPage() {
     return (
       <div className="section-padding bg-dark-bg text-center">
         <h1 className="text-4xl font-bold text-white mb-4">Service Not Found</h1>
-        <p className="text-gray-400 mb-8">The service you're looking for doesn't exist.</p>
+        <p className="text-gray-400 mb-8">The service you&apos;re looking for doesn&apos;t exist.</p>
         <Link href="/services" className="btn-primary">
           Back to Services
         </Link>
@@ -288,7 +288,7 @@ export default function ServiceDetailPage() {
                   Ready to Transform Your Business?
                 </h3>
                 <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-                  Let's discuss how {service.title.split("—")[0].trim()} can drive real results for your organization.
+                  Let&apos;s discuss how {service.title.split("—")[0].trim()} can drive real results for your organization.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link

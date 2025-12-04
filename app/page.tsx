@@ -37,7 +37,7 @@ export default function HomePage() {
                   From first commit to global rollout, we ship software that actually ships.
                 </p>
                 <p className="text-lg text-gray-400 leading-relaxed">
-                  Tell us what you're building. Get a clear plan in your inbox. Share a bit about your product, your timeline, and what 'success' looks like.
+                  Tell us what you&apos;re building. Get a clear plan in your inbox. Share a bit about your product, your timeline, and what &apos;success&apos; looks like.
                 </p>
               </div>
 

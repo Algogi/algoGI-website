@@ -139,7 +139,7 @@ export default function ServicesPage() {
           <div className="absolute top-0 left-0 w-64 h-64 bg-neon-blue/5 rounded-full blur-3xl" />
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Let's co-create. Strategy to scale, we're your go-to AI software partner.
+              Let&apos;s co-create. Strategy to scale, we&apos;re your go-to AI software partner.
             </h2>
             <Link
               href="/contact"

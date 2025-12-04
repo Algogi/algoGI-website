@@ -54,7 +54,7 @@ export default function HomeHero() {
                     transition={{ delay: 0.4, duration: 0.8 }}
                     className="block"
                   >
-                    Engineering Tomorrow's
+                    Engineering Tomorrow&apos;s
                   </motion.div>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}

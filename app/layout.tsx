@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     "generative AI",
   ],
   authors: [{ name: "AlgoGI" }],
+  icons: {
+    icon: "/images/algogi-logo.svg",
+    shortcut: "/images/algogi-logo.svg",
+    apple: "/images/algogi-logo.png",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

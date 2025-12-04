@@ -19,10 +19,10 @@ export default function ContactPage() {
             Contact
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-4">
-            Tell us what you're building. Get a clear plan in your inbox.
+            Tell us what you&apos;re building. Get a clear plan in your inbox.
           </p>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Share a bit about your product, your timeline, and what 'success' looks like. A senior engineer will respond with next steps—no sales scripts, no spam.
+            Share a bit about your product, your timeline, and what &apos;success&apos; looks like. A senior engineer will respond with next steps—no sales scripts, no spam.
           </p>
         </motion.div>
 

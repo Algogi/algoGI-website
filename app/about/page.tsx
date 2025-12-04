@@ -62,7 +62,7 @@ export default function AboutPage() {
               href="/contact"
               className="btn-primary text-lg px-8 py-4 inline-block transform hover:scale-105 transition-transform duration-200"
             >
-              Let's Build the Future Together
+              Let&apos;s Build the Future Together
             </Link>
           </motion.div>
         </div>
@@ -175,11 +175,11 @@ export default function AboutPage() {
                   </h2>
                 </div>
                 <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-6 font-semibold">
-                  We don't only develop products—we develop Solutions
+                  We don&apos;t only develop products—we develop Solutions
                 </p>
                 <div className="space-y-4">
                   <p className="text-lg text-gray-400 leading-relaxed">
-                    With a solid background in AI and software development, we provide the optimal combination of innovation, pace, and stability to turn your digital concepts into reality. We don't just build products—we craft tailored AI solutions.
+                    With a solid background in AI and software development, we provide the optimal combination of innovation, pace, and stability to turn your digital concepts into reality. We don&apos;t just build products—we craft tailored AI solutions.
                   </p>
                   <p className="text-lg text-gray-400 leading-relaxed">
                     Combining deep tech expertise with speed and stability, we collaborate closely from concept to deployment, ensuring scalable, future-ready outcomes that align with your business goals and drive real impact.
@@ -264,7 +264,7 @@ export default function AboutPage() {
                 We foster a vibrant and inclusive company culture that fuels our creativity and drives our success.
               </p>
               <p className="text-lg text-gray-400 leading-relaxed">
-                We believe in creating a collaborative environment where every team member's unique perspectives and talents are valued and respected.
+                We believe in creating a collaborative environment where every team member&apos;s unique perspectives and talents are valued and respected.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -312,13 +312,13 @@ export default function AboutPage() {
             <div className="absolute top-0 left-0 w-64 h-64 bg-neon-blue/5 rounded-full blur-3xl" />
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">
-                Let's build the future of software together.
+                Let&apos;s build the future of software together.
               </h2>
               <Link
                 href="/contact"
                 className="btn-primary text-lg px-8 py-4 inline-block transform hover:scale-105 transition-transform duration-200"
               >
-                Let's Talk
+                Let&apos;s Talk
               </Link>
             </div>
           </motion.div>

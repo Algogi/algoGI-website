@@ -244,7 +244,7 @@ export default function LeadCaptureForm() {
             className="w-5 h-5 mr-3 bg-dark-card border border-neon-blue/30 rounded focus:ring-2 focus:ring-neon-blue text-neon-blue cursor-pointer flex-shrink-0"
           />
           <span className="text-gray-300 group-hover:text-white transition-colors">
-            I'm open to a quick call this week
+            I&apos;m open to a quick call this week
           </span>
         </label>
       </motion.div>
