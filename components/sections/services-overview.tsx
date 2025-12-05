@@ -71,16 +71,16 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
               whileHover={{ scale: 1.3, rotate: 10 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <service.Icon className="w-16 h-16 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+              <service.Icon className="w-16 h-16 text-neon-blue" />
             </motion.div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-neon-blue dark:group-hover:text-neon-blue group-hover:text-neon-light-blue transition-colors">
+            <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-neon-blue transition-colors">
               {service.title}
             </h3>
-            <p className="text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">
+            <p className="text-gray-400 leading-relaxed">
               {service.description}
             </p>
             <motion.div
-              className="mt-6 text-neon-blue dark:text-neon-blue text-neon-light-blue font-semibold flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="mt-6 text-neon-blue font-semibold flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
               initial={false}
             >
               Learn More <span>→</span>
@@ -94,7 +94,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
 
 export default function ServicesOverview() {
   return (
-    <section className="section-padding bg-dark-surface dark:bg-dark-surface bg-light-surface relative overflow-hidden">
+    <section className="section-padding bg-dark-bg relative overflow-hidden">
       <div className="absolute inset-0 grid-background opacity-20" />
       <div className="container-custom relative z-10">
         <motion.div
@@ -105,10 +105,10 @@ export default function ServicesOverview() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            <span className="text-gray-900 dark:text-white">Strategy · Engineering · </span>
+            <span className="text-white">Strategy · Engineering · </span>
             <span className="text-gradient">AI & Automation</span>
           </h2>
-          <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Built‑for‑you product teams that move from idea to deployment with precision and speed.
           </p>
         </motion.div>

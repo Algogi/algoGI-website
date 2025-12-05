@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import SiteHeader from "@/components/navigation/site-header";
-import SiteFooter from "@/components/footer/site-footer";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { OrganizationStructuredData } from "@/components/seo/structured-data";
-import FloatingCTA from "@/components/cta/floating-cta";
+import AdminRouteHandler from "@/components/admin/admin-route-handler";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geometric" });
 
@@ -79,10 +77,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange={false}
         >
-          <SiteHeader />
-          <main className="min-h-screen">{children}</main>
-          <SiteFooter />
-          <FloatingCTA />
+          <AdminRouteHandler>
+            {children}
+          </AdminRouteHandler>
         </ThemeProvider>
         {/* Google Analytics 4 - Replace G-XXXXXXXXXX with your actual GA4 Measurement ID */}
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (

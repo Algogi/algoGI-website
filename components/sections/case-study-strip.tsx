@@ -76,21 +76,21 @@ function CaseStudyCard({
                 initial={{ scale: 0 }}
                 animate={inView ? { scale: 1 } : {}}
                 transition={{ delay: index * 0.15 + 0.3, type: "spring", stiffness: 200 }}
-                className="text-6xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-br from-gray-300 dark:from-gray-300 from-gray-700 via-neon-blue/60 dark:via-neon-blue/60 via-neon-light-blue/80 to-gray-400 dark:to-gray-400 to-gray-600"
+                className="text-6xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-br from-gray-300 via-neon-blue/60 to-gray-400"
                 style={{
                   textShadow: isLight ? "0 0 20px rgba(0, 136, 204, 0.2)" : "0 0 20px rgba(0, 240, 255, 0.15)",
                 }}
               >
                 {study.metric}
               </motion.div>
-              <div className="text-xs text-gray-400 dark:text-gray-400 text-gray-600 uppercase tracking-widest">
+              <div className="text-xs text-gray-400 uppercase tracking-widest">
                 {study.metricLabel}
               </div>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-neon-blue dark:group-hover:text-neon-blue group-hover:text-neon-light-blue transition-colors">
+            <h3 className="text-xl font-bold text-white mb-4 group-hover:text-neon-blue transition-colors">
               {study.title}
             </h3>
-            <p className="text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed text-sm">
+            <p className="text-gray-400 leading-relaxed text-sm">
               {study.description}
             </p>
           </div>
@@ -102,7 +102,7 @@ function CaseStudyCard({
 
 export default function CaseStudyStrip() {
   return (
-    <section className="section-padding bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden">
+    <section className="section-padding bg-dark-bg relative overflow-hidden">
       <div className="absolute inset-0 grid-background opacity-20" />
       <div className="container-custom relative z-10">
         <motion.div
@@ -113,7 +113,7 @@ export default function CaseStudyStrip() {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-            <span className="text-gray-900 dark:text-white">Selected work from teams that care about </span>
+            <span className="text-white">Selected work from teams that care about </span>
             <span className="text-gradient">throughput, quality, and real‑world impact</span>
           </h2>
         </motion.div>

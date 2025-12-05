@@ -96,7 +96,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="section-padding bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden min-h-screen">
+    <div className="section-padding bg-dark-bg relative overflow-hidden min-h-screen">
       <ContactPageStructuredData />
       <div className="absolute inset-0 grid-background opacity-10" />
       
@@ -115,17 +115,17 @@ export default function ContactPage() {
             className="inline-block mb-6"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-neon-blue/20 dark:bg-neon-blue/20 bg-neon-light-blue/30 rounded-full blur-2xl" />
-              <MessageSquare className="w-16 h-16 text-neon-blue dark:text-neon-blue text-neon-light-blue relative z-10" />
+              <div className="absolute inset-0 bg-neon-blue/20 rounded-full blur-2xl" />
+              <MessageSquare className="w-16 h-16 text-neon-blue relative z-10" />
             </div>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
             Let&apos;s <span className="text-gradient">Connect</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 max-w-3xl mx-auto leading-relaxed mb-4">
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-4">
             Tell us what you&apos;re building. Get a clear plan in your inbox.
           </p>
-          <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
             Share a bit about your product, your timeline, and what &apos;success&apos; looks like. A senior engineer will respond with next steps—no sales scripts, no spam.
           </p>
         </motion.div>
@@ -146,15 +146,15 @@ export default function ContactPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="neon-card rounded-xl p-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 text-center"
+                className="neon-card rounded-xl p-6 border border-neon-blue/30 text-center"
               >
-                <div className="bg-neon-blue/10 dark:bg-neon-blue/10 bg-neon-light-blue/20 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40">
-                  <Icon className="w-6 h-6 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                <div className="bg-neon-blue/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 border border-neon-blue/30">
+                  <Icon className="w-6 h-6 text-neon-blue" />
                 </div>
-                <div className="text-2xl md:text-3xl font-bold text-neon-blue dark:text-neon-blue text-neon-light-blue mb-1">
+                <div className="text-2xl md:text-3xl font-bold text-neon-blue mb-1">
                   {indicator.value}
                 </div>
-                <div className="text-sm text-gray-400 dark:text-gray-400 text-gray-600">
+                <div className="text-sm text-gray-400">
                   {indicator.label}
                 </div>
               </motion.div>
@@ -171,10 +171,10 @@ export default function ContactPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Why <span className="text-gradient">Contact Us</span>?
             </h2>
-            <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Get expert guidance and actionable insights for your AI and software development projects
             </p>
           </motion.div>
@@ -190,15 +190,15 @@ export default function ContactPage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1, duration: 0.6 }}
                   whileHover={{ y: -8 }}
-                  className="neon-card rounded-xl p-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 transition-all group"
+                  className="neon-card rounded-xl p-6 border border-neon-blue/30 hover:border-neon-blue/50 transition-all group"
                 >
-                  <div className="bg-neon-blue/10 dark:bg-neon-blue/10 bg-neon-light-blue/20 w-14 h-14 rounded-xl flex items-center justify-center mb-4 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 group-hover:bg-neon-blue/20 dark:group-hover:bg-neon-blue/20 group-hover:bg-neon-light-blue/30 transition-colors">
-                    <Icon className="w-7 h-7 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                  <div className="bg-neon-blue/10 w-14 h-14 rounded-xl flex items-center justify-center mb-4 border border-neon-blue/30 group-hover:bg-neon-blue/20 transition-colors">
+                    <Icon className="w-7 h-7 text-neon-blue" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-neon-blue dark:group-hover:text-neon-blue group-hover:text-neon-light-blue transition-colors">
+                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-neon-blue transition-colors">
                     {benefit.title}
                   </h3>
-                  <p className="text-sm text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">
+                  <p className="text-sm text-gray-400 leading-relaxed">
                     {benefit.description}
                   </p>
                 </motion.div>
@@ -209,7 +209,7 @@ export default function ContactPage() {
 
         {/* Divider */}
         <div className="relative z-10 mb-16">
-          <div className="h-px bg-gradient-to-r from-transparent via-neon-blue/30 dark:via-neon-blue/30 via-neon-light-blue/40 to-transparent" />
+          <div className="h-px bg-gradient-to-r from-transparent via-neon-blue/30 to-transparent" />
         </div>
 
         {/* Contact Methods Section */}
@@ -221,10 +221,10 @@ export default function ContactPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Get in <span className="text-gradient">Touch</span>
             </h2>
-            <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Multiple ways to reach us—choose what works best for you
             </p>
           </motion.div>
@@ -238,14 +238,14 @@ export default function ContactPage() {
               whileHover={{ y: -8, scale: 1.02 }}
               className="neon-card rounded-xl p-8 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 text-center relative overflow-hidden group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 dark:from-neon-blue/5 from-neon-light-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10">
                 <div className="bg-neon-blue/10 dark:bg-neon-blue/10 bg-neon-light-blue/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 group-hover:scale-110 transition-transform">
                   <Phone className="w-10 h-10 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Phone</h3>
-                <p className="text-gray-300 dark:text-gray-300 text-gray-700 mb-2">+1 (555) 123-4567</p>
-                <p className="text-sm text-gray-400 dark:text-gray-400 text-gray-600">Mon-Fri, 9AM-6PM EST</p>
+                <h3 className="text-xl font-bold text-white mb-3">Phone</h3>
+                <p className="text-gray-300 mb-2">+1 (555) 123-4567</p>
+                <p className="text-sm text-gray-400">Mon-Fri, 9AM-6PM EST</p>
               </div>
             </motion.div>
 
@@ -257,16 +257,16 @@ export default function ContactPage() {
               whileHover={{ y: -8, scale: 1.02 }}
               className="neon-card rounded-xl p-8 border border-neon-purple/30 dark:border-neon-purple/30 border-neon-light-purple/40 text-center relative overflow-hidden group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 dark:from-neon-purple/5 from-neon-light-purple/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10">
                 <div className="bg-neon-purple/10 dark:bg-neon-purple/10 bg-neon-light-purple/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-neon-purple/30 dark:border-neon-purple/30 border-neon-light-purple/40 group-hover:scale-110 transition-transform">
                   <Mail className="w-10 h-10 text-neon-purple dark:text-neon-purple text-neon-light-purple" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Email</h3>
+                <h3 className="text-xl font-bold text-white mb-3">Email</h3>
                 <a href="mailto:hello@algogi.com" className="text-neon-purple dark:text-neon-purple text-neon-light-purple hover:underline block mb-2">
                   hello@algogi.com
                 </a>
-                <p className="text-sm text-gray-400 dark:text-gray-400 text-gray-600">24/7 support available</p>
+                <p className="text-sm text-gray-400">24/7 support available</p>
               </div>
             </motion.div>
 
@@ -278,14 +278,14 @@ export default function ContactPage() {
               whileHover={{ y: -8, scale: 1.02 }}
               className="neon-card rounded-xl p-8 border border-neon-cyan/30 dark:border-neon-cyan/30 border-neon-light-blue/40 text-center relative overflow-hidden group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 dark:from-neon-cyan/5 from-neon-light-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-neon-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10">
                 <div className="bg-neon-cyan/10 dark:bg-neon-cyan/10 bg-neon-light-blue/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-neon-cyan/30 dark:border-neon-cyan/30 border-neon-light-blue/40 group-hover:scale-110 transition-transform">
                   <Globe className="w-10 h-10 text-neon-cyan dark:text-neon-cyan text-neon-light-blue" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Global Offices</h3>
-                <p className="text-gray-300 dark:text-gray-300 text-gray-700 mb-2">3 locations worldwide</p>
-                <p className="text-sm text-gray-400 dark:text-gray-400 text-gray-600">See locations below</p>
+                <h3 className="text-xl font-bold text-white mb-3">Global Offices</h3>
+                <p className="text-gray-300 mb-2">3 locations worldwide</p>
+                <p className="text-sm text-gray-400">See locations below</p>
               </div>
             </motion.div>
           </div>
@@ -316,10 +316,10 @@ export default function ContactPage() {
                   <MessageSquare className="w-12 h-12 text-neon-blue dark:text-neon-blue text-neon-light-blue relative z-10" />
                 </div>
               </motion.div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                 Send Your <span className="text-gradient">Project Brief</span>
               </h2>
-              <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
                 Fill out the form below and we&apos;ll get back to you within 24 hours
               </p>
             </div>
@@ -338,11 +338,11 @@ export default function ContactPage() {
           >
             <div className="inline-flex items-center justify-center mb-4">
               <HelpCircle className="w-8 h-8 text-neon-blue dark:text-neon-blue text-neon-light-blue mr-3" />
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl md:text-4xl font-bold text-white">
                 Frequently Asked <span className="text-gradient">Questions</span>
               </h2>
             </div>
-            <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Everything you need to know about contacting us
             </p>
           </motion.div>
@@ -358,14 +358,14 @@ export default function ContactPage() {
                 className="neon-card rounded-xl p-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 transition-all"
               >
                 <div className="flex items-start gap-4">
-                  <div className="bg-neon-blue/10 dark:bg-neon-blue/10 bg-neon-light-blue/20 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40">
-                    <HelpCircle className="w-5 h-5 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                  <div className="bg-neon-blue/10 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border border-neon-blue/30">
+                    <HelpCircle className="w-5 h-5 text-neon-blue" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-bold text-white mb-2">
                       {faq.question}
                     </h3>
-                    <p className="text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">
+                    <p className="text-gray-400 leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>
@@ -377,7 +377,7 @@ export default function ContactPage() {
 
         {/* Divider */}
         <div className="relative z-10 mb-16">
-          <div className="h-px bg-gradient-to-r from-transparent via-neon-purple/30 dark:via-neon-purple/30 via-neon-light-purple/40 to-transparent" />
+                <div className="h-px bg-gradient-to-r from-transparent via-neon-purple/30 to-transparent" />
         </div>
 
         {/* Office Locations Section */}
@@ -390,12 +390,12 @@ export default function ContactPage() {
             className="text-center mb-12"
           >
             <div className="inline-flex items-center justify-center mb-4">
-              <Globe className="w-8 h-8 text-neon-blue dark:text-neon-blue text-neon-light-blue mr-3" />
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+              <Globe className="w-8 h-8 text-neon-blue mr-3" />
+              <h2 className="text-3xl md:text-4xl font-bold text-white">
                 Our <span className="text-gradient">Locations</span>
               </h2>
             </div>
-            <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Visit us at any of our global offices
             </p>
           </motion.div>
@@ -409,32 +409,32 @@ export default function ContactPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.6 }}
                 whileHover={{ y: -8 }}
-                className="neon-card rounded-xl p-8 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 transition-all relative overflow-hidden group"
+                className="neon-card rounded-xl p-8 border border-neon-blue/30 hover:border-neon-blue/50 transition-all relative overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 dark:from-neon-blue/5 from-neon-light-blue/10 to-neon-purple/5 dark:to-neon-purple/5 to-neon-light-purple/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-neon-purple/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative z-10">
-                  <div className="bg-neon-blue/10 dark:bg-neon-blue/10 bg-neon-light-blue/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 group-hover:scale-110 transition-transform">
-                    <MapPin className="w-8 h-8 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                  <div className="bg-neon-blue/10 w-16 h-16 rounded-xl flex items-center justify-center mb-6 border border-neon-blue/30 group-hover:scale-110 transition-transform">
+                    <MapPin className="w-8 h-8 text-neon-blue" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-neon-blue dark:group-hover:text-neon-blue group-hover:text-neon-light-blue transition-colors">
+                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-neon-blue transition-colors">
                     {location.city}
                   </h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-neon-blue dark:text-neon-blue text-neon-light-blue mt-1 flex-shrink-0" />
-                      <p className="text-gray-300 dark:text-gray-300 text-gray-700 leading-relaxed">
+                      <MapPin className="w-4 h-4 text-neon-blue mt-1 flex-shrink-0" />
+                      <p className="text-gray-300 leading-relaxed">
                         {location.address}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-neon-blue dark:text-neon-blue text-neon-light-blue flex-shrink-0" />
-                      <a href={`tel:${location.phone.replace(/\s/g, '')}`} className="text-gray-300 dark:text-gray-300 text-gray-700 hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors">
+                      <Phone className="w-4 h-4 text-neon-blue flex-shrink-0" />
+                      <a href={`tel:${location.phone.replace(/\s/g, '')}`} className="text-gray-300 hover:text-neon-blue transition-colors">
                         {location.phone}
                       </a>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-neon-blue dark:text-neon-blue text-neon-light-blue flex-shrink-0" />
-                      <a href={`mailto:${location.email}`} className="text-gray-300 dark:text-gray-300 text-gray-700 hover:text-neon-blue dark:hover:text-neon-blue hover:text-neon-light-blue transition-colors">
+                      <Mail className="w-4 h-4 text-neon-blue flex-shrink-0" />
+                      <a href={`mailto:${location.email}`} className="text-gray-300 hover:text-neon-blue transition-colors">
                         {location.email}
                       </a>
                     </div>
@@ -451,14 +451,14 @@ export default function ContactPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center neon-card rounded-2xl p-12 md:p-16 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 max-w-4xl mx-auto relative overflow-hidden bg-gradient-to-br from-neon-blue/10 dark:from-neon-blue/10 from-neon-light-blue/20 via-neon-purple/5 dark:via-neon-purple/5 via-neon-light-purple/10 to-neon-cyan/10 dark:to-neon-cyan/10 to-neon-light-blue/20"
+          className="text-center neon-card rounded-2xl p-12 md:p-16 border border-neon-blue/30 max-w-4xl mx-auto relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-neon-blue/5 dark:bg-neon-blue/5 bg-neon-light-blue/10 rounded-full blur-3xl" />
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
               Ready to Start Your <span className="text-gradient">Project</span>?
             </h2>
-            <p className="text-lg text-gray-300 dark:text-gray-300 text-gray-700 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
               Let&apos;s discuss how we can help bring your AI and software vision to life.
             </p>
             <motion.a

@@ -39,7 +39,7 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden">
+    <div className="bg-dark-bg relative overflow-hidden">
       <div className="absolute inset-0 grid-background opacity-10" />
       
       {/* Hero Section */}
@@ -55,7 +55,7 @@ export default function AboutPage() {
               <span className="text-gradient">Innovation Driven</span>{" "}
               <span className="text-gray-900 dark:text-white">By AI-Powered Engineering</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 leading-relaxed max-w-4xl mx-auto mb-10">
+            <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 leading-relaxed max-w-4xl mx-auto mb-10">
               We are a fervent group of software innovators, engineers, and designers—creating future-capable solutions for companies worldwide. With profound technical expertise in artificial intelligence, product design, and full-cycle development, we drive complex challenges to intelligent, scalable systems.
             </p>
             <Link
@@ -70,7 +70,7 @@ export default function AboutPage() {
 
       {/* Divider */}
       <div className="relative z-10">
-        <div className="h-px bg-gradient-to-r from-transparent via-neon-blue/30 dark:via-neon-blue/30 via-neon-light-blue/40 to-transparent" />
+        <div className="h-px bg-gradient-to-r from-transparent via-neon-blue/30 to-transparent" />
       </div>
 
       {/* Our Vision */}
@@ -84,16 +84,16 @@ export default function AboutPage() {
             className="max-w-4xl mx-auto"
           >
             <div className="flex items-center justify-center gap-4 mb-8">
-              <div className="p-3 rounded-xl bg-neon-blue/10 dark:bg-neon-blue/10 bg-neon-light-blue/20 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40">
-                <Target className="w-8 h-8 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+              <div className="p-3 rounded-xl bg-neon-blue/10 border border-neon-blue/30">
+                <Target className="w-8 h-8 text-neon-blue" />
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Our Vision</h2>
             </div>
             <div className="text-center">
-              <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 leading-relaxed mb-6 font-medium">
+              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-6 font-medium">
                 Empowering businesses to transform with intelligent digital solutions.
               </p>
-              <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed max-w-3xl mx-auto">
+              <p className="text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto">
                 We imagine a future where AI-powered technology delivers frictionless, smart, and meaningful experiences. Our goal is to drive that change—one solution at a time.
               </p>
             </div>
@@ -107,7 +107,7 @@ export default function AboutPage() {
       </div>
 
       {/* Our Strengths */}
-      <section className="section-padding relative z-10 bg-gradient-to-b from-neon-blue/5 dark:from-dark-bg via-neon-purple/10 dark:via-dark-surface/30 to-neon-cyan/5 dark:to-dark-bg">
+      <section className="section-padding relative z-10 bg-dark-bg">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -119,7 +119,7 @@ export default function AboutPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white text-center mb-4">
               Our <span className="text-gradient">Strengths</span>
             </h2>
-            <p className="text-center text-gray-400 dark:text-gray-400 text-gray-600 mb-12 max-w-2xl mx-auto">
+            <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">
               What sets us apart in delivering exceptional AI solutions
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -136,10 +136,10 @@ export default function AboutPage() {
                   >
                     <div className="mb-5">
                       <div className="w-12 h-12 rounded-lg bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center group-hover:bg-neon-blue/20 transition-colors">
-                        <Icon className="w-6 h-6 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                        <Icon className="w-6 h-6 text-neon-blue" />
                       </div>
                     </div>
-                    <p className="text-gray-300 dark:text-gray-300 text-gray-700 leading-relaxed text-base">{strength.text}</p>
+                    <p className="text-gray-300 leading-relaxed text-base">{strength.text}</p>
                   </motion.div>
                 );
               })}
@@ -168,20 +168,20 @@ export default function AboutPage() {
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="p-3 rounded-xl bg-neon-purple/10 border border-neon-purple/30">
-                    <Sparkles className="w-8 h-8 text-neon-purple dark:text-neon-purple text-neon-light-purple" />
+                    <Sparkles className="w-8 h-8 text-neon-purple" />
                   </div>
                   <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
                     Why <span className="text-gradient">AlgoGI?</span>
                   </h2>
                 </div>
-                <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 leading-relaxed mb-6 font-semibold">
+                <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-6 font-semibold">
                   We don&apos;t only develop products—we develop Solutions
                 </p>
                 <div className="space-y-4">
-                  <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">
+                  <p className="text-lg text-gray-400 leading-relaxed">
                     With a solid background in AI and software development, we provide the optimal combination of innovation, pace, and stability to turn your digital concepts into reality. We don&apos;t just build products—we craft tailored AI solutions.
                   </p>
-                  <p className="text-lg text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">
+                  <p className="text-lg text-gray-400 leading-relaxed">
                     Combining deep tech expertise with speed and stability, we collaborate closely from concept to deployment, ensuring scalable, future-ready outcomes that align with your business goals and drive real impact.
                   </p>
                 </div>
@@ -209,7 +209,7 @@ export default function AboutPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white text-center mb-4">
               Milestones & <span className="text-gradient">Metrics</span>
             </h2>
-            <p className="text-center text-gray-400 dark:text-gray-400 text-gray-600 mb-12 max-w-2xl mx-auto">
+            <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto">
               Numbers that reflect our commitment to excellence
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -226,13 +226,13 @@ export default function AboutPage() {
                   >
                     <div className="mb-4">
                       <div className="w-12 h-12 rounded-lg bg-neon-cyan/10 dark:bg-neon-cyan/10 bg-neon-light-blue/20 border border-neon-cyan/30 dark:border-neon-cyan/30 border-neon-light-blue/40 flex items-center justify-center mx-auto">
-                        <Icon className="w-6 h-6 text-neon-cyan dark:text-neon-cyan text-neon-light-blue" />
+                        <Icon className="w-6 h-6 text-neon-cyan" />
                       </div>
                     </div>
                     <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-300 dark:from-gray-300 from-gray-700 via-neon-blue/60 dark:via-neon-blue/60 via-neon-light-blue/80 to-gray-400 dark:to-gray-400 to-gray-600 bg-clip-text text-transparent mb-3" style={{ textShadow: '0 0 10px rgba(0, 240, 255, 0.15)' }}>
                       {milestone.value}
                     </div>
-                    <p className="text-sm text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">{milestone.label}</p>
+                    <p className="text-sm text-gray-400 leading-relaxed">{milestone.label}</p>
                   </motion.div>
                 );
               })}
@@ -260,7 +260,7 @@ export default function AboutPage() {
               Team And <span className="text-gradient">Culture</span>
             </h2>
             <div className="text-center mb-12 max-w-3xl mx-auto space-y-4">
-              <p className="text-lg text-gray-300 dark:text-gray-300 text-gray-700 leading-relaxed">
+              <p className="text-lg text-gray-300 leading-relaxed">
                 We foster a vibrant and inclusive company culture that fuels our creativity and drives our success.
               </p>
               <p className="text-lg text-gray-400 leading-relaxed">
@@ -281,11 +281,11 @@ export default function AboutPage() {
                   >
                     <div className="mb-5">
                       <div className="w-12 h-12 rounded-lg bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center group-hover:bg-neon-blue/20 transition-colors">
-                        <Icon className="w-6 h-6 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                        <Icon className="w-6 h-6 text-neon-blue" />
                       </div>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{point.title}</h3>
-                    <p className="text-gray-400 dark:text-gray-400 text-gray-600 leading-relaxed">{point.description}</p>
+                    <p className="text-gray-400 leading-relaxed">{point.description}</p>
                   </motion.div>
                 );
               })}

@@ -75,7 +75,7 @@ export default function DateTimePicker({
                   : ""
               }
               placeholder={placeholder}
-              className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400 pr-12 cursor-pointer group-hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] dark:group-hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] group-hover:shadow-[0_0_15px_rgba(0,136,204,0.15)]"
+              className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none transition-all duration-200 hover:border-neon-blue/50 text-gray-900 dark:text-white placeholder-gray-500 pr-12 cursor-pointer group-hover:shadow-[0_0_15px_rgba(0,240,255,0.2)]"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
               <Calendar className="w-5 h-5 text-neon-blue dark:text-neon-blue text-neon-light-blue group-hover:text-neon-cyan dark:group-hover:text-neon-cyan group-hover:text-neon-light-blue transition-colors" />

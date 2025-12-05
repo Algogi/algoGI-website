@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDb } from "@/lib/firebase/config";
+import { FieldValue } from "firebase-admin/firestore";
 
 interface NewsletterData {
   email: string;
@@ -34,20 +36,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log the newsletter subscription (in production, you would send this to your email service)
-    console.log("New newsletter subscription:", {
-      timestamp: new Date().toISOString(),
-      email: body.email,
-      agreedToMarketing: body.agreedToMarketing,
-    });
+    // Get client IP address and referrer
+    const ipAddress =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    const referrer = request.headers.get("referer") || "unknown";
 
-    // TODO: Integrate with your email service provider
-    // Examples:
-    // - Send to Mailchimp: await addToMailchimp(body.email);
-    // - Send to SendGrid: await addToSendGrid(body.email);
-    // - Send to ConvertKit: await addToConvertKit(body.email);
-    // - Store in database: await db.newsletter.create({ email: body.email });
-    // - Send to Zapier webhook: await sendToZapier({ email: body.email, type: 'newsletter' });
+    // Store newsletter subscription in Firestore
+    try {
+      const db = getDb();
+      // Check if email already exists
+      const existing = await db
+        .collection("newsletter")
+        .where("email", "==", body.email)
+        .get();
+
+      if (existing.empty) {
+        // Add new subscription
+        await db.collection("newsletter").add({
+          email: body.email,
+          subscribedAt: FieldValue.serverTimestamp(),
+          source: referrer,
+          ipAddress,
+          agreedToMarketing: body.agreedToMarketing || false,
+        });
+      } else {
+        // Update existing subscription
+        await existing.docs[0].ref.update({
+          subscribedAt: FieldValue.serverTimestamp(),
+          source: referrer,
+          ipAddress,
+          agreedToMarketing: body.agreedToMarketing || false,
+        });
+      }
+    } catch (dbError) {
+      console.error("Error storing newsletter subscription in Firestore:", dbError);
+      // Don't fail the request if logging fails
+    }
 
     return NextResponse.json(
       {

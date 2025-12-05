@@ -4,16 +4,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Wrench, Bot, Download } from "lucide-react";
 import CaseStudyModal from "@/components/modals/case-study-modal";
 import DownloadFormModal from "@/components/modals/download-form-modal";
 import { ArticleStructuredData } from "@/components/seo/structured-data";
-import { caseStudies, type CaseStudy } from "./case-studies-data";
+import { caseStudies as staticCaseStudies, type CaseStudy } from "./case-studies-data";
 
 // Helper function to get image source with fallback
 function getCaseStudyImage(study: CaseStudy): string {
   if (study.heroImage) {
+    // If it's already a full URL (Cloud Storage signed URL), use it directly
+    if (study.heroImage.startsWith("http://") || study.heroImage.startsWith("https://")) {
+      return study.heroImage;
+    }
+    // Otherwise, treat it as a local image path
     return `/images/${study.heroImage}`;
   }
   // Return generic placeholder based on type
@@ -74,30 +79,41 @@ function ProjectCard({
                 {study.isTemplate ? (
                   <Wrench className="w-16 h-16 text-brand-primary dark:text-brand-primary text-brand-primary" />
                 ) : (
-                  <Bot className="w-16 h-16 text-neon-purple dark:text-neon-purple text-neon-light-purple" />
+                  <Bot className="w-16 h-16 text-neon-purple" />
                 )}
               </motion.div>
             </div>
           )}
         </div>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-neon-purple dark:text-neon-purple text-neon-light-purple bg-neon-purple/10 dark:bg-neon-purple/10 bg-neon-light-purple/20 px-3 py-1 rounded-full border border-neon-purple/30 dark:border-neon-purple/30 border-neon-light-purple/40">
+          <span className="text-xs font-semibold text-neon-purple bg-neon-purple/10 px-3 py-1 rounded-full border border-neon-purple/30">
             {study.isTemplate ? "Automation Template" : "AI Solution"}
           </span>
           {study.isTemplate && (
-            <span className="text-xs font-semibold text-neon-cyan dark:text-neon-cyan text-neon-light-blue bg-neon-cyan/10 dark:bg-neon-cyan/10 bg-neon-light-blue/20 px-3 py-1 rounded-full border border-neon-cyan/30 dark:border-neon-cyan/30 border-neon-light-blue/40">
+            <span className="text-xs font-semibold text-neon-cyan bg-neon-cyan/10 px-3 py-1 rounded-full border border-neon-cyan/30">
               Open Source
             </span>
           )}
         </div>
-        <h3 
-          className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-brand-primary dark:group-hover:text-brand-primary group-hover:text-brand-primary transition-colors cursor-pointer"
-          onClick={onClick}
-        >
-          {study.title}
-        </h3>
+        <div className="mb-3">
+          <h3 
+            className="text-xl font-semibold text-white mb-1 group-hover:text-brand-primary transition-colors cursor-pointer line-clamp-2"
+            onClick={onClick}
+            title={study.title}
+          >
+            {study.title}
+          </h3>
+          {study.client && (
+            <p 
+              className="text-sm text-gray-400 line-clamp-1"
+              title={study.client}
+            >
+              {study.client}
+            </p>
+          )}
+        </div>
         <p 
-          className="text-gray-300 dark:text-gray-300 text-gray-700 text-sm mb-4 line-clamp-3 leading-relaxed cursor-pointer"
+          className="text-gray-300 text-sm mb-4 line-clamp-3 leading-relaxed cursor-pointer"
           onClick={onClick}
         >
           {study.solution}
@@ -106,25 +122,25 @@ function ProjectCard({
           {study.techStack.map((tech, idx) => (
             <span
               key={idx}
-              className="text-xs text-gray-400 dark:text-gray-400 text-gray-600 bg-dark-card dark:bg-dark-card bg-light-card px-2 py-1 rounded border border-neon-blue/10 dark:border-neon-blue/10 border-neon-light-blue/20"
+              className="text-xs text-gray-400 bg-dark-card px-2 py-1 rounded border border-neon-blue/10"
             >
               {tech}
             </span>
           ))}
         </div>
-        <div className="pt-4 border-t border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30 flex items-center justify-between">
+        <div className="pt-4 border-t border-neon-light-blue/30 dark:border-neon-blue/20 flex items-center justify-between gap-2">
           <motion.button
             onClick={onClick}
             whileHover={{ x: 5 }}
-            className="text-brand-primary dark:text-brand-primary text-brand-primary font-semibold flex items-center gap-2 group-hover:opacity-80 transition-colors"
+            className="text-brand-primary dark:text-brand-primary text-brand-primary font-semibold flex items-center gap-2 group-hover:opacity-80 transition-colors text-sm flex-shrink min-w-0"
           >
-            {study.isTemplate ? "View Template" : "View Demo"} →
+            <span className="truncate">{study.isTemplate ? "View Template" : "View Demo"}</span> →
           </motion.button>
           <motion.button
             onClick={onDownloadClick}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 rounded-lg bg-brand-primary/10 dark:bg-brand-primary/10 bg-brand-primary/20 hover:bg-brand-primary/20 dark:hover:bg-brand-primary/20 hover:bg-brand-primary/30 border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40 transition-colors"
+            className="p-2 rounded-lg bg-brand-primary/10 dark:bg-brand-primary/10 bg-brand-primary/20 hover:bg-brand-primary/20 dark:hover:bg-brand-primary/20 hover:bg-brand-primary/30 border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40 transition-colors flex-shrink-0"
             aria-label="Download"
             title="Download"
           >
@@ -141,6 +157,53 @@ export default function CaseStudiesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [selectedDownloadStudy, setSelectedDownloadStudy] = useState<CaseStudy | null>(null);
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCaseStudies() {
+      try {
+        const response = await fetch("/api/portfolio");
+        if (response.ok) {
+          const data = await response.json();
+          // Transform Firestore data to match CaseStudy interface
+          const transformed = data.map((item: any) => ({
+            title: item.title,
+            client: item.client,
+            challenge: item.challenge,
+            solution: item.solution,
+            results: item.results || [],
+            metrics: item.metrics || {
+              primary: "",
+              primaryLabel: "",
+              secondary: "",
+              secondaryLabel: "",
+            },
+            techStack: item.techStack || [],
+            isTemplate: item.isTemplate || false,
+            demoUrl: item.demoUrl || "#",
+            downloadFile: item.downloadFile || {
+              type: "pdf" as const,
+              identifier: "",
+            },
+            heroImage: item.heroImage,
+          }));
+          setCaseStudies(transformed);
+        } else {
+          // Fallback to static data
+          setCaseStudies(staticCaseStudies);
+        }
+      } catch (error) {
+        console.error("Error fetching case studies:", error);
+        // Fallback to static data
+        setCaseStudies(staticCaseStudies);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCaseStudies();
+  }, []);
 
   const handleProjectClick = (study: CaseStudy) => {
     // For templates, open demo URL; for solutions, open modal
@@ -164,7 +227,7 @@ export default function CaseStudiesPage() {
         headline="Portfolio - AI Solutions & Automation Templates"
         description="Explore AlgoGI's portfolio of innovative AI solutions and free automation templates."
       />
-      <div className="section-padding bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden">
+      <div className="section-padding bg-dark-bg relative overflow-hidden">
         <div className="absolute inset-0 grid-background opacity-10" />
         <div className="container-custom relative z-10">
           <motion.div
@@ -173,25 +236,32 @@ export default function CaseStudiesPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               Portfolio
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 max-w-4xl mx-auto">
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
               Innovative AI solutions and free automation templates built by AlgoGI. Explore our open-source contributions and AI agent implementations.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {caseStudies.map((study, index) => (
-              <ProjectCard
-                key={index}
-                study={study}
-                index={index}
-                onClick={() => handleProjectClick(study)}
-                onDownloadClick={(e) => handleDownloadClick(e, study)}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="spinner mb-4"></div>
+              <div className="text-gray-500 dark:text-gray-400">Loading portfolio...</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+              {caseStudies.map((study, index) => (
+                <ProjectCard
+                  key={index}
+                  study={study}
+                  index={index}
+                  onClick={() => handleProjectClick(study)}
+                  onDownloadClick={(e) => handleDownloadClick(e, study)}
+                />
+              ))}
+            </div>
+          )}
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -200,10 +270,10 @@ export default function CaseStudiesPage() {
             transition={{ duration: 0.6 }}
             className="text-center neon-card rounded-2xl p-12 border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40"
           >
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-white mb-4">
               See our full portfolio of AI solutions and automation templates
             </h2>
-            <p className="text-lg text-gray-300 dark:text-gray-300 text-gray-700 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
               Explore more innovative AI solutions, workflow automation examples, and free automation templates designed to accelerate your business.
             </p>
             <Link

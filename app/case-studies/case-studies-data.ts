@@ -35,7 +35,7 @@
  * - demoUrl: URL for demo (use "#" if no demo available)
  * - downloadFile: File download information
  *   - type: "pdf" for case studies, "json" for automation templates
- *   - identifier: Unique identifier for the file (used by n8n to find the file in Google Drive)
+ *   - identifier: Unique identifier for the file (used to find the file in Cloud Storage)
  * - heroImage: Image filename in /public/images/ folder (leave as undefined if no custom image)
  */
 

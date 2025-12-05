@@ -45,13 +45,13 @@ export default function DownloadFormModal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="neon-card rounded-2xl max-w-md w-full shadow-2xl border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40">
-              <div className="sticky top-0 bg-dark-card dark:bg-dark-card bg-light-card border-b border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40 p-6 flex items-center justify-between rounded-t-2xl">
+              <div className="sticky top-0 bg-dark-card border-b border-brand-primary/30 p-6 flex items-center justify-between rounded-t-2xl">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   Download {fileType === "pdf" ? "Case Study" : "Template"}
                 </h2>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-dark-surface dark:hover:bg-dark-surface hover:bg-light-surface rounded-lg transition-colors"
+                  className="p-2 hover:bg-dark-surface rounded-lg transition-colors"
                   aria-label="Close modal"
                 >
                   <X className="w-5 h-5 text-gray-300 dark:text-gray-300 text-gray-700" />

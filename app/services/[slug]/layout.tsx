@@ -10,9 +10,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const service = getServiceBySlug(params.slug);
+  const { slug } = await params;
+  const service = getServiceBySlug(slug);
 
   if (!service) {
     return {
@@ -40,7 +41,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${serviceTitle} | AlgoGI`,
       description: service.description,
-      url: `https://algogi.com/services/${params.slug}`,
+      url: `https://algogi.com/services/${slug}`,
       type: "website",
     },
     twitter: {
@@ -49,7 +50,7 @@ export async function generateMetadata({
       description: service.description,
     },
     alternates: {
-      canonical: `https://algogi.com/services/${params.slug}`,
+      canonical: `https://algogi.com/services/${slug}`,
     },
   };
 }

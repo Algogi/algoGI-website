@@ -57,9 +57,9 @@ function ProcessStep({
       transition={{ duration: 0.6, delay: index * 0.15 }}
       className="relative group"
     >
-      <div className="neon-card rounded-2xl p-8 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 transition-all duration-300 h-full relative overflow-hidden">
+      <div className="neon-card rounded-2xl p-8 border border-neon-blue/30 hover:border-neon-blue/50 transition-all duration-300 h-full relative overflow-hidden">
         {/* Gradient background on hover */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+              <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
         
         <div className="relative z-10">
           {/* Icon */}
@@ -70,27 +70,27 @@ function ProcessStep({
               className="relative"
             >
               {/* Bright gradient background */}
-              <div className={`relative p-6 rounded-2xl bg-gradient-to-br ${step.gradient} border-2 border-neon-blue/70 dark:border-neon-blue/70 border-neon-light-blue/60 shadow-[0_0_50px_rgba(0,240,255,0.5)] dark:shadow-[0_0_50px_rgba(0,240,255,0.5)] shadow-[0_0_50px_rgba(0,136,204,0.4)]`}>
+              <div className={`relative p-6 rounded-2xl bg-gradient-to-br ${step.gradient} border-2 border-neon-blue/70 shadow-[0_0_50px_rgba(0,240,255,0.5)]`}>
                 {/* Dark overlay for icon contrast */}
-                <div className="absolute inset-0 bg-black/20 dark:bg-black/20 bg-white/10 rounded-2xl" />
+                <div className="absolute inset-0 bg-black/20 rounded-2xl" />
                 
                 {/* Icon with strong contrast */}
-                <Icon className="w-14 h-14 text-white dark:text-white text-white relative z-10" style={{ 
+                <Icon className="w-14 h-14 text-white relative z-10 process-step-icon" style={{ 
                   filter: 'drop-shadow(0 0 20px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 30px rgba(0, 240, 255, 0.7))',
                   strokeWidth: 2.5
                 }} />
               </div>
               
               {/* Bright glow effect */}
-              <div className={`absolute -inset-3 bg-gradient-to-br ${step.gradient} opacity-40 dark:opacity-40 opacity-30 blur-2xl -z-10`} />
+              <div className={`absolute -inset-3 bg-gradient-to-br ${step.gradient} opacity-40 blur-2xl -z-10`} />
             </motion.div>
           </div>
 
           {/* Content */}
-          <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-neon-blue dark:group-hover:text-neon-blue group-hover:text-neon-light-blue transition-colors">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-neon-blue transition-colors">
             {step.title}
           </h3>
-          <p className="text-lg text-gray-300 dark:text-gray-300 text-gray-700 leading-relaxed">
+          <p className="text-lg text-gray-300 leading-relaxed">
             {step.description}
           </p>
         </div>
@@ -101,7 +101,7 @@ function ProcessStep({
 
 export default function HowWeWork() {
   return (
-    <section className="section-padding bg-gradient-to-b from-dark-bg dark:from-dark-bg from-light-bg via-dark-surface/30 dark:via-dark-surface/30 via-light-surface/30 to-dark-bg dark:to-dark-bg to-light-bg relative overflow-hidden">
+    <section className="section-padding bg-dark-bg relative overflow-hidden">
       <div className="absolute inset-0 grid-background opacity-10" />
       <div className="container-custom relative z-10">
         <motion.div
@@ -111,10 +111,10 @@ export default function HowWeWork() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
             How We <span className="text-gradient">Work</span>
           </h2>
-          <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
             A streamlined approach that transforms your vision into reality
           </p>
         </motion.div>
@@ -140,15 +140,15 @@ export default function HowWeWork() {
               transition={{ duration: 0.6, delay: index * 0.15 + 0.6 }}
               className="flex-1 flex items-center justify-center"
             >
-              <div className="h-px w-full bg-gradient-to-r from-neon-blue/50 dark:from-neon-blue/50 from-neon-light-blue/60 via-neon-purple/50 dark:via-neon-purple/50 via-neon-light-purple/60 to-transparent" />
+              <div className="h-px w-full bg-gradient-to-r from-neon-blue/50 via-neon-purple/50 to-transparent" />
               <motion.div
                 animate={{ x: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, delay: index * 0.3 }}
                 className="mx-2"
               >
-                <ArrowRight className="w-6 h-6 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                <ArrowRight className="w-6 h-6 text-neon-blue" />
               </motion.div>
-              <div className="h-px w-full bg-gradient-to-l from-neon-blue/50 dark:from-neon-blue/50 from-neon-light-blue/60 via-neon-purple/50 dark:via-neon-purple/50 via-neon-light-purple/60 to-transparent" />
+              <div className="h-px w-full bg-gradient-to-l from-neon-blue/50 via-neon-purple/50 to-transparent" />
             </motion.div>
           ))}
         </div>

@@ -40,8 +40,8 @@ export default function ServiceModal({
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-dark-card dark:bg-dark-card bg-light-card rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40">
-              <div className="sticky top-0 bg-dark-card dark:bg-dark-card bg-light-card border-b border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30 p-6 flex items-center justify-between z-10">
+            <div className="bg-dark-card rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-neon-blue/30">
+              <div className="sticky top-0 bg-dark-card border-b border-neon-blue/20 p-6 flex items-center justify-between z-10">
                 <div className="flex items-center gap-4">
                   {service.Icon && (
                     <div className="p-3 rounded-xl bg-neon-blue/10 border border-neon-blue/30">
@@ -54,7 +54,7 @@ export default function ServiceModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-dark-surface dark:hover:bg-dark-surface hover:bg-light-surface rounded-lg transition-colors"
+                  className="p-2 hover:bg-dark-surface rounded-lg transition-colors"
                   aria-label="Close modal"
                 >
                   <X className="w-6 h-6 text-gray-400 dark:text-gray-400 text-gray-600 hover:text-white dark:hover:text-white hover:text-gray-900" />

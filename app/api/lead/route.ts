@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDb } from "@/lib/firebase/config";
+import { FieldValue } from "firebase-admin/firestore";
 
 interface LeadData {
   name: string;
@@ -48,19 +50,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log the lead data (in production, you would send this to your CRM)
-    console.log("New lead submission:", {
-      timestamp: new Date().toISOString(),
-      ...body,
-    });
+    // Get client IP address (if available)
+    const ipAddress =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
 
-    // TODO: Integrate with your CRM or automation platform
-    // Examples:
-    // - Send to HubSpot: await sendToHubSpot(body);
-    // - Send to Salesforce: await sendToSalesforce(body);
-    // - Send to Zapier webhook: await sendToZapier(body);
-    // - Store in database: await db.leads.create(body);
-    // - Send email notification: await sendEmailNotification(body);
+    // Store lead in Firestore
+    try {
+      const db = getDb();
+      await db.collection("leads").add({
+        ...body,
+        submittedAt: FieldValue.serverTimestamp(),
+        ipAddress,
+      });
+    } catch (dbError) {
+      console.error("Error storing lead in Firestore:", dbError);
+      // Don't fail the request if logging fails
+    }
 
     return NextResponse.json(
       {

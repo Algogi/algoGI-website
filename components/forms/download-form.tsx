@@ -64,11 +64,11 @@ export default function DownloadForm({
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.success) {
+        // Email was sent successfully - show success message
         setSubmitStatus({
           type: "success",
-          message:
-            "Thank you! We've sent the file to your email. Please check your inbox.",
+          message: data.message || "Thank you! We've sent the file to your email. Please check your inbox.",
         });
         setFormData({
           name: "",
@@ -80,7 +80,8 @@ export default function DownloadForm({
           onSuccess();
         }, 2000);
       } else {
-        throw new Error(data.error || "Submission failed");
+        // Show error message from API
+        throw new Error(data.error || data.message || "Failed to send email. Please try again later.");
       }
     } catch (error) {
       setSubmitStatus({
@@ -105,7 +106,7 @@ export default function DownloadForm({
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           Get Your {fileType === "pdf" ? "Case Study" : "Automation Template"}
         </h3>
-        <p className="text-gray-400 dark:text-gray-400 text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
           Enter your details to receive the {fileType === "pdf" ? "PDF case study" : "automation template"} via email.
         </p>
       </div>
@@ -119,7 +120,7 @@ export default function DownloadForm({
         >
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-300 dark:text-gray-300 text-gray-700 mb-2"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
             Name *
           </label>
@@ -130,7 +131,7 @@ export default function DownloadForm({
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
+            className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none transition-all duration-200 hover:border-neon-blue/50 text-gray-900 dark:text-white placeholder-gray-500"
             placeholder="Your full name"
           />
         </motion.div>
@@ -154,7 +155,7 @@ export default function DownloadForm({
             required
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
+            className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none transition-all duration-200 hover:border-neon-blue/50 text-gray-900 dark:text-white placeholder-gray-500"
             placeholder="your.email@company.com"
           />
         </motion.div>
@@ -178,7 +179,7 @@ export default function DownloadForm({
             required
             value={formData.company}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-dark-card dark:bg-dark-card bg-light-card border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 rounded-lg focus:ring-2 focus:ring-neon-blue dark:focus:ring-neon-blue focus:ring-neon-light-blue focus:border-neon-blue dark:focus:border-neon-blue focus:border-neon-light-blue outline-none transition-all duration-200 hover:border-neon-blue/50 dark:hover:border-neon-blue/50 hover:border-neon-light-blue/60 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 placeholder-gray-400"
+            className="w-full px-4 py-3 bg-dark-card border border-neon-blue/30 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none transition-all duration-200 hover:border-neon-blue/50 text-gray-900 dark:text-white placeholder-gray-500"
             placeholder="Your company name"
           />
         </motion.div>

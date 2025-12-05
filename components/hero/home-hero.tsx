@@ -11,22 +11,126 @@ import ParallaxSection from "@/components/animations/parallax-section";
 
 export default function HomeHero() {
   return (
-    <section className="relative section-padding bg-dark-bg dark:bg-dark-bg bg-[#000000] overflow-hidden min-h-screen flex items-center grid-background -mt-20 pt-24">
+    <section className="relative section-padding bg-dark-bg overflow-hidden min-h-screen flex items-center grid-background -mt-20 pt-24">
       {/* Dark overlay for more prominence */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black pointer-events-none z-0" />
       <Tiles3DBackground />
       {/* Subtle radial gradient for depth */}
       <div className="absolute inset-0 pointer-events-none z-0" style={{ background: 'radial-gradient(circle at center, transparent 0%, rgba(74, 58, 255, 0.05) 50%, transparent 100%)' }} />
       {/* Gradient fade at top to blend with header */}
-      <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-dark-bg dark:from-dark-bg from-black to-transparent pointer-events-none z-20" />
+      <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-dark-bg to-transparent pointer-events-none z-20" />
       <div className="container-custom relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Algo + GI - Mobile First (above content) */}
+            <ParallaxSection speed={0.3} className="lg:order-2">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8, duration: 1 }}
+                className="relative h-full flex items-center justify-center"
+              >
+                {/* Animated "Algo + GI" Text - Horizontal on mobile, Vertical on desktop */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex flex-col items-center justify-center gap-4 md:gap-6"
+                >
+                  <motion.div
+                    className="flex flex-row lg:flex-col items-center justify-center gap-4 md:gap-6"
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {/* Algo */}
+                    <motion.span
+                      className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold relative"
+                      variants={{
+                        hidden: { opacity: 0, y: -80, x: 20, scale: 0.7 },
+                        visible: {
+                          opacity: 1,
+                          x: 0,
+                          y: 0,
+                          scale: 1,
+                          transition: {
+                            duration: 1,
+                            delay: 0.2,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        },
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <span className="text-gradient bg-clip-text text-transparent">
+                        Algo
+                      </span>
+                    </motion.span>
+
+                    {/* Plus Sign */}
+                    <motion.span
+                      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-400 relative"
+                      variants={{
+                        hidden: { opacity: 0, scale: 0 },
+                        visible: {
+                          opacity: 1,
+                          scale: 1,
+                          transition: {
+                            duration: 0.6,
+                            delay: 0.5,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        },
+                      }}
+                    >
+                      +
+                    </motion.span>
+
+                    {/* GI */}
+                    <motion.span
+                      className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold relative"
+                      variants={{
+                        hidden: { opacity: 0, y: 80, x: 20, scale: 0.7 },
+                        visible: {
+                          opacity: 1,
+                          x: 0,
+                          y: 0,
+                          scale: 1,
+                          transition: {
+                            duration: 1,
+                            delay: 0.8,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
+                        },
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <span className="text-gradient bg-clip-text text-transparent">
+                        GI
+                      </span>
+                    </motion.span>
+                  </motion.div>
+
+                  {/* Subtitle */}
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.4, duration: 0.8 }}
+                    className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 mt-0 lg:mt-6 font-medium tracking-wide text-center"
+                  >
+                    Algorithmic General Intelligence
+                  </motion.p>
+                </motion.div>
+              </motion.div>
+            </ParallaxSection>
+
+            {/* Hero Content - Mobile Second (below Algo + GI) */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="relative"
+              className="relative lg:order-1"
             >
               <motion.div
                 initial={{ opacity: 0 }}
@@ -43,7 +147,7 @@ export default function HomeHero() {
               
               <div className="relative z-10">
 
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900 dark:text-white">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-white">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -66,7 +170,7 @@ export default function HomeHero() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.2, duration: 0.8 }}
-                  className="text-base md:text-lg text-gray-400 dark:text-gray-400 text-gray-600 mb-8 leading-relaxed max-w-2xl"
+                  className="text-base md:text-lg text-gray-400 mb-8 leading-relaxed max-w-2xl"
                 >
                   We fuse algorithms with general intelligence to create AI agents that learn, adapt, and transform your business. From smart automation to scalable AI platforms, AlgoGI delivers future-capable solutions that drive real impact.
                 </motion.p>
@@ -75,22 +179,22 @@ export default function HomeHero() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.3, duration: 0.8 }}
-                  className="space-y-3 mb-8 text-base text-gray-300 dark:text-gray-300 text-gray-700"
+                  className="space-y-3 mb-8 text-base text-gray-300"
                 >
                   <li className="flex items-start">
-                    <span className="text-brand-primary dark:text-brand-primary text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-brand-primary mr-3 mt-1">•</span>
                     <span>Neural network architectures and deep learning systems</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-brand-primary dark:text-brand-primary text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-brand-primary mr-3 mt-1">•</span>
                     <span>General intelligence agents that reason and adapt</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-brand-primary dark:text-brand-primary text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-brand-primary mr-3 mt-1">•</span>
                     <span>Algorithmic solutions that learn from data and experience</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-brand-primary dark:text-brand-primary text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-brand-primary mr-3 mt-1">•</span>
                     <span>From neural networks to production AI systems</span>
                   </li>
                 </motion.ul>
@@ -110,108 +214,6 @@ export default function HomeHero() {
                 </motion.div>
               </div>
             </motion.div>
-
-            <ParallaxSection speed={0.3}>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8, duration: 1 }}
-                className="relative h-full flex items-center justify-center"
-              >
-                {/* Animated "Algo + GI" Text - Vertical */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex flex-col items-center justify-center gap-4 md:gap-6"
-                >
-                  <motion.div
-                    className="flex flex-col items-center justify-center gap-4 md:gap-6"
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {/* Algo */}
-                    <motion.span
-                      className="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold relative"
-                      variants={{
-                        hidden: { opacity: 0, y: -80, x: 20, scale: 0.7 },
-                        visible: {
-                          opacity: 1,
-                          x: 0,
-                          y: 0,
-                          scale: 1,
-                          transition: {
-                            duration: 1,
-                            delay: 0.2,
-                            ease: [0.22, 1, 0.36, 1],
-                          },
-                        },
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <span className="text-gradient bg-gradient-to-b from-blue-600/80 via-purple-600/80 to-pink-600/80 dark:from-blue-400/80 dark:via-purple-400/80 dark:to-pink-400/80 bg-clip-text text-transparent">
-                        Algo
-                      </span>
-                    </motion.span>
-
-                    {/* Plus Sign */}
-                    <motion.span
-                      className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-600 dark:text-gray-400 relative"
-                      variants={{
-                        hidden: { opacity: 0, scale: 0 },
-                        visible: {
-                          opacity: 1,
-                          scale: 1,
-                          transition: {
-                            duration: 0.6,
-                            delay: 0.5,
-                            ease: [0.22, 1, 0.36, 1],
-                          },
-                        },
-                      }}
-                    >
-                      +
-                    </motion.span>
-
-                    {/* GI */}
-                    <motion.span
-                      className="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold relative"
-                      variants={{
-                        hidden: { opacity: 0, y: 80, x: 20, scale: 0.7 },
-                        visible: {
-                          opacity: 1,
-                          x: 0,
-                          y: 0,
-                          scale: 1,
-                          transition: {
-                            duration: 1,
-                            delay: 0.8,
-                            ease: [0.22, 1, 0.36, 1],
-                          },
-                        },
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <span className="text-gradient bg-gradient-to-b from-pink-600/80 via-purple-600/80 to-blue-600/80 dark:from-pink-400/80 dark:via-purple-400/80 dark:to-blue-400/80 bg-clip-text text-transparent">
-                        GI
-                      </span>
-                    </motion.span>
-                  </motion.div>
-
-                  {/* Subtitle */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.4, duration: 0.8 }}
-                    className="text-lg md:text-xl lg:text-2xl text-gray-400 dark:text-gray-400 text-gray-600 mt-6 font-medium tracking-wide text-center"
-                  >
-                    Algorithmic General Intelligence
-                  </motion.p>
-                </motion.div>
-              </motion.div>
-            </ParallaxSection>
           </div>
         </div>
       </div>

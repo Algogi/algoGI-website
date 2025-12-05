@@ -27,12 +27,11 @@ export default function AnimatedBigLogo({ className = "" }: AnimatedBigLogoProps
       transition: {
         pathLength: { 
           duration: 1.2,
-          ease: [0.43, 0.13, 0.23, 0.96],
+          ease: [0.43, 0.13, 0.23, 0.96] as const,
         },
         fillOpacity: {
           duration: 0.6,
           delay: 1.2,
-          ease: "easeOut",
         },
       },
     },
@@ -51,13 +50,12 @@ export default function AnimatedBigLogo({ className = "" }: AnimatedBigLogoProps
       transition: {
         pathLength: { 
           duration: 1.2,
-          ease: [0.43, 0.13, 0.23, 0.96],
+          ease: [0.43, 0.13, 0.23, 0.96] as const,
           delay: 0.2,
         },
         fillOpacity: {
           duration: 0.6,
           delay: 1.4,
-          ease: "easeOut",
         },
       },
     },

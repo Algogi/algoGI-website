@@ -42,28 +42,28 @@ export default function FloatingCTA() {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="neon-card rounded-2xl p-4 md:p-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 shadow-2xl backdrop-blur-md bg-dark-card/95 dark:bg-dark-card/95 bg-light-card/95"
+              className="rounded-2xl p-4 md:p-6 border shadow-2xl backdrop-blur-md bg-dark-card/95 dark:bg-light-card/95 border-neon-blue/30 dark:border-neon-light-blue/30"
             >
               <button
                 onClick={handleDismiss}
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gray-700 dark:bg-gray-700 bg-gray-300 hover:bg-gray-600 dark:hover:bg-gray-600 hover:bg-gray-400 flex items-center justify-center transition-colors z-10"
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gray-700 dark:bg-gray-300 hover:bg-gray-600 dark:hover:bg-gray-400 flex items-center justify-center transition-colors z-10"
                 aria-label="Dismiss"
               >
-                <X className="w-4 h-4 text-white dark:text-white text-gray-900" />
+                <X className="w-4 h-4 text-white dark:text-gray-900" />
               </button>
               
               <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-neon-blue/10 dark:bg-neon-blue/10 bg-neon-light-blue/20 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 flex items-center justify-center">
-                    <MessageSquare className="w-6 h-6 md:w-7 md:h-7 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-neon-blue/10 dark:bg-neon-light-blue/20 border border-neon-blue/30 dark:border-neon-light-blue/40 flex items-center justify-center">
+                    <MessageSquare className="w-6 h-6 md:w-7 md:h-7 text-neon-blue dark:text-neon-light-blue" />
                   </div>
                 </div>
                 
                 <div className="flex-1 text-center md:text-left min-w-0">
-                  <p className="text-sm md:text-base font-semibold text-gray-900 dark:text-white mb-1">
+                  <p className="text-sm md:text-base font-semibold text-white dark:text-gray-900 mb-1">
                     Ready to get started?
                   </p>
-                  <p className="text-xs md:text-sm text-gray-400 dark:text-gray-400 text-gray-600">
+                  <p className="text-xs md:text-sm text-gray-400 dark:text-gray-600">
                     Let&apos;s discuss your AI project
                   </p>
                 </div>
@@ -80,7 +80,7 @@ export default function FloatingCTA() {
             
             {/* Pulse animation */}
             <motion.div
-              className="absolute inset-0 rounded-2xl bg-neon-blue/20 dark:bg-neon-blue/20 bg-neon-light-blue/30 blur-xl -z-10"
+              className="absolute inset-0 rounded-2xl bg-neon-blue/20 dark:bg-neon-light-blue/30 blur-xl -z-10"
               animate={{
                 scale: [1, 1.2, 1],
                 opacity: [0.5, 0.8, 0.5],

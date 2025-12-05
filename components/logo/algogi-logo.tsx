@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface AlgogiLogoProps {
   className?: string;
@@ -15,10 +17,18 @@ export default function AlgogiLogo({
   enableHover = true,
   enableSvgAnimation = true,
 }: AlgogiLogoProps) {
-  // Fixed colors that work well in both themes on frosted glass background
-  const iconColor = "#4A3AFF"; // brand-primary
-  const textColor = "#e5e7eb"; // light gray for good contrast on frosted glass
-  const subtitleColor = "#d1d5db"; // lighter gray for subtitle - more visible
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Theme-aware colors
+  const iconColor = "#4A3AFF"; // brand-primary (same in both themes)
+  // For admin sidebar: use dark text in light mode, light text in dark mode
+  const textColor = mounted && theme === "dark" ? "#e5e7eb" : "#201F54";
+  const subtitleColor = mounted && theme === "dark" ? "#d1d5db" : "#201F54";
   
   // Animation variants
   const containerVariants = {
@@ -28,7 +38,7 @@ export default function AlgogiLogo({
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
         staggerChildren: enableSvgAnimation ? 0.1 : 0,
       },
     },
@@ -38,7 +48,7 @@ export default function AlgogiLogo({
     ? {
         whileHover: {
           scale: 1.05,
-          transition: { duration: 0.3, ease: "easeOut" },
+          transition: { duration: 0.3 },
         },
       }
     : {};
@@ -52,7 +62,7 @@ export default function AlgogiLogo({
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { duration: 0.8, ease: "easeInOut" },
+        pathLength: { duration: 0.8 },
         opacity: { duration: 0.3, delay: 0.2 },
       },
     },
@@ -65,7 +75,6 @@ export default function AlgogiLogo({
       transition: {
         duration: 0.4,
         delay: custom * 0.1,
-        ease: "easeOut",
       },
     }),
   };
@@ -77,7 +86,6 @@ export default function AlgogiLogo({
       transition: {
         duration: 0.5,
         delay: 0.4,
-        ease: "easeOut",
       },
     },
   };
