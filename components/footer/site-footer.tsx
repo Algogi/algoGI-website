@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useInView } from "react-intersection-observer";
 import { Linkedin, Twitter, Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import AlgogiLogo from "@/components/logo/algogi-logo";
 
@@ -14,6 +15,11 @@ export default function SiteFooter() {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+
+  const [logoRef, logoInView] = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,8 +91,13 @@ export default function SiteFooter() {
           {/* Left Column - Company Info & Newsletter */}
           <div className="space-y-8">
             {/* Logo */}
-            <div>
-              <AlgogiLogo className="h-12 w-auto mb-2" />
+            <div ref={logoRef}>
+              <AlgogiLogo 
+                className="h-12 w-auto mb-2" 
+                animateOnMount={logoInView}
+                enableHover={true}
+                enableSvgAnimation={true}
+              />
             </div>
 
             {/* Newsletter */}

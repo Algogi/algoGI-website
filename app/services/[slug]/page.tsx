@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, TrendingUp, Target } from "lucide-react";
 import { getServiceBySlug } from "../services-data";
+import { ServiceStructuredData } from "@/components/seo/structured-data";
 
 export default function ServiceDetailPage() {
   const params = useParams();
@@ -26,6 +27,13 @@ export default function ServiceDetailPage() {
 
   return (
     <div className="bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden">
+      {service && (
+        <ServiceStructuredData
+          name={service.title.split("—")[0].trim()}
+          description={service.description}
+          serviceType="AI Development Service"
+        />
+      )}
       <div className="absolute inset-0 grid-background opacity-10" />
       
       {/* Hero Section */}
@@ -108,7 +116,7 @@ export default function ServiceDetailPage() {
                   >
                     <Image
                       src={service.image}
-                      alt={service.title.split("—")[0].trim()}
+                      alt={`${service.title.split("—")[0].trim()} - AI development service by AlgoGI showcasing ${service.shortDescription.toLowerCase()}`}
                       fill
                       className="object-contain transition-all duration-500 group-hover:brightness-110"
                     />

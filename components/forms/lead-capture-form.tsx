@@ -53,6 +53,15 @@ export default function LeadCaptureForm() {
     setIsSubmitting(true);
     setSubmitStatus({ type: null, message: "" });
 
+    // Track form submission event
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "form_submit", {
+        event_category: "Lead Generation",
+        event_label: "Project Brief Form",
+        value: 1,
+      });
+    }
+
     try {
       const response = await fetch("/api/lead", {
         method: "POST",
@@ -63,10 +72,19 @@ export default function LeadCaptureForm() {
       });
 
       if (response.ok) {
+        // Track successful submission
+        if (typeof window !== "undefined" && (window as any).gtag) {
+          (window as any).gtag("event", "conversion", {
+            send_to: "AW-CONVERSION_ID/CONVERSION_LABEL",
+            value: 1.0,
+            currency: "USD",
+          });
+        }
+
         setSubmitStatus({
           type: "success",
           message:
-            "Thank you! A senior engineer will review your brief and respond with next steps.",
+            "Thank you! A senior engineer will review your brief and respond within 24 hours. Check your email for confirmation and next steps.",
         });
         setFormData({
           name: "",
@@ -81,10 +99,18 @@ export default function LeadCaptureForm() {
         throw new Error("Submission failed");
       }
     } catch (error) {
+      // Track form error
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "form_error", {
+          event_category: "Lead Generation",
+          event_label: "Project Brief Form Error",
+        });
+      }
+
       setSubmitStatus({
         type: "error",
         message:
-          "Something went wrong. Please try again or contact us directly.",
+          "Something went wrong. Please try again or contact us directly at Sales@algogi.com.",
       });
     } finally {
       setIsSubmitting(false);

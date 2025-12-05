@@ -39,53 +39,63 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-neon-blue/30 rounded-full;
+    background-color: rgba(74, 58, 255, 0.4);
+    @apply rounded-full;
   }
 
   html.light ::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 136, 204, 0.4);
+    background-color: rgba(74, 58, 255, 0.5);
     @apply rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neon-blue/50;
+    background-color: rgba(74, 58, 255, 0.6);
   }
 
   html.light ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 136, 204, 0.6);
+    background-color: rgba(74, 58, 255, 0.7);
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply relative bg-neon-gradient text-dark-bg px-8 py-4 rounded-lg font-bold text-lg overflow-hidden transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2 focus:ring-offset-dark-bg;
-    @apply hover:scale-105 hover:shadow-[0_0_30px_rgba(0,240,255,0.5)];
+    background-image: linear-gradient(135deg, #4A3AFF 0%, #5a4aff 100%);
+    @apply relative text-white px-8 py-4 rounded-lg font-bold text-lg overflow-hidden transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg;
+    --tw-ring-color: #4A3AFF;
+    @apply hover:scale-105 hover:shadow-[0_0_30px_rgba(74,58,255,0.6)];
     @apply before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700;
   }
 
   html.light .btn-primary {
-    background: linear-gradient(135deg, #0088cc 0%, #8b1aff 100%);
+    background-image: linear-gradient(135deg, #4A3AFF 0%, #5a4aff 100%);
     color: #ffffff;
-    --tw-ring-color: #0088cc;
+    --tw-ring-color: #4A3AFF;
     --tw-ring-offset-color: #ffffff;
-    box-shadow: 0 0 30px rgba(0, 136, 204, 0.4);
+    box-shadow: 0 0 30px rgba(74, 58, 255, 0.5);
   }
   
   .btn-secondary {
-    @apply relative bg-transparent text-neon-blue px-8 py-4 rounded-lg font-bold text-lg border-2 border-neon-blue transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2 focus:ring-offset-dark-bg;
-    @apply hover:bg-neon-blue/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:scale-105;
+    @apply relative bg-transparent px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg;
+    color: #4A3AFF;
+    border-color: #4A3AFF;
+    --tw-ring-color: #4A3AFF;
+    @apply hover:shadow-[0_0_20px_rgba(74,58,255,0.4)] hover:scale-105;
+  }
+  
+  .btn-secondary:hover {
+    background-color: rgba(74, 58, 255, 0.1);
   }
 
   html.light .btn-secondary {
-    color: #0088cc;
-    border-color: #0088cc;
-    --tw-ring-color: #0088cc;
+    color: #4A3AFF;
+    border-color: #4A3AFF;
+    --tw-ring-color: #4A3AFF;
     --tw-ring-offset-color: #ffffff;
   }
   
   html.light .btn-secondary:hover {
-    background-color: rgba(0, 136, 204, 0.1);
-    box-shadow: 0 0 20px rgba(0, 136, 204, 0.25);
+    background-color: rgba(74, 58, 255, 0.1);
+    box-shadow: 0 0 20px rgba(74, 58, 255, 0.3);
   }
   
   .section-padding {
@@ -98,12 +108,12 @@
 
   /* Neon glow text */
   .neon-text {
-    @apply text-neon-blue;
+    @apply text-brand-primary;
     text-shadow: 
-      0 0 5px #00f0ff,
-      0 0 10px #00f0ff,
-      0 0 15px #00f0ff,
-      0 0 20px #00f0ff;
+      0 0 5px #4A3AFF,
+      0 0 10px #4A3AFF,
+      0 0 15px #4A3AFF,
+      0 0 20px #4A3AFF;
   }
 
   .neon-text-purple {
@@ -165,8 +175,8 @@
 
   /* Loading spinner */
   .spinner {
-    border: 3px solid rgba(0, 240, 255, 0.1);
-    border-top: 3px solid #00f0ff;
+    border: 3px solid rgba(74, 58, 255, 0.1);
+    border-top: 3px solid #4A3AFF;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -180,52 +190,58 @@
 
   /* Card with neon glow */
   .neon-card {
-    @apply bg-dark-card border border-neon-blue/20 rounded-xl p-6;
-    @apply hover:border-neon-blue/50 hover:shadow-[0_0_30px_rgba(0,240,255,0.2)] transition-all duration-300;
+    @apply bg-dark-card rounded-xl p-6;
+    border: 1px solid rgba(74, 58, 255, 0.2);
+    @apply transition-all duration-300;
+  }
+  
+  .neon-card:hover {
+    border-color: rgba(74, 58, 255, 0.5);
+    box-shadow: 0 0 30px rgba(74, 58, 255, 0.3);
   }
 
   html.light .neon-card {
     background-color: #ffffff;
-    border-color: rgba(0, 136, 204, 0.3);
+    border-color: rgba(74, 58, 255, 0.3);
   }
   
   html.light .neon-card:hover {
-    border-color: rgba(0, 136, 204, 0.6);
-    box-shadow: 0 0 30px rgba(0, 136, 204, 0.15);
+    border-color: rgba(74, 58, 255, 0.6);
+    box-shadow: 0 0 30px rgba(74, 58, 255, 0.2);
   }
 
   /* Grid background */
   .grid-background {
     background-image: 
-      linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+      linear-gradient(rgba(74, 58, 255, 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74, 58, 255, 0.15) 1px, transparent 1px);
     background-size: 50px 50px;
   }
 
   html.light .grid-background {
     background-image: 
-      linear-gradient(rgba(0, 136, 204, 0.15) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 136, 204, 0.15) 1px, transparent 1px);
+      linear-gradient(rgba(74, 58, 255, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74, 58, 255, 0.2) 1px, transparent 1px);
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink;
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-neon-purple to-neon-pink;
   }
 
   html.light .text-gradient {
     @apply text-transparent bg-clip-text;
-    background-image: linear-gradient(to right, #0088cc, #8b1aff, #cc00cc);
+    background-image: linear-gradient(to right, #4A3AFF, #8b1aff, #cc00cc);
   }
 
   .text-gradient-reverse {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-purple to-neon-blue;
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-purple to-brand-primary;
   }
 
   html.light .text-gradient-reverse {
     @apply text-transparent bg-clip-text;
-    background-image: linear-gradient(to right, #cc00cc, #8b1aff, #0088cc);
+    background-image: linear-gradient(to right, #cc00cc, #8b1aff, #4A3AFF);
   }
 
   /* 3D transform utilities */

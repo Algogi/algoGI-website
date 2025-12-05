@@ -18,6 +18,7 @@ import {
   Shield,
   TrendingUp
 } from "lucide-react";
+import { ContactPageStructuredData } from "@/components/seo/structured-data";
 
 export default function ContactPage() {
   const trustIndicators = [
@@ -96,6 +97,7 @@ export default function ContactPage() {
 
   return (
     <div className="section-padding bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden min-h-screen">
+      <ContactPageStructuredData />
       <div className="absolute inset-0 grid-background opacity-10" />
       
       <div className="container-custom relative z-10">

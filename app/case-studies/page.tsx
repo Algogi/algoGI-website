@@ -1,120 +1,45 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useState } from "react";
-import { Wrench, Bot } from "lucide-react";
+import { Wrench, Bot, Download } from "lucide-react";
 import CaseStudyModal from "@/components/modals/case-study-modal";
+import DownloadFormModal from "@/components/modals/download-form-modal";
+import { ArticleStructuredData } from "@/components/seo/structured-data";
+import { caseStudies, type CaseStudy } from "./case-studies-data";
 
-const caseStudies = [
-  {
-    title: "Customer Data Sync Automation",
-    client: "n8n Template · Open Source",
-    challenge:
-      "Manual data synchronization across multiple platforms leads to errors, delays, and inconsistent customer information.",
-    solution:
-      "Open-source n8n workflow template that automates customer data synchronization across multiple platforms. This template eliminates manual data entry and enables seamless integration between CRM, email marketing, and analytics platforms.",
-    results: [
-      "95% reduction in sync errors",
-      "Real-time data synchronization",
-      "Multi-platform integration",
-      "Free open-source template available",
-    ],
-    metrics: {
-      primary: "95%",
-      primaryLabel: "Error Reduction",
-      secondary: "100%",
-      secondaryLabel: "Open Source",
-    },
-    techStack: ["n8n", "API Integration", "Workflow Automation"],
-    isTemplate: true,
-    demoUrl: "#",
-  },
-  {
-    title: "AI-Powered Lead Qualification Agent",
-    client: "AI Solution · SaaS",
-    challenge:
-      "Manual lead qualification is time-consuming and inconsistent, leading to missed opportunities and inefficient sales processes.",
-    solution:
-      "Intelligent AI agent that automatically qualifies leads using natural language processing and machine learning. The agent analyzes customer inquiries, scores leads based on multiple criteria, and routes high-value prospects to sales teams.",
-    results: [
-      "40% increase in conversion rates",
-      "24/7 lead qualification",
-      "Automated lead scoring",
-      "Reduced sales cycle time",
-    ],
-    metrics: {
-      primary: "40%",
-      primaryLabel: "Conversion Increase",
-      secondary: "24/7",
-      secondaryLabel: "Availability",
-    },
-    techStack: ["AI Agents", "NLP", "Machine Learning", "Automation"],
-    isTemplate: false,
-    demoUrl: "#",
-  },
-  {
-    title: "Invoice Processing Workflow",
-    client: "n8n Template · Open Source",
-    challenge:
-      "Manual invoice processing takes hours per invoice, is error-prone, and delays financial operations.",
-    solution:
-      "Free open-source n8n template for automated invoice processing. This workflow extracts data from invoices, validates information, routes for approval, and updates accounting systems automatically.",
-    results: [
-      "99% processing accuracy",
-      "Hours to minutes processing time",
-      "Automated approval routing",
-      "Free template available",
-    ],
-    metrics: {
-      primary: "99%",
-      primaryLabel: "Accuracy",
-      secondary: "90%",
-      secondaryLabel: "Time Saved",
-    },
-    techStack: ["n8n", "OCR", "Document Processing", "Workflow Automation"],
-    isTemplate: true,
-    demoUrl: "#",
-  },
-  {
-    title: "Intelligent Customer Support Virtual Agent",
-    client: "AI Solution · Customer Support",
-    challenge:
-      "Customer support teams are overwhelmed with routine inquiries, leading to slow response times and high operational costs.",
-    solution:
-      "Advanced AI virtual agent that handles customer support inquiries with context awareness and natural conversation flow. Built using AlgoGI's AI agent development framework, this solution provides intelligent, automated support.",
-    results: [
-      "75% automated resolution rate",
-      "92% customer satisfaction",
-      "24/7 intelligent support",
-      "Reduced support costs by 60%",
-    ],
-    metrics: {
-      primary: "75%",
-      primaryLabel: "Auto Resolution",
-      secondary: "92%",
-      secondaryLabel: "Satisfaction",
-    },
-    techStack: ["AI Virtual Agents", "NLP", "Context Understanding", "Automation"],
-    isTemplate: false,
-    demoUrl: "#",
-  },
-];
+// Helper function to get image source with fallback
+function getCaseStudyImage(study: CaseStudy): string {
+  if (study.heroImage) {
+    return `/images/${study.heroImage}`;
+  }
+  // Return generic placeholder based on type
+  return study.isTemplate 
+    ? "/images/case-study-template-default.png" 
+    : "/images/case-study-ai-default.png";
+}
 
 function ProjectCard({
   study,
   index,
   onClick,
+  onDownloadClick,
 }: {
-  study: typeof caseStudies[0];
+  study: CaseStudy;
   index: number;
   onClick: () => void;
+  onDownloadClick: (e: React.MouseEvent) => void;
 }) {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
+
+  const imageSrc = getCaseStudyImage(study);
+  const hasCustomImage = !!study.heroImage;
 
   return (
     <motion.div
@@ -123,27 +48,41 @@ function ProjectCard({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8, scale: 1.02 }}
-      onClick={onClick}
-      className="neon-card rounded-xl p-6 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] dark:hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(0,136,204,0.25)] transition-all duration-300 cursor-pointer group relative overflow-hidden"
+      className="neon-card rounded-xl p-6 border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40 hover:shadow-[0_0_30px_rgba(74,58,255,0.4)] dark:hover:shadow-[0_0_30px_rgba(74,58,255,0.4)] hover:shadow-[0_0_30px_rgba(74,58,255,0.3)] transition-all duration-300 group relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/5 dark:from-neon-purple/5 from-neon-light-purple/10 to-neon-blue/5 dark:to-neon-blue/5 to-neon-light-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="relative z-10">
-        <div className="h-48 bg-gradient-to-br from-neon-blue/10 dark:from-neon-blue/10 from-neon-light-blue/20 to-neon-purple/10 dark:to-neon-purple/10 to-neon-light-purple/20 rounded-lg mb-4 flex items-center justify-center border border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30 group-hover:border-neon-purple/50 dark:group-hover:border-neon-purple/50 group-hover:border-neon-light-purple/60 transition-colors">
-          <motion.div
-            className="flex items-center justify-center"
-            whileHover={{ scale: 1.2, rotate: 5 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            {study.isTemplate ? (
-              <Wrench className="w-16 h-16 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
-            ) : (
-              <Bot className="w-16 h-16 text-neon-purple dark:text-neon-purple text-neon-light-purple" />
-            )}
-          </motion.div>
+        <div 
+          className="h-48 rounded-lg mb-4 relative overflow-hidden border border-brand-primary/20 dark:border-brand-primary/20 border-brand-primary/30 group-hover:border-brand-primary/50 dark:group-hover:border-brand-primary/50 group-hover:border-brand-primary/60 transition-colors cursor-pointer"
+          onClick={onClick}
+        >
+          {hasCustomImage ? (
+            <Image
+              src={imageSrc}
+              alt={study.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-neon-blue/10 dark:from-neon-blue/10 from-neon-light-blue/20 to-neon-purple/10 dark:to-neon-purple/10 to-neon-light-purple/20 flex items-center justify-center">
+              <motion.div
+                className="flex items-center justify-center"
+                whileHover={{ scale: 1.2, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                {study.isTemplate ? (
+                  <Wrench className="w-16 h-16 text-brand-primary dark:text-brand-primary text-brand-primary" />
+                ) : (
+                  <Bot className="w-16 h-16 text-neon-purple dark:text-neon-purple text-neon-light-purple" />
+                )}
+              </motion.div>
+            </div>
+          )}
         </div>
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-semibold text-neon-purple dark:text-neon-purple text-neon-light-purple bg-neon-purple/10 dark:bg-neon-purple/10 bg-neon-light-purple/20 px-3 py-1 rounded-full border border-neon-purple/30 dark:border-neon-purple/30 border-neon-light-purple/40">
-            {study.isTemplate ? "n8n Template" : "AI Solution"}
+            {study.isTemplate ? "Automation Template" : "AI Solution"}
           </span>
           {study.isTemplate && (
             <span className="text-xs font-semibold text-neon-cyan dark:text-neon-cyan text-neon-light-blue bg-neon-cyan/10 dark:bg-neon-cyan/10 bg-neon-light-blue/20 px-3 py-1 rounded-full border border-neon-cyan/30 dark:border-neon-cyan/30 border-neon-light-blue/40">
@@ -151,10 +90,16 @@ function ProjectCard({
             </span>
           )}
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-neon-blue dark:group-hover:text-neon-blue group-hover:text-neon-light-blue transition-colors">
+        <h3 
+          className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-brand-primary dark:group-hover:text-brand-primary group-hover:text-brand-primary transition-colors cursor-pointer"
+          onClick={onClick}
+        >
           {study.title}
         </h3>
-        <p className="text-gray-300 dark:text-gray-300 text-gray-700 text-sm mb-4 line-clamp-3 leading-relaxed">
+        <p 
+          className="text-gray-300 dark:text-gray-300 text-gray-700 text-sm mb-4 line-clamp-3 leading-relaxed cursor-pointer"
+          onClick={onClick}
+        >
           {study.solution}
         </p>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -167,12 +112,23 @@ function ProjectCard({
             </span>
           ))}
         </div>
-        <div className="pt-4 border-t border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30">
+        <div className="pt-4 border-t border-neon-blue/20 dark:border-neon-blue/20 border-neon-light-blue/30 flex items-center justify-between">
           <motion.button
+            onClick={onClick}
             whileHover={{ x: 5 }}
-            className="text-neon-blue dark:text-neon-blue text-neon-light-blue font-semibold flex items-center gap-2 group-hover:text-neon-cyan dark:group-hover:text-neon-cyan group-hover:text-neon-light-blue transition-colors"
+            className="text-brand-primary dark:text-brand-primary text-brand-primary font-semibold flex items-center gap-2 group-hover:opacity-80 transition-colors"
           >
             {study.isTemplate ? "View Template" : "View Demo"} →
+          </motion.button>
+          <motion.button
+            onClick={onDownloadClick}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2 rounded-lg bg-brand-primary/10 dark:bg-brand-primary/10 bg-brand-primary/20 hover:bg-brand-primary/20 dark:hover:bg-brand-primary/20 hover:bg-brand-primary/30 border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40 transition-colors"
+            aria-label="Download"
+            title="Download"
+          >
+            <Download className="w-5 h-5 text-brand-primary dark:text-brand-primary text-brand-primary" />
           </motion.button>
         </div>
       </div>
@@ -181,12 +137,14 @@ function ProjectCard({
 }
 
 export default function CaseStudiesPage() {
-  const [selectedStudy, setSelectedStudy] = useState<typeof caseStudies[0] | null>(null);
+  const [selectedStudy, setSelectedStudy] = useState<CaseStudy | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [selectedDownloadStudy, setSelectedDownloadStudy] = useState<CaseStudy | null>(null);
 
-  const handleProjectClick = (study: typeof caseStudies[0]) => {
+  const handleProjectClick = (study: CaseStudy) => {
     // For templates, open demo URL; for solutions, open modal
-    if (study.isTemplate && study.demoUrl) {
+    if (study.isTemplate && study.demoUrl && study.demoUrl !== "#") {
       window.open(study.demoUrl, '_blank');
     } else {
       setSelectedStudy(study);
@@ -194,8 +152,18 @@ export default function CaseStudiesPage() {
     }
   };
 
+  const handleDownloadClick = (e: React.MouseEvent, study: CaseStudy) => {
+    e.stopPropagation();
+    setSelectedDownloadStudy(study);
+    setDownloadModalOpen(true);
+  };
+
   return (
     <>
+      <ArticleStructuredData
+        headline="Portfolio - AI Solutions & Automation Templates"
+        description="Explore AlgoGI's portfolio of innovative AI solutions and free automation templates."
+      />
       <div className="section-padding bg-dark-bg dark:bg-dark-bg bg-light-bg relative overflow-hidden">
         <div className="absolute inset-0 grid-background opacity-10" />
         <div className="container-custom relative z-10">
@@ -209,7 +177,7 @@ export default function CaseStudiesPage() {
               Portfolio
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 text-gray-700 max-w-4xl mx-auto">
-              Innovative AI solutions and free n8n templates built by AlgoGI. Explore our open-source contributions and AI agent implementations.
+              Innovative AI solutions and free automation templates built by AlgoGI. Explore our open-source contributions and AI agent implementations.
             </p>
           </motion.div>
 
@@ -220,6 +188,7 @@ export default function CaseStudiesPage() {
                 study={study}
                 index={index}
                 onClick={() => handleProjectClick(study)}
+                onDownloadClick={(e) => handleDownloadClick(e, study)}
               />
             ))}
           </div>
@@ -229,13 +198,13 @@ export default function CaseStudiesPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center neon-card rounded-2xl p-12 border border-neon-blue/30 dark:border-neon-blue/30 border-neon-light-blue/40"
+            className="text-center neon-card rounded-2xl p-12 border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40"
           >
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               See our full portfolio of AI solutions and automation templates
             </h2>
             <p className="text-lg text-gray-300 dark:text-gray-300 text-gray-700 mb-8 max-w-2xl mx-auto">
-              Explore more innovative AI solutions, workflow automation examples, and free n8n templates designed to accelerate your business.
+              Explore more innovative AI solutions, workflow automation examples, and free automation templates designed to accelerate your business.
             </p>
             <Link
               href="/contact"
@@ -252,6 +221,19 @@ export default function CaseStudiesPage() {
         onClose={() => setIsModalOpen(false)}
         study={selectedStudy}
       />
+
+      {selectedDownloadStudy && (
+        <DownloadFormModal
+          isOpen={downloadModalOpen}
+          onClose={() => {
+            setDownloadModalOpen(false);
+            setSelectedDownloadStudy(null);
+          }}
+          fileIdentifier={selectedDownloadStudy.downloadFile.identifier}
+          fileType={selectedDownloadStudy.downloadFile.type}
+          caseStudyTitle={selectedDownloadStudy.title}
+        />
+      )}
     </>
   );
 }

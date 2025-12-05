@@ -7,6 +7,7 @@ import CaseStudyStrip from "@/components/sections/case-study-strip";
 import TechnologiesSection from "@/components/sections/technologies-section";
 import HowWeWork from "@/components/sections/how-we-work";
 import LeadCaptureForm from "@/components/forms/lead-capture-form";
+import TrustSignals from "@/components/sections/trust-signals";
 
 export default function HomePage() {
   return (
@@ -16,6 +17,7 @@ export default function HomePage() {
       <HowWeWork />
       <TechnologiesSection />
       <CaseStudyStrip />
+      <TrustSignals />
       <section className="section-padding bg-gradient-to-br from-dark-surface dark:from-dark-surface from-light-surface via-dark-bg dark:via-dark-bg via-light-bg to-dark-surface dark:to-dark-surface to-light-surface relative overflow-hidden">
         <div className="absolute inset-0 grid-background opacity-10" />
         <div className="container-custom relative z-10">

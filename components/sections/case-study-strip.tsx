@@ -110,9 +110,9 @@ export default function CaseStudyStrip() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
             <span className="text-gray-900 dark:text-white">Selected work from teams that care about </span>
             <span className="text-gradient">throughput, quality, and real‑world impact</span>
           </h2>
@@ -129,7 +129,7 @@ export default function CaseStudyStrip() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center mt-16"
+          className="text-center mt-12"
         >
           <Link href="/case-studies" className="btn-secondary">
             View case studies
