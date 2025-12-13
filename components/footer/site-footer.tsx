@@ -86,6 +86,33 @@ export default function SiteFooter() {
     <footer className="bg-dark-bg border-t border-brand-blue/20 relative overflow-hidden">
       <div className="absolute inset-0 grid-background opacity-10" />
       <div className="container-custom py-16 relative z-10">
+        {/* Email Section - Separate CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-16 pb-12 border-b border-gray-700"
+        >
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              Get in Touch
+            </h3>
+            <p className="text-gray-400 mb-6">
+              Have a question or want to discuss your project? Reach out to us via email.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+              <a
+                href="mailto:info@algogi.com"
+                className="btn-primary flex items-center gap-2"
+              >
+                <Mail className="w-5 h-5" />
+                Email Us: info@algogi.com
+              </a>
+            </div>
+          </div>
+        </motion.div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
           {/* Left Column - Company Info & Newsletter */}
           <div className="space-y-8">
@@ -189,16 +216,10 @@ export default function SiteFooter() {
             <div>
               <h4 className="text-white font-bold mb-4 text-lg">USA</h4>
               <div className="space-y-3 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-neon-blue" />
-                  <a href="tel:+918770170371" className="hover:text-neon-blue transition-colors">
-                    +1 540 268 8778
-                  </a>
-                </div>
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-neon-blue" />
-                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
-                    Email Us: info@algogi.com
+                  <Phone className="w-4 h-4 text-neon-blue" />
+                  <a href="tel:+15402688778" className="hover:text-neon-blue transition-colors">
+                    +1 540 268 8778
                   </a>
                 </div>
                 <div className="flex items-start gap-2">
@@ -218,12 +239,6 @@ export default function SiteFooter() {
                   <Phone className="w-4 h-4 text-neon-blue" />
                   <a href="tel:+918770170371" className="hover:text-neon-blue transition-colors">
                     +91 877 017 0371
-                  </a>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-neon-blue" />
-                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
-                    Email Us: info@algogi.com
                   </a>
                 </div>
                 <div className="flex items-start gap-2">

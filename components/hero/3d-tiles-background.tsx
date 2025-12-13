@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 
 interface Tile {
@@ -13,16 +13,27 @@ interface Tile {
   color: string;
   opacity: number;
   size: number;
+  baseColor: string; // Store original color for interpolation
 }
 
 export default function Tiles3DBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const mouseVelocityRef = useRef({ x: 0, y: 0 });
+  const lastMouseRef = useRef({ x: 0, y: 0 });
+  const lastTimeRef = useRef(Date.now());
   const animationFrameRef = useRef<number>();
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch by only rendering on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -48,6 +59,10 @@ export default function Tiles3DBackground() {
       const x = (col - 1) * tileSize;
       const y = (row - 1) * tileSize;
       
+      const baseColor = isLight 
+        ? (Math.random() < 0.5 ? "#6B7280" : "#4B5563") // Medium-dark grays for light theme
+        : (Math.random() < 0.5 ? "#4A5568" : "#374151"); // Dark gray tones for dark theme
+      
       tiles.push({
         x,
         y,
@@ -56,20 +71,31 @@ export default function Tiles3DBackground() {
         rotationY: Math.random() * Math.PI * 0.1,
         rotationZ: Math.random() * Math.PI * 0.1,
         // Theme-aware colors
-        color: isLight 
-          ? (Math.random() < 0.5 ? "#D1D5DB" : "#E5E7EB") // Light gray tones for light theme
-          : (Math.random() < 0.5 ? "#4A5568" : "#374151"), // Dark gray tones for dark theme
-        opacity: 0.03 + Math.random() * 0.04, // Even more subtle
+        color: baseColor,
+        baseColor: baseColor, // Store original for color interpolation
+        opacity: 0.08 + Math.random() * 0.06, // More visible
         size: tileSize,
       });
     }
 
-    // Mouse interaction
+    // Mouse interaction with velocity tracking
     const handleMouseMove = (e: MouseEvent) => {
+      const now = Date.now();
+      const dt = Math.max(1, now - lastTimeRef.current) / 16.67; // Normalize to ~60fps
+      
+      // Calculate velocity
+      mouseVelocityRef.current = {
+        x: (e.clientX - lastMouseRef.current.x) / dt,
+        y: (e.clientY - lastMouseRef.current.y) / dt,
+      };
+      
       mouseRef.current = {
         x: e.clientX,
         y: e.clientY,
       };
+      
+      lastMouseRef.current = { x: e.clientX, y: e.clientY };
+      lastTimeRef.current = now;
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -78,7 +104,7 @@ export default function Tiles3DBackground() {
       if (!ctx || !canvas) return;
 
       // Clear canvas with theme-aware fade
-      ctx.fillStyle = isLight ? "rgba(255, 255, 255, 0.03)" : "rgba(10, 10, 10, 0.05)";
+      ctx.fillStyle = isLight ? "rgba(255, 255, 255, 0.08)" : "rgba(10, 10, 10, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const time = Date.now() * 0.001;
@@ -105,17 +131,21 @@ export default function Tiles3DBackground() {
         const mouseDistance = Math.sqrt(dx * dx + dy * dy);
         
         // Enhanced interactive rotation based on mouse position
-        const maxDistance = 400;
+        const maxDistance = 600; // Increased from 400
         const influence = Math.max(0, 1 - mouseDistance / maxDistance);
         
-        // Stronger rotation response
-        const rotationSpeed = influence * 0.05;
-        tile.rotationY += (dx / maxDistance) * rotationSpeed;
-        tile.rotationX += (-dy / maxDistance) * rotationSpeed;
+        // Velocity-based momentum for smoother, more dynamic effects
+        const velocityInfluence = Math.min(1, (Math.abs(mouseVelocityRef.current.x) + Math.abs(mouseVelocityRef.current.y)) / 50);
+        const momentum = 1 + velocityInfluence * 0.5;
         
-        // Z-axis rotation based on mouse movement
+        // Stronger rotation response with velocity momentum
+        const rotationSpeed = influence * 0.12 * momentum; // Increased from 0.05
+        tile.rotationY += (dx / maxDistance) * rotationSpeed * 1.5;
+        tile.rotationX += (-dy / maxDistance) * rotationSpeed * 1.5;
+        
+        // Z-axis rotation based on mouse movement with velocity
         const angle = Math.atan2(dy, dx);
-        tile.rotationZ += Math.sin(angle) * influence * 0.01;
+        tile.rotationZ += Math.sin(angle) * influence * 0.02 * momentum; // Increased from 0.01
         
         // Subtle continuous rotation when not interacting
         if (influence < 0.1) {
@@ -127,8 +157,8 @@ export default function Tiles3DBackground() {
         tile.rotationY *= 0.95;
         tile.rotationZ *= 0.97;
         
-        // Interactive opacity - tiles brighten near mouse
-        const interactiveOpacity = tile.opacity * (1 + influence * 2);
+        // Interactive opacity - tiles brighten near mouse (more dramatic)
+        const interactiveOpacity = tile.opacity * (1 + influence * 4); // Increased from * 2
 
         // Calculate 3D position
         const cosX = Math.cos(tile.rotationX);
@@ -140,7 +170,7 @@ export default function Tiles3DBackground() {
 
         // 3D to 2D projection
         const perspective = 1000;
-        const scale = perspective / (perspective + tile.z);
+        const depthScale = perspective / (perspective + tile.z);
         
         // Calculate tile corners in 3D space
         const halfSize = tile.size / 2;
@@ -169,14 +199,17 @@ export default function Tiles3DBackground() {
           const finalZ = newZ;
           
           // Project to 2D
-          const projectedX = tile.x + halfSize + finalX * scale;
-          const projectedY = tile.y + halfSize + finalY * scale;
+          const projectedX = tile.x + halfSize + finalX * depthScale;
+          const projectedY = tile.y + halfSize + finalY * depthScale;
           
           return { x: projectedX, y: projectedY, z: finalZ };
         });
 
         // Draw tile with gradient based on rotation
         ctx.save();
+        
+        // Use base color (no color interpolation)
+        const currentColor = tile.baseColor;
         
         // Create gradient for tile face
         const gradient = ctx.createLinearGradient(
@@ -186,15 +219,15 @@ export default function Tiles3DBackground() {
           projectedCorners[2].y
         );
         
-        const baseOpacity = interactiveOpacity * (0.15 + scale * 0.2); // Very subtle
+        const baseOpacity = interactiveOpacity * (0.25 + depthScale * 0.3); // Increased visibility
         const lightIntensity = Math.max(0.15, Math.cos(tile.rotationX) * Math.cos(tile.rotationY));
         
-        gradient.addColorStop(0, hexToRgba(tile.color, baseOpacity * lightIntensity));
-        gradient.addColorStop(0.5, hexToRgba(tile.color, baseOpacity * (lightIntensity * 0.7)));
-        gradient.addColorStop(1, hexToRgba(tile.color, baseOpacity * (lightIntensity * 0.5)));
+        gradient.addColorStop(0, hexToRgba(currentColor, baseOpacity * lightIntensity));
+        gradient.addColorStop(0.5, hexToRgba(currentColor, baseOpacity * (lightIntensity * 0.7)));
+        gradient.addColorStop(1, hexToRgba(currentColor, baseOpacity * (lightIntensity * 0.5)));
 
         ctx.fillStyle = gradient;
-        ctx.strokeStyle = hexToRgba(tile.color, baseOpacity * 0.2);
+        ctx.strokeStyle = hexToRgba(currentColor, baseOpacity * 0.2);
         ctx.lineWidth = 0.5; // Thinner lines
 
         // Draw tile
@@ -207,26 +240,28 @@ export default function Tiles3DBackground() {
         ctx.fill();
         ctx.stroke();
 
-        // Add very subtle glow for depth and interactivity
-        const glowIntensity = influence * 0.3 + (scale > 0.8 ? 0.1 : 0);
+        // Enhanced glow for depth and interactivity (more visible)
+        const glowIntensity = influence * 0.6 + (depthScale > 0.8 ? 0.15 : 0); // Increased from 0.3
         if (glowIntensity > 0.05) {
+          const glowSize = tile.size * 0.8;
           const glowGradient = ctx.createRadialGradient(
             tileCenterX,
             tileCenterY,
             0,
             tileCenterX,
             tileCenterY,
-            tile.size * 0.6
+            glowSize
           );
-          glowGradient.addColorStop(0, hexToRgba(tile.color, baseOpacity * glowIntensity * 0.2));
+          glowGradient.addColorStop(0, hexToRgba(currentColor, baseOpacity * glowIntensity * 0.4)); // Increased from 0.2
+          glowGradient.addColorStop(0.5, hexToRgba(currentColor, baseOpacity * glowIntensity * 0.15));
           glowGradient.addColorStop(1, "transparent");
           
           ctx.fillStyle = glowGradient;
           ctx.fillRect(
-            tile.x - tile.size * 0.3,
-            tile.y - tile.size * 0.3,
-            tile.size * 1.6,
-            tile.size * 1.6
+            tile.x - tile.size * 0.4,
+            tile.y - tile.size * 0.4,
+            tile.size * 1.8,
+            tile.size * 1.8
           );
         }
 
@@ -254,6 +289,10 @@ export default function Tiles3DBackground() {
         const x = (col - 1) * tileSize;
         const y = (row - 1) * tileSize;
         
+        const baseColor = isLight 
+          ? (Math.random() < 0.5 ? "#6B7280" : "#4B5563") // Medium-dark grays for light theme
+          : (Math.random() < 0.5 ? "#4A5568" : "#374151"); // Dark gray tones for dark theme
+          
         tiles.push({
           x,
           y,
@@ -262,10 +301,9 @@ export default function Tiles3DBackground() {
           rotationY: Math.random() * Math.PI * 0.1,
           rotationZ: Math.random() * Math.PI * 0.1,
           // Theme-aware colors
-          color: isLight 
-            ? (Math.random() < 0.5 ? "#D1D5DB" : "#E5E7EB") // Light gray tones for light theme
-            : (Math.random() < 0.5 ? "#4A5568" : "#374151"), // Dark gray tones for dark theme
-          opacity: 0.03 + Math.random() * 0.04, // Even more subtle
+          color: baseColor,
+          baseColor: baseColor, // Store original for color interpolation
+          opacity: 0.08 + Math.random() * 0.06, // More visible
           size: tileSize,
         });
       }
@@ -280,7 +318,12 @@ export default function Tiles3DBackground() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isLight]);
+  }, [isLight, mounted]);
+
+  // Don't render canvas until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <canvas
