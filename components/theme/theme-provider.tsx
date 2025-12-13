@@ -14,9 +14,9 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       
       // Only update if there's a mismatch
       if (!hasDark && !hasLight) {
-        // No theme class means it's light (defaultTheme is dark, but check localStorage)
+        // No theme class means it's light (defaultTheme is light, but check localStorage)
         const storedTheme = localStorage.getItem("theme");
-        if (storedTheme === "light") {
+        if (storedTheme === "light" || !storedTheme) {
           html.classList.add("light");
         }
       } else if (hasDark && hasLight) {

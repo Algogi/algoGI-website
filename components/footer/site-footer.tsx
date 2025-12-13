@@ -61,17 +61,16 @@ export default function SiteFooter() {
   };
 
   const socialLinks = [
-    { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
-    { icon: Twitter, href: "https://twitter.com", label: "X (Twitter)" },
-    { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-    { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+    { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61576218601719#", label: "Facebook" },
+    { icon: Instagram, href: "https://instagram.com/algogi_", label: "Instagram" },
+    { icon: Linkedin, href: "https://www.linkedin.com/company/algogi/", label: "LinkedIn" },
   ];
 
   const footerLinks = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About Us" },
+    { href: "/about", label: "About" },
     { href: "/services", label: "Services" },
-    { href: "/case-studies", label: "Projects" },
+    { href: "/case-studies", label: "Portfolio" },
   ];
 
   const services = [
@@ -190,10 +189,16 @@ export default function SiteFooter() {
             <div>
               <h4 className="text-white font-bold mb-4 text-lg">USA</h4>
               <div className="space-y-3 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-neon-blue" />
+                  <a href="tel:+918770170371" className="hover:text-neon-blue transition-colors">
+                    +1 540 268 8778
+                  </a>
+                </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-neon-blue" />
-                  <a href="mailto:Sales@algogi.com" className="hover:text-neon-blue transition-colors">
-                    Sales@algogi.com
+                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
+                    Email Us: info@algogi.com
                   </a>
                 </div>
                 <div className="flex items-start gap-2">
@@ -210,15 +215,15 @@ export default function SiteFooter() {
               <h4 className="text-white font-bold mb-4 text-lg">India</h4>
               <div className="space-y-3 text-sm text-gray-400">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-neon-blue" />
-                  <a href="mailto:Contact@algogi.com" className="hover:text-neon-blue transition-colors">
-                    Contact@algogi.com
+                  <Phone className="w-4 h-4 text-neon-blue" />
+                  <a href="tel:+918770170371" className="hover:text-neon-blue transition-colors">
+                    +91 877 017 0371
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-neon-blue" />
-                  <a href="tel:+13029300149" className="hover:text-neon-blue transition-colors">
-                    +1 302 930 0149
+                  <Mail className="w-4 h-4 text-neon-blue" />
+                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
+                    Email Us: info@algogi.com
                   </a>
                 </div>
                 <div className="flex items-start gap-2">

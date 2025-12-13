@@ -73,7 +73,7 @@ export default function RootLayout({
         <OrganizationStructuredData />
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange={false}
         >

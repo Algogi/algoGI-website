@@ -63,11 +63,11 @@ export default function HomeHero() {
                       transition={{ duration: 0.3 }}
                     >
                       <span className="text-gradient bg-clip-text text-transparent">
-                        Algo
+                        AlgoGI
                       </span>
                     </motion.span>
-
-                    {/* Plus Sign */}
+{/* 
+                  
                     <motion.span
                       className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-400 relative"
                       variants={{
@@ -84,10 +84,10 @@ export default function HomeHero() {
                       }}
                     >
                       +
-                    </motion.span>
+                    </motion.span> */}
 
                     {/* GI */}
-                    <motion.span
+                    {/* <motion.span
                       className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold relative"
                       variants={{
                         hidden: { opacity: 0, y: 80, x: 20, scale: 0.7 },
@@ -107,9 +107,9 @@ export default function HomeHero() {
                       transition={{ duration: 0.3 }}
                     >
                       <span className="text-gradient bg-clip-text text-transparent">
-                        GI
+                        Applied General Intelligence
                       </span>
-                    </motion.span>
+                    </motion.span> */}
                   </motion.div>
 
                   {/* Subtitle */}
@@ -119,7 +119,7 @@ export default function HomeHero() {
                     transition={{ delay: 1.4, duration: 0.8 }}
                     className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 mt-0 lg:mt-6 font-medium tracking-wide text-center"
                   >
-                    Algorithmic General Intelligence
+                    Practical AI systems engineered for business execution
                   </motion.p>
                 </motion.div>
               </motion.div>
@@ -154,7 +154,7 @@ export default function HomeHero() {
                     transition={{ delay: 0.4, duration: 0.8 }}
                     className="block"
                   >
-                    Engineering Tomorrow&apos;s
+                    Engineering <span className="text-gradient">Applied Intelligence</span>
                   </motion.div>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -162,7 +162,7 @@ export default function HomeHero() {
                     transition={{ delay: 0.6, duration: 0.8 }}
                     className="block"
                   >
-                    <span className="text-gradient">Intelligence Today</span>
+                    for Real Business Outcomes
                   </motion.div>
                 </h1>
 
@@ -172,7 +172,7 @@ export default function HomeHero() {
                   transition={{ delay: 1.2, duration: 0.8 }}
                   className="text-base md:text-lg text-gray-400 mb-8 leading-relaxed max-w-2xl"
                 >
-                  We fuse algorithms with general intelligence to create AI agents that learn, adapt, and transform your business. From smart automation to scalable AI platforms, AlgoGI delivers future-capable solutions that drive real impact.
+                  We design and deploy Applied General Intelligence systems - AI-powered automations, analytice, and agents that improve revenue, operations, and decision-making today, not someday.
                 </motion.p>
 
                 <motion.ul
@@ -183,19 +183,19 @@ export default function HomeHero() {
                 >
                   <li className="flex items-start">
                     <span className="text-brand-primary mr-3 mt-1">•</span>
-                    <span>Neural network architectures and deep learning systems</span>
+                    <span>Applied intelligence systems for revenue, marketing, and operations</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-brand-primary mr-3 mt-1">•</span>
-                    <span>General intelligence agents that reason and adapt</span>
+                    <span>AI agents developed for specific business workflows, not experiments</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-brand-primary mr-3 mt-1">•</span>
-                    <span>Algorithmic solutions that learn from data and experience</span>
+                    <span>Data-driven automation that improves over time</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-brand-primary mr-3 mt-1">•</span>
-                    <span>From neural networks to production AI systems</span>
+                    <span>From strategy and architecture to production deployment</span>
                   </li>
                 </motion.ul>
 

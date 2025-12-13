@@ -16,7 +16,7 @@ export default function SiteHeader() {
     { href: "/services", label: "Services" },
     { href: "/case-studies", label: "Portfolio" },
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
+    // { href: "/contact", label: "Contact" },
   ];
 
   return (
@@ -82,7 +82,7 @@ export default function SiteHeader() {
               })}
               <ThemeToggle />
               <Link href="/contact" className="btn-primary">
-                Get Started
+                Contact Us
               </Link>
             </div>
 
@@ -215,7 +215,7 @@ export default function SiteHeader() {
                   className="btn-primary text-center block"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Get Started
+                  Contact Us
                 </Link>
               </div>
             </div>

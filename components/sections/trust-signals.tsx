@@ -6,8 +6,6 @@ import { useState, useEffect } from "react";
 
 const certifications = [
   { name: "ISO 27001", icon: Shield, description: "Information Security" },
-  { name: "SOC 2", icon: Shield, description: "Security & Compliance" },
-  { name: "GDPR Compliant", icon: Award, description: "Data Protection" },
 ];
 
 export default function TrustSignals() {
@@ -51,7 +49,7 @@ export default function TrustSignals() {
       <div className="absolute inset-0 grid-background opacity-10" />
       <div className="container-custom relative z-10">
         {/* Certifications & Security Badges */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -83,7 +81,7 @@ export default function TrustSignals() {
               );
             })}
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Client Testimonials - Only show if testimonials exist */}
         {!isLoading && testimonials.length > 0 && (
@@ -141,12 +139,12 @@ export default function TrustSignals() {
         >
           <div className="text-center neon-card p-6 rounded-xl border border-neon-cyan/30">
             <Users className="w-8 h-8 text-neon-cyan mx-auto mb-2" />
-            <div className="text-3xl font-bold text-white mb-1">100+</div>
+            <div className="text-3xl font-bold text-white mb-1">25+</div>
             <div className="text-sm text-gray-400">Happy Clients</div>
           </div>
           <div className="text-center neon-card p-6 rounded-xl border border-neon-blue/30">
             <CheckCircle2 className="w-8 h-8 text-neon-blue mx-auto mb-2" />
-            <div className="text-3xl font-bold text-white mb-1">500+</div>
+            <div className="text-3xl font-bold text-white mb-1">75+</div>
             <div className="text-sm text-gray-400">Projects Delivered</div>
           </div>
           <div className="text-center neon-card p-6 rounded-xl border border-neon-purple/30">
