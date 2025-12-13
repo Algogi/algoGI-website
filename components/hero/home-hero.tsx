@@ -117,7 +117,7 @@ export default function HomeHero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.4, duration: 0.8 }}
-                    className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 mt-0 lg:mt-6 font-medium tracking-wide text-center"
+                    className="text-base sm:text-lg md:text-xl lg:text-2xl text-logo-color mt-0 lg:mt-6 font-medium tracking-wide text-center"
                   >
                     Practical AI systems engineered for business execution
                   </motion.p>
@@ -170,7 +170,7 @@ export default function HomeHero() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.2, duration: 0.8 }}
-                  className="text-base md:text-lg text-gray-400 mb-8 leading-relaxed max-w-2xl"
+                  className="text-base md:text-lg text-logo-color mb-8 leading-relaxed max-w-2xl"
                 >
                   We design and deploy Applied General Intelligence systems - AI-powered automations, analytice, and agents that improve revenue, operations, and decision-making today, not someday.
                 </motion.p>
@@ -179,22 +179,22 @@ export default function HomeHero() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.3, duration: 0.8 }}
-                  className="space-y-3 mb-8 text-base text-gray-300"
+                  className="space-y-3 mb-8 text-base text-logo-color"
                 >
                   <li className="flex items-start">
-                    <span className="text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-logo-color mr-3 mt-1">•</span>
                     <span>Applied intelligence systems for revenue, marketing, and operations</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-logo-color mr-3 mt-1">•</span>
                     <span>AI agents developed for specific business workflows, not experiments</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-logo-color mr-3 mt-1">•</span>
                     <span>Data-driven automation that improves over time</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="text-brand-primary mr-3 mt-1">•</span>
+                    <span className="text-logo-color mr-3 mt-1">•</span>
                     <span>From strategy and architecture to production deployment</span>
                   </li>
                 </motion.ul>

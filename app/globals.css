@@ -64,6 +64,19 @@
     color: #6b7280; /* Medium gray for secondary text */
   }
 
+  /* Logo text color - matches logo component */
+  .text-logo-color {
+    color: #201F54;
+  }
+
+  html.light .text-logo-color {
+    color: #201F54;
+  }
+
+  html:not(.light) .text-logo-color {
+    color: #e5e7eb;
+  }
+
   /* Light mode override for neon-cyan text */
   html.light .text-neon-cyan {
     color: #0088cc; /* Use lighter blue for better visibility in light mode */
