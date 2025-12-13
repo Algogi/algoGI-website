@@ -76,22 +76,16 @@ export default function ContactPage() {
 
   const officeLocations = [
     {
-      city: "San Francisco, USA",
-      address: "123 Tech Street, San Francisco, CA 94105",
-      phone: "+1 (555) 123-4567",
-      email: "hello@algogi.com",
-    },
-    {
       city: "Newark, USA",
-      address: "131 Continental Drive, Suite 305, Newark, New Castle, DE 19713",
-      phone: "+1 302 930 0149",
-      email: "Sales@algogi.com",
+      address: "131 CONTINENTAL DRIVE, SUITE 305 NEWARK, New Castle, DE -19713",
+      phone: "+1 540 268 8778",
+      email: "info@algogi.com",
     },
     {
       city: "Bengaluru, India",
       address: "JBR Tech Park, Plot No. 77, 6th Rd, EPIP Zone, Whitefield, Bengaluru, Karnataka 560066",
-      phone: "+1 302 930 0149",
-      email: "Contact@algogi.com",
+      phone: "+91 877 017 0371",
+      email: "info@algogi.com",
     },
   ];
 
@@ -244,7 +238,7 @@ export default function ContactPage() {
                   <Phone className="w-10 h-10 text-neon-blue dark:text-neon-blue text-neon-light-blue" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">Phone</h3>
-                <p className="text-gray-300 mb-2">+1 (555) 123-4567</p>
+                <p className="text-gray-300 mb-2">+1 540 268 8778</p>
                 <p className="text-sm text-gray-400">Mon-Fri, 9AM-6PM EST</p>
               </div>
             </motion.div>
@@ -263,10 +257,10 @@ export default function ContactPage() {
                   <Mail className="w-10 h-10 text-neon-purple dark:text-neon-purple text-neon-light-purple" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">Email</h3>
-                <a href="mailto:hello@algogi.com" className="text-neon-purple dark:text-neon-purple text-neon-light-purple hover:underline block mb-2">
-                  hello@algogi.com
+                <a href="mailto:info@algogi.com" className="text-neon-purple dark:text-neon-purple text-neon-light-purple hover:underline block mb-2">
+                  info@algogi.com
                 </a>
-                <p className="text-sm text-gray-400">24/7 support available</p>
+                <p className="text-sm text-gray-400">Email your questions to us 24/7</p>
               </div>
             </motion.div>
 
@@ -284,7 +278,7 @@ export default function ContactPage() {
                   <Globe className="w-10 h-10 text-neon-cyan dark:text-neon-cyan text-neon-light-blue" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">Global Offices</h3>
-                <p className="text-gray-300 mb-2">3 locations worldwide</p>
+                <p className="text-gray-300 mb-2">2 locations worldwide</p>
                 <p className="text-sm text-gray-400">See locations below</p>
               </div>
             </motion.div>
@@ -400,7 +394,7 @@ export default function ContactPage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {officeLocations.map((location, index) => (
               <motion.div
                 key={index}

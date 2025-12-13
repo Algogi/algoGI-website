@@ -66,7 +66,7 @@ export default function SiteHeader() {
                       className={`relative font-semibold transition-colors duration-300 group ${
                         isActive 
                           ? "text-brand-primary" 
-                          : "text-gray-200 hover:text-brand-primary"
+                          : "text-logo-color hover:text-brand-primary"
                       }`}
                     >
                       {link.label}
@@ -91,7 +91,7 @@ export default function SiteHeader() {
               <ThemeToggle />
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg text-gray-200 hover:text-brand-primary hover:bg-brand-primary/10 focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                className="p-2 rounded-lg text-logo-color hover:text-brand-primary hover:bg-brand-primary/10 focus:outline-none focus:ring-2 focus:ring-brand-primary"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle menu"
                 aria-expanded={isMobileMenuOpen}
@@ -158,7 +158,7 @@ export default function SiteHeader() {
                 </Link>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-lg text-gray-200 hover:text-brand-primary hover:bg-brand-primary/10 focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                  className="p-2 rounded-lg text-logo-color hover:text-brand-primary hover:bg-brand-primary/10 focus:outline-none focus:ring-2 focus:ring-brand-primary"
                   onClick={() => setIsMobileMenuOpen(false)}
                   aria-label="Close menu"
                 >
@@ -194,7 +194,7 @@ export default function SiteHeader() {
                         className={`font-semibold transition-colors py-3 px-4 block relative rounded-lg ${
                           isActive 
                             ? "text-brand-primary bg-brand-primary/10" 
-                            : "text-gray-200 hover:text-brand-primary hover:bg-brand-primary/5"
+                            : "text-logo-color hover:text-brand-primary hover:bg-brand-primary/5"
                         }`}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

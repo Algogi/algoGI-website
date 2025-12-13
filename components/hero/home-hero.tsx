@@ -147,7 +147,7 @@ export default function HomeHero() {
               
               <div className="relative z-10">
 
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-white">
+                <h1 className="hero-title text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-white">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

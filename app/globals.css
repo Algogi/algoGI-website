@@ -51,6 +51,11 @@
     color: #0088cc; /* Blue for headings and primary text */
   }
 
+  /* Use logo color for hero title in light mode */
+  html.light .hero-title {
+    color: #201F54 !important;
+  }
+
   /* Keep process step icons white in light mode (they're on colored backgrounds) */
   html.light .process-step-icon {
     color: #ffffff !important;
