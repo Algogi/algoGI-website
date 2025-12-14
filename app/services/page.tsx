@@ -53,7 +53,7 @@ function ServiceCard({
 
           {/* Title */}
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-neon-blue transition-colors">
-            {service.title.split("—")[0].trim()}
+            {service.title.split("-")[0].trim()}
           </h2>
 
           {/* Short description - flex-1 to push button down */}

@@ -32,7 +32,7 @@ export default function ContactPage() {
     {
       icon: MessageSquare,
       title: "Direct Communication",
-      description: "Speak directly with senior engineers—no sales scripts, no spam.",
+      description: "Speak directly with senior engineers-no sales scripts, no spam.",
     },
     {
       icon: Zap,
@@ -77,7 +77,7 @@ export default function ContactPage() {
   const officeLocations = [
     {
       city: "Delaware, USA",
-      address: "131 continental drive, suite 305 newark, DE 19713",
+      address: "131 Continental Drive, Suite 305 Newark, DE 19713",
       phone: "+1 540 268 8778",
       email: "info@algogi.com",
     },
@@ -120,7 +120,7 @@ export default function ContactPage() {
             Tell us what you&apos;re building. Get a clear plan in your inbox.
           </p>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Share a bit about your product, your timeline, and what &apos;success&apos; looks like. A senior engineer will respond with next steps—no sales scripts, no spam.
+            Share a bit about your product, your timeline, and what &apos;success&apos; looks like. A senior engineer will respond with next steps-no sales scripts, no spam.
           </p>
         </motion.div>
 
@@ -219,7 +219,7 @@ export default function ContactPage() {
               Get in <span className="text-gradient">Touch</span>
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Multiple ways to reach us—choose what works best for you
+              Multiple ways to reach us-choose what works best for you
             </p>
           </motion.div>
 

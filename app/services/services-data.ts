@@ -17,7 +17,7 @@ export interface Service {
 export const services: Service[] = [
   {
     slug: "ai-agent-development",
-    title: "AI Agent Development — Autonomous Intelligence That Evolves",
+    title: "AI Agent Development - Autonomous Intelligence That Evolves",
     shortDescription: "Build adaptive AI agents that learn, decide, and scale autonomously",
     description:
       "AlgoGI engineers intelligent AI agents that operate independently, learning from real-world data to make sophisticated decisions and continuously improve performance.",
@@ -48,7 +48,7 @@ export const services: Service[] = [
   },
   {
     slug: "bespoke-ai-platforms",
-    title: "Bespoke AI Platforms — Custom Intelligence Built for Your Business",
+    title: "Bespoke AI Platforms - Custom Intelligence Built for Your Business",
     shortDescription: "Enterprise-grade AI platforms tailored to your exact requirements",
     description:
       "AlgoGI builds custom AI platforms that integrate seamlessly with your infrastructure while delivering breakthrough capabilities tailored to your industry.",
@@ -79,7 +79,7 @@ export const services: Service[] = [
   },
   {
     slug: "ai-strategy-consulting",
-    title: "AI Strategy Consulting — From Vision to $ROI Reality",
+    title: "AI Strategy Consulting - From Vision to $ROI Reality",
     shortDescription: "Proven frameworks to prioritize AI investments and measure success",
     description:
       "AlgoGI helps executives build AI strategies that deliver measurable business outcomes, not just proof-of-concepts.",
@@ -110,7 +110,7 @@ export const services: Service[] = [
   },
   {
     slug: "intelligent-automation",
-    title: "Intelligent Automation — AI-Powered Process Transformation",
+    title: "Intelligent Automation - AI-Powered Process Transformation",
     shortDescription: "End-to-end automation that learns and continuously improves",
     description:
       "AlgoGI combines RPA, ML, and NLP to create automation systems that handle unstructured data and complex decision-making.",
@@ -141,7 +141,7 @@ export const services: Service[] = [
   },
   {
     slug: "ai-virtual-agents",
-    title: "AI Virtual Agents — Enterprise-Grade Conversational Intelligence",
+    title: "AI Virtual Agents - Enterprise-Grade Conversational Intelligence",
     shortDescription: "Human-like conversations that resolve 85%+ of interactions",
     description:
       "AlgoGI builds virtual agents that understand nuance, maintain context across sessions, and escalate intelligently.",
@@ -172,7 +172,7 @@ export const services: Service[] = [
   },
   {
     slug: "ai-model-lifecycle-management",
-    title: "AI Model Lifecycle Management — Production AI That Never Degrades",
+    title: "AI Model Lifecycle Management - Production AI That Never Degrades",
     shortDescription: "MLOps platform ensuring 99.9% model uptime and accuracy",
     description:
       "AlgoGI manages the complete AI lifecycle from data drift detection to champion/challenger model deployment.",
@@ -203,7 +203,7 @@ export const services: Service[] = [
   },
   {
     slug: "product-engineering",
-    title: "Product Engineering — From 0 to 1M Users Without Breaking",
+    title: "Product Engineering - From 0 to 1M Users Without Breaking",
     shortDescription: "Full-stack teams that ship scalable products at unicorn velocity",
     description:
       "AlgoGI's product engineering squads deliver production systems that handle 1M+ users from day one with zero refactoring.",
@@ -234,7 +234,7 @@ export const services: Service[] = [
   },
   {
     slug: "cloud-and-platforms",
-    title: "Cloud Platforms — Infrastructure That Scales to $1B ARR",
+    title: "Cloud Platforms - Infrastructure That Scales to $1B ARR",
     shortDescription: "Production cloud platforms with FinOps, security, and 99.99% SLA",
     description:
       "AlgoGI builds cloud platforms that support unicorn growth while optimizing costs and maintaining security.",
@@ -265,7 +265,7 @@ export const services: Service[] = [
   },
   {
     slug: "strategy-sprints",
-    title: "Strategy Sprints — 80 Hours That Save You $8M in Wrong Turns",
+    title: "Strategy Sprints - 80 Hours That Save You $8M in Wrong Turns",
     shortDescription: "5-day workshops that de-risk your entire technical roadmap",
     description:
       "AlgoGI's strategy sprints compress 6 months of planning into 5 high-intensity days with guaranteed outcomes.",

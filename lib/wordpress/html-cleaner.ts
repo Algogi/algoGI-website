@@ -42,7 +42,7 @@ export function cleanWordPressHTML(html: string): string {
   cleaned = cleaned.replace(/&#8220;/g, '"');
   cleaned = cleaned.replace(/&#8221;/g, '"');
   cleaned = cleaned.replace(/&#8211;/g, "–");
-  cleaned = cleaned.replace(/&#8212;/g, "—");
+  cleaned = cleaned.replace(/&#8212;/g, "-");
   cleaned = cleaned.replace(/&#8230;/g, "…");
 
   // 5. Remove empty tags
@@ -130,7 +130,7 @@ export function cleanWordPressText(text: string): string {
   cleaned = cleaned.replace(/&#8220;/g, '"');
   cleaned = cleaned.replace(/&#8221;/g, '"');
   cleaned = cleaned.replace(/&#8211;/g, "–");
-  cleaned = cleaned.replace(/&#8212;/g, "—");
+  cleaned = cleaned.replace(/&#8212;/g, "-");
   cleaned = cleaned.replace(/&#8230;/g, "…");
 
   // Clean up whitespace

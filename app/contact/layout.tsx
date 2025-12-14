@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Contact Us - Get Your AI Project Started | AlgoGI",
   description:
-    "Contact AlgoGI to discuss your AI and software development needs. Get a clear plan in your inbox within 24 hours. Speak directly with senior engineers—no sales scripts, no spam. Multiple ways to reach us.",
+    "Contact AlgoGI to discuss your AI and software development needs. Get a clear plan in your inbox within 24 hours. Speak directly with senior engineers-no sales scripts, no spam. Multiple ways to reach us.",
   keywords: [
     "contact AI development company",
     "AI consultation",

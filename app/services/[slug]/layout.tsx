@@ -22,9 +22,9 @@ export async function generateMetadata({
     };
   }
 
-  const serviceTitle = service.title.split("—")[0].trim();
-  const serviceSubtitle = service.title.includes("—")
-    ? service.title.split("—")[1].trim()
+  const serviceTitle = service.title.split("-")[0].trim();
+  const serviceSubtitle = service.title.includes("-")
+    ? service.title.split("-")[1].trim()
     : "";
 
   return {

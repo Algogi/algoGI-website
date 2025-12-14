@@ -29,7 +29,7 @@ export default function ServiceDetailPage() {
     <div className="bg-dark-bg relative overflow-hidden">
       {service && (
         <ServiceStructuredData
-          name={service.title.split("—")[0].trim()}
+          name={service.title.split("-")[0].trim()}
           description={service.description}
           serviceType="AI Development Service"
         />
@@ -55,11 +55,11 @@ export default function ServiceDetailPage() {
           >
             <div className="mb-6">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2">
-                {service.title.split("—")[0].trim()}
+                {service.title.split("-")[0].trim()}
               </h1>
-              {service.title.includes("—") && (
+              {service.title.includes("-") && (
                 <p className="text-xl md:text-2xl lg:text-3xl text-gray-400 font-normal">
-                  {service.title.split("—")[1].trim()}
+                  {service.title.split("-")[1].trim()}
                 </p>
               )}
             </div>
@@ -116,7 +116,7 @@ export default function ServiceDetailPage() {
                   >
                     <Image
                       src={service.image}
-                      alt={`${service.title.split("—")[0].trim()} - AI development service by AlgoGI showcasing ${service.shortDescription.toLowerCase()}`}
+                      alt={`${service.title.split("-")[0].trim()} - AI development service by AlgoGI showcasing ${service.shortDescription.toLowerCase()}`}
                       fill
                       className="object-contain transition-all duration-500 group-hover:brightness-110"
                     />
@@ -296,7 +296,7 @@ export default function ServiceDetailPage() {
                   Ready to Transform Your Business?
                 </h3>
                 <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-                  Let&apos;s discuss how {service.title.split("—")[0].trim()} can drive real results for your organization.
+                  Let&apos;s discuss how {service.title.split("-")[0].trim()} can drive real results for your organization.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link

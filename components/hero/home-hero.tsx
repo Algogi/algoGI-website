@@ -208,7 +208,7 @@ export default function HomeHero() {
                   <Link href="/contact" className="btn-primary">
                     Start Your AI Transformation
                   </Link>
-                  <Link href="/services" className="btn-secondary">
+                  <Link href="/services" className="btn-secondary text-[#201F54] border-[#201F54] hover:border-[#201F54]/80 hover:text-[#201F54]/90 dark:text-logo-color dark:border-logo-color dark:hover:border-logo-color/80 dark:hover:text-logo-color/90">
                     Explore Our Solutions
                   </Link>
                 </motion.div>

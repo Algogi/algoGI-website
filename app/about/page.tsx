@@ -56,7 +56,7 @@ export default function AboutPage() {
               <span className="text-gray-900 dark:text-white">By AI-Powered Engineering</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 dark:text-gray-300 leading-relaxed max-w-4xl mx-auto mb-10">
-              We are a fervent group of software innovators, engineers, and designers—creating future-capable solutions for companies worldwide. With profound technical expertise in artificial intelligence, product design, and full-cycle development, we drive complex challenges to intelligent, scalable systems.
+              We are a fervent group of software innovators, engineers, and designers-creating future-capable solutions for companies worldwide. With profound technical expertise in artificial intelligence, product design, and full-cycle development, we drive complex challenges to intelligent, scalable systems.
             </p>
             <Link
               href="/contact"
@@ -94,7 +94,7 @@ export default function AboutPage() {
                 Empowering businesses to transform with intelligent digital solutions.
               </p>
               <p className="text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto">
-                We imagine a future where AI-powered technology delivers frictionless, smart, and meaningful experiences. Our goal is to drive that change—one solution at a time.
+                We imagine a future where AI-powered technology delivers frictionless, smart, and meaningful experiences. Our goal is to drive that change-one solution at a time.
               </p>
             </div>
           </motion.div>
@@ -175,11 +175,11 @@ export default function AboutPage() {
                   </h2>
                 </div>
                 <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-6 font-semibold">
-                  We don&apos;t only develop products—we develop Solutions
+                  We don&apos;t only develop products-we develop Solutions
                 </p>
                 <div className="space-y-4">
                   <p className="text-lg text-gray-400 leading-relaxed">
-                    With a solid background in AI and software development, we provide the optimal combination of innovation, pace, and stability to turn your digital concepts into reality. We don&apos;t just build products—we craft tailored AI solutions.
+                    With a solid background in AI and software development, we provide the optimal combination of innovation, pace, and stability to turn your digital concepts into reality. We don&apos;t just build products-we craft tailored AI solutions.
                   </p>
                   <p className="text-lg text-gray-400 leading-relaxed">
                     Combining deep tech expertise with speed and stability, we collaborate closely from concept to deployment, ensuring scalable, future-ready outcomes that align with your business goals and drive real impact.

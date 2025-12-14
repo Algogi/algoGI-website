@@ -52,7 +52,7 @@ export default function QuoteBlock({ block, isSelected, onUpdate }: QuoteBlockPr
       onClick={() => setIsEditing(true)}
     >
       <p>{text}</p>
-      {author && <cite className="block mt-2 text-sm not-italic">— {author}</cite>}
+      {author && <cite className="block mt-2 text-sm not-italic">- {author}</cite>}
     </blockquote>
   );
 }
