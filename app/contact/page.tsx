@@ -77,13 +77,15 @@ export default function ContactPage() {
   const officeLocations = [
     {
       city: "Delaware, USA",
-      address: "131 CONTINENTAL DRIVE, SUITE 305 NEWARK, New Castle, DE -19713",
+      address: "131 continental drive, suite 305 newark, DE 19713",
       phone: "+1 540 268 8778",
+      email: "info@algogi.com",
     },
     {
       city: "Bengaluru, India",
       address: "JBR Tech Park, Plot No. 77, 6th Rd, EPIP Zone, Whitefield, Bengaluru, Karnataka 560066",
       phone: "+91 877 017 0371",
+      email: "info@algogi.com",
     },
   ];
 
@@ -421,6 +423,14 @@ export default function ContactPage() {
                         {location.phone}
                       </a>
                     </div>
+                    {location.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-neon-blue flex-shrink-0" />
+                        <a href={`mailto:${location.email}`} className="text-gray-300 hover:text-neon-blue transition-colors">
+                          {location.email}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

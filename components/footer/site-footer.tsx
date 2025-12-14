@@ -248,7 +248,7 @@ export default function SiteFooter() {
                 <div className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 text-neon-blue mt-1 flex-shrink-0" />
                   <span>
-                    131 CONTINENTAL DRIVE, SUITE 305 NEWARK, New Castle, DE -19713
+                    131 continental drive, suite 305 newark, DE 19713
                   </span>
                 </div>
               </div>
