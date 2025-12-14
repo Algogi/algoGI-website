@@ -42,7 +42,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
   // Update editor content when content prop changes externally
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content, false);
+      editor.commands.setContent(content, { emitUpdate: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
