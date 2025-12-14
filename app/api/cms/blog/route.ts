@@ -3,6 +3,22 @@ import { getSession } from "@/lib/auth/session";
 import { getDb } from "@/lib/firebase/config";
 import { FieldValue } from "firebase-admin/firestore";
 
+interface SEOData {
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string[];
+  focusKeyword?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  canonicalUrl?: string;
+  robotsIndex?: boolean;
+  robotsFollow?: boolean;
+}
+
 interface BlogPost {
   title: string;
   slug: string;
@@ -15,6 +31,8 @@ interface BlogPost {
   published: boolean;
   featuredImage?: string;
   tags?: string[];
+  faqs?: any[];
+  seo?: SEOData;
 }
 
 export async function GET(request: NextRequest) {
@@ -39,10 +57,13 @@ export async function GET(request: NextRequest) {
         published: data.published || false,
         featuredImage: data.featuredImage || null,
         tags: data.tags || [],
+        faqs: data.faqs || [],
         publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
         seoScore: data.seoScore || null,
+        seoAnalysis: data.seoAnalysis || null,
+        seo: data.seo || null,
         wordpressId: data.wordpressId || null,
         migratedAt: data.migratedAt?.toDate?.()?.toISOString() || null,
       };
@@ -89,7 +110,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const postData = {
+    const postData: any = {
       title: body.title,
       slug,
       content: body.content,
@@ -103,6 +124,11 @@ export async function POST(request: NextRequest) {
       updatedAt: FieldValue.serverTimestamp(),
       publishedAt: body.published ? FieldValue.serverTimestamp() : null,
     };
+
+    // Add SEO data if provided
+    if (body.seo) {
+      postData.seo = body.seo;
+    }
 
     const docRef = await db.collection("blog").add(postData);
 

@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         content: transformed.content,
         excerpt: transformed.excerpt,
         author: transformed.author,
-        published: transformed.published,
+        published: false, // Always save as draft when syncing from WordPress
         featuredImage: transformed.featuredImage,
         tags: transformed.tags,
         wordpressId: transformed.wordpressId,
@@ -81,11 +81,7 @@ export async function POST(request: NextRequest) {
         results.updated = 1;
       } else {
         postData.createdAt = FieldValue.serverTimestamp();
-        postData.publishedAt = transformed.published
-          ? transformed.publishedAt
-            ? new Date(transformed.publishedAt)
-            : FieldValue.serverTimestamp()
-          : null;
+        postData.publishedAt = null; // No publishedAt for drafts
         await docRef.set(postData);
         results.created = 1;
       }
@@ -135,7 +131,7 @@ export async function POST(request: NextRequest) {
             content: transformed.content,
             excerpt: transformed.excerpt,
             author: transformed.author,
-            published: transformed.published,
+            published: false, // Always save as draft when syncing from WordPress
             featuredImage: transformed.featuredImage,
             tags: transformed.tags,
             wordpressId: transformed.wordpressId,
@@ -148,11 +144,7 @@ export async function POST(request: NextRequest) {
             results.updated++;
           } else {
             postData.createdAt = FieldValue.serverTimestamp();
-            postData.publishedAt = transformed.published
-              ? transformed.publishedAt
-                ? new Date(transformed.publishedAt)
-                : FieldValue.serverTimestamp()
-              : null;
+            postData.publishedAt = null; // No publishedAt for drafts
             await docRef.set(postData);
             results.created++;
           }

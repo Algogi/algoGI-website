@@ -115,12 +115,12 @@ export default function TrustSignals() {
                         <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                       ))}
                     </div>
-                    <p className="text-gray-300 mb-4 leading-relaxed italic">
+                    <p className="text-gray-300 dark:text-gray-700 mb-4 leading-relaxed italic">
                       &quot;{testimonial.quote}&quot;
                     </p>
-                    <div className="pt-4 border-t border-neon-purple/20">
-                      <p className="font-semibold text-white">{testimonial.author}</p>
-                      <p className="text-sm text-gray-400">{testimonial.role}</p>
+                    <div className="pt-4 border-t border-neon-purple/20 dark:border-neon-purple/30">
+                      <p className="font-semibold text-white dark:text-gray-900">{testimonial.author}</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-600">{testimonial.role}</p>
                     </div>
                   </div>
                 </motion.div>

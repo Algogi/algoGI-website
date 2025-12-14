@@ -1,3 +1,5 @@
+import { cleanWordPressContent, cleanWordPressText } from "./html-cleaner";
+
 interface WordPressPost {
   id: number;
   date: string;
@@ -287,9 +289,12 @@ class WordPressClient {
   }
 
   private htmlToMarkdown(html: string): string {
+    // Clean WordPress HTML first
+    const cleanedHTML = cleanWordPressContent(html);
+    
     // Basic HTML to Markdown conversion
     // This is a simplified version - for production, consider using a library like turndown
-    let markdown = html
+    let markdown = cleanedHTML
       .replace(/<h1[^>]*>(.*?)<\/h1>/gi, "# $1\n\n")
       .replace(/<h2[^>]*>(.*?)<\/h2>/gi, "## $1\n\n")
       .replace(/<h3[^>]*>(.*?)<\/h3>/gi, "### $1\n\n")
@@ -340,13 +345,18 @@ class WordPressClient {
     const tagObjects = await this.fetchTags(post.tags || []);
     const tags = tagObjects.map((tag) => tag.name);
 
-    // Convert HTML content to Markdown
-    const content = this.htmlToMarkdown(post.content.rendered);
-    const excerpt = this.htmlToMarkdown(post.excerpt.rendered);
+    // Clean and convert HTML content to Markdown
+    const cleanedContent = cleanWordPressContent(post.content.rendered);
+    const cleanedExcerpt = cleanWordPressText(post.excerpt.rendered);
+    const content = this.htmlToMarkdown(cleanedContent);
+    const excerpt = this.htmlToMarkdown(cleanedExcerpt);
+
+    // Clean title
+    const cleanedTitle = cleanWordPressText(post.title.rendered);
 
     return {
       wordpressId: post.id,
-      title: post.title.rendered,
+      title: cleanedTitle,
       slug: post.slug,
       content,
       excerpt,

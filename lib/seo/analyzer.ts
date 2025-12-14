@@ -64,61 +64,188 @@ interface SEOAnalysis {
   };
 }
 
+interface SEOData {
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string[];
+  focusKeyword?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  canonicalUrl?: string;
+  robotsIndex?: boolean;
+  robotsFollow?: boolean;
+}
+
 interface BlogPostData {
   title: string;
   slug: string;
   content: string;
   excerpt: string;
   featuredImage?: string | null;
+  seo?: SEOData;
 }
 
 export class SEOAnalyzer {
-  private extractTextFromMarkdown(markdown: string): string {
-    // Remove markdown syntax to get plain text
-    return markdown
-      .replace(/#{1,6}\s+/g, "") // Remove headers
-      .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove bold
-      .replace(/\*([^*]+)\*/g, "$1") // Remove italic
-      .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1") // Remove links, keep text
-      .replace(/!\[([^\]]*)\]\([^\)]+\)/g, "") // Remove images
-      .replace(/`([^`]+)`/g, "$1") // Remove code
-      .replace(/```[\s\S]*?```/g, "") // Remove code blocks
+  private extractTextFromMarkdown(content: string): string {
+    let text = content;
+    
+    // Handle JSON block format
+    if (text.trim().startsWith("{") && text.includes("blocks")) {
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.blocks && Array.isArray(parsed.blocks)) {
+          // Extract text from blocks
+          const extractTextFromBlock = (block: any): string => {
+            if (block.data?.text) return block.data.text;
+            if (block.data?.content) {
+              // TipTap JSON format
+              if (typeof block.data.content === "object" && block.data.content.content) {
+                const extractFromTipTap = (node: any): string => {
+                  if (node.type === "text" && node.text) return node.text;
+                  if (node.content && Array.isArray(node.content)) {
+                    return node.content.map(extractFromTipTap).join(" ");
+                  }
+                  return "";
+                };
+                return extractFromTipTap(block.data.content);
+              }
+            }
+            return "";
+          };
+          text = parsed.blocks.map(extractTextFromBlock).join(" ");
+        }
+      } catch {
+        // Not valid JSON, continue with HTML/markdown processing
+      }
+    }
+    
+    // Remove HTML tags and get text content
+    text = text
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove scripts
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "") // Remove styles
+      .replace(/<[^>]+>/g, " ") // Remove HTML tags
+      .replace(/&nbsp;/g, " ") // Replace &nbsp;
+      .replace(/&[a-z]+;/gi, " ") // Replace HTML entities
+      .replace(/#{1,6}\s+/g, "") // Remove markdown headers
+      .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove markdown bold
+      .replace(/\*([^*]+)\*/g, "$1") // Remove markdown italic
+      .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1") // Remove markdown links, keep text
+      .replace(/!\[([^\]]*)\]\([^\)]+\)/g, "") // Remove markdown images
+      .replace(/`([^`]+)`/g, "$1") // Remove markdown code
+      .replace(/```[\s\S]*?```/g, "") // Remove markdown code blocks
       .replace(/\n+/g, " ") // Replace newlines with spaces
+      .replace(/\s+/g, " ") // Normalize whitespace
       .trim();
+    
+    return text;
   }
 
-  private extractHeadings(markdown: string): {
+  private extractHeadings(content: string): {
     h1: string[];
     h2: string[];
     h3: string[];
   } {
-    const h1Matches = markdown.match(/^#\s+(.+)$/gm) || [];
-    const h2Matches = markdown.match(/^##\s+(.+)$/gm) || [];
-    const h3Matches = markdown.match(/^###\s+(.+)$/gm) || [];
+    // Extract from HTML
+    const htmlH1Matches = content.match(/<h1[^>]*>(.*?)<\/h1>/gi) || [];
+    const htmlH2Matches = content.match(/<h2[^>]*>(.*?)<\/h2>/gi) || [];
+    const htmlH3Matches = content.match(/<h3[^>]*>(.*?)<\/h3>/gi) || [];
+    
+    // Extract from markdown
+    const mdH1Matches = content.match(/^#\s+(.+)$/gm) || [];
+    const mdH2Matches = content.match(/^##\s+(.+)$/gm) || [];
+    const mdH3Matches = content.match(/^###\s+(.+)$/gm) || [];
+    
+    // Extract from JSON blocks
+    let jsonH1: string[] = [];
+    let jsonH2: string[] = [];
+    let jsonH3: string[] = [];
+    
+    if (content.trim().startsWith("{") && content.includes("blocks")) {
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed.blocks && Array.isArray(parsed.blocks)) {
+          parsed.blocks.forEach((block: any) => {
+            if (block.type === "heading") {
+              const level = block.data?.level || 1;
+              const text = block.data?.text || "";
+              if (level === 1) jsonH1.push(text);
+              else if (level === 2) jsonH2.push(text);
+              else if (level === 3) jsonH3.push(text);
+            }
+          });
+        }
+      } catch {
+        // Not valid JSON, ignore
+      }
+    }
 
     return {
-      h1: h1Matches.map((h) => h.replace(/^#\s+/, "").trim()),
-      h2: h2Matches.map((h) => h.replace(/^##\s+/, "").trim()),
-      h3: h3Matches.map((h) => h.replace(/^###\s+/, "").trim()),
+      h1: [
+        ...htmlH1Matches.map((h) => h.replace(/<[^>]+>/g, "").trim()),
+        ...mdH1Matches.map((h) => h.replace(/^#\s+/, "").trim()),
+        ...jsonH1,
+      ],
+      h2: [
+        ...htmlH2Matches.map((h) => h.replace(/<[^>]+>/g, "").trim()),
+        ...mdH2Matches.map((h) => h.replace(/^##\s+/, "").trim()),
+        ...jsonH2,
+      ],
+      h3: [
+        ...htmlH3Matches.map((h) => h.replace(/<[^>]+>/g, "").trim()),
+        ...mdH3Matches.map((h) => h.replace(/^###\s+/, "").trim()),
+        ...jsonH3,
+      ],
     };
   }
 
-  private extractImages(markdown: string, featuredImage?: string | null): {
+  private extractImages(content: string, featuredImage?: string | null): {
     total: number;
     withAlt: number;
   } {
-    const imageRegex = /!\[([^\]]*)\]\([^\)]+\)/g;
-    const matches = markdown.match(imageRegex) || [];
-    const withAlt = matches.filter((img) => {
+    // Extract from HTML
+    const htmlImageRegex = /<img[^>]+>/gi;
+    const htmlMatches = content.match(htmlImageRegex) || [];
+    const htmlWithAlt = htmlMatches.filter((img) => {
+      const altMatch = img.match(/alt=["']([^"']+)["']/i);
+      return altMatch && altMatch[1].trim().length > 0;
+    }).length;
+
+    // Extract from markdown
+    const mdImageRegex = /!\[([^\]]*)\]\([^\)]+\)/g;
+    const mdMatches = content.match(mdImageRegex) || [];
+    const mdWithAlt = mdMatches.filter((img) => {
       const altMatch = img.match(/!\[([^\]]+)\]/);
       return altMatch && altMatch[1].trim().length > 0;
     }).length;
 
-    // Include featured image in total count
-    const totalImages = matches.length + (featuredImage ? 1 : 0);
-    // Featured images are typically set with proper alt text via media selector
-    // Count featured image as having alt text if it exists
-    const totalWithAlt = withAlt + (featuredImage ? 1 : 0);
+    // Extract from JSON blocks
+    let jsonImages = 0;
+    let jsonWithAlt = 0;
+    
+    if (content.trim().startsWith("{") && content.includes("blocks")) {
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed.blocks && Array.isArray(parsed.blocks)) {
+          parsed.blocks.forEach((block: any) => {
+            if (block.type === "image") {
+              jsonImages++;
+              if (block.data?.alt && block.data.alt.trim().length > 0) {
+                jsonWithAlt++;
+              }
+            }
+          });
+        }
+      } catch {
+        // Not valid JSON, ignore
+      }
+    }
+
+    const totalImages = htmlMatches.length + mdMatches.length + jsonImages + (featuredImage ? 1 : 0);
+    const totalWithAlt = htmlWithAlt + mdWithAlt + jsonWithAlt + (featuredImage ? 1 : 0);
 
     return {
       total: totalImages,
@@ -126,20 +253,20 @@ export class SEOAnalyzer {
     };
   }
 
-  private extractLinks(markdown: string): {
+  private extractLinks(content: string): {
     internal: number;
     external: number;
   } {
-    const linkRegex = /\[([^\]]+)\]\(([^\)]+)\)/g;
-    const matches = [...markdown.matchAll(linkRegex)];
-    const baseUrl = process.env.NEXTAUTH_URL || "";
-
+    const baseUrl = process.env.NEXTAUTH_URL || "https://algogi.com";
     let internal = 0;
     let external = 0;
 
-    matches.forEach((match) => {
-      const url = match[2];
-      if (url.startsWith("/") || url.startsWith(baseUrl) || url.startsWith("#")) {
+    // Extract from HTML
+    const htmlLinkRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>/gi;
+    const htmlMatches = [...content.matchAll(htmlLinkRegex)];
+    htmlMatches.forEach((match) => {
+      const url = match[1];
+      if (url.startsWith("/") || url.includes("algogi.com") || url.startsWith("#")) {
         internal++;
       } else if (url.startsWith("http://") || url.startsWith("https://")) {
         external++;
@@ -147,6 +274,54 @@ export class SEOAnalyzer {
         internal++; // Relative links are considered internal
       }
     });
+
+    // Extract from markdown
+    const mdLinkRegex = /\[([^\]]+)\]\(([^\)]+)\)/g;
+    const mdMatches = [...content.matchAll(mdLinkRegex)];
+    mdMatches.forEach((match) => {
+      const url = match[2];
+      if (url.startsWith("/") || url.includes("algogi.com") || url.startsWith("#")) {
+        internal++;
+      } else if (url.startsWith("http://") || url.startsWith("https://")) {
+        external++;
+      } else {
+        internal++; // Relative links are considered internal
+      }
+    });
+
+    // Extract from JSON blocks
+    if (content.trim().startsWith("{") && content.includes("blocks")) {
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed.blocks && Array.isArray(parsed.blocks)) {
+          parsed.blocks.forEach((block: any) => {
+            if (block.type === "link" || (block.data?.content && block.data.content.content)) {
+              // Check TipTap content for links
+              const extractLinksFromTipTap = (node: any) => {
+                if (node.type === "link" && node.attrs?.href) {
+                  const url = node.attrs.href;
+                  if (url.startsWith("/") || url.includes("algogi.com") || url.startsWith("#")) {
+                    internal++;
+                  } else if (url.startsWith("http://") || url.startsWith("https://")) {
+                    external++;
+                  } else {
+                    internal++;
+                  }
+                }
+                if (node.content && Array.isArray(node.content)) {
+                  node.content.forEach(extractLinksFromTipTap);
+                }
+              };
+              if (block.data?.content) {
+                extractLinksFromTipTap(block.data.content);
+              }
+            }
+          });
+        }
+      } catch {
+        // Not valid JSON, ignore
+      }
+    }
 
     return { internal, external };
   }
@@ -206,7 +381,11 @@ export class SEOAnalyzer {
     return (matches / totalWords) * 100;
   }
 
-  private extractKeyword(title: string, slug: string): string {
+  private extractKeyword(title: string, slug: string, focusKeyword?: string): string {
+    // Use focus keyword if provided
+    if (focusKeyword && focusKeyword.trim().length > 0) {
+      return focusKeyword.trim();
+    }
     // Extract main keyword from title or slug
     const slugWords = slug.split("-").filter((w) => w.length > 3);
     if (slugWords.length > 0) {
@@ -217,7 +396,10 @@ export class SEOAnalyzer {
   }
 
   public analyze(post: BlogPostData): SEOAnalysis {
-    const keyword = this.extractKeyword(post.title, post.slug);
+    // Use SEO data if available, otherwise fall back to defaults
+    const seoTitle = post.seo?.metaTitle || post.title;
+    const seoDescription = post.seo?.metaDescription || post.excerpt;
+    const keyword = this.extractKeyword(post.title, post.slug, post.seo?.focusKeyword);
     const plainText = this.extractTextFromMarkdown(post.content);
     const wordCount = plainText.split(/\s+/).filter((w) => w.length > 0).length;
     const headings = this.extractHeadings(post.content);
@@ -226,10 +408,10 @@ export class SEOAnalyzer {
     const readability = this.calculateReadability(plainText);
     const keywordDensity = this.calculateKeywordDensity(plainText, keyword);
 
-    // Title Analysis
-    const titleLength = post.title.length;
+    // Title Analysis (use SEO title if available)
+    const titleLength = seoTitle.length;
     const titleOptimal = titleLength >= 50 && titleLength <= 60;
-    const titleHasKeyword = post.title.toLowerCase().includes(keyword.toLowerCase());
+    const titleHasKeyword = seoTitle.toLowerCase().includes(keyword.toLowerCase());
     let titleScore = 0;
     const titleRecommendations: string[] = [];
 
@@ -243,11 +425,11 @@ export class SEOAnalyzer {
     if (titleLength > 0 && titleLength <= 70) titleScore += 20;
     else titleRecommendations.push("Keep title under 70 characters for best display");
 
-    // Meta Description Analysis
-    const metaLength = post.excerpt.length;
+    // Meta Description Analysis (use SEO description if available)
+    const metaLength = seoDescription.length;
     const metaOptimal = metaLength >= 150 && metaLength <= 160;
-    const metaHasKeyword = post.excerpt.toLowerCase().includes(keyword.toLowerCase());
-    const metaHasCTA = /(learn|read|discover|explore|get|try|start|click|visit|download)/i.test(post.excerpt);
+    const metaHasKeyword = seoDescription.toLowerCase().includes(keyword.toLowerCase());
+    const metaHasCTA = /(learn|read|discover|explore|get|try|start|click|visit|download)/i.test(seoDescription);
     let metaScore = 0;
     const metaRecommendations: string[] = [];
 

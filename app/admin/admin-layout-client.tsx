@@ -71,8 +71,8 @@ export default function AdminLayoutClient({ children, session }: AdminLayoutClie
   return (
     <div className="min-h-screen bg-dark-bg flex">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-50 w-64 bg-dark-card border-r border-neon-blue/20 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-        <div className="flex flex-col h-full">
+      <div className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-50 w-64 bg-dark-card border-r border-neon-blue/20 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 max-h-screen`}>
+        <div className="flex flex-col h-screen max-h-screen">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-neon-blue/20">
             <Link href="/admin" className="flex items-center">

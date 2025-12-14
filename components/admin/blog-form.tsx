@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import MediaSelector from "./media-selector";
 import SEOReport from "./seo-report";
-import VisualEditor from "./visual-editor/VisualEditor";
+import SEOEditor, { SEOData } from "./seo-editor";
+import BlogEditor from "@/app/admin/blog/_components/BlogEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,22 @@ interface FAQ {
   answer: string;
 }
 
+interface SEOData {
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string[];
+  focusKeyword?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
+  canonicalUrl?: string;
+  robotsIndex?: boolean;
+  robotsFollow?: boolean;
+}
+
 interface BlogPost {
   id?: string;
   title: string;
@@ -33,6 +50,7 @@ interface BlogPost {
   faqs?: FAQ[];
   seoScore?: number | null;
   seoAnalysis?: any;
+  seo?: SEOData;
 }
 
 interface BlogFormProps {
@@ -45,52 +63,27 @@ export default function BlogForm({ post }: BlogFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null);
-  // Convert markdown to HTML if needed (for backward compatibility with existing markdown posts)
-  const convertMarkdownToHTML = (content: string): string => {
-    if (!content) return "";
-    // Simple check: if it contains markdown syntax but no HTML tags, it's markdown
-    const isMarkdown = /^[^<]*[#*\[\!`]/.test(content) && !/<[a-z][\s\S]*>/i.test(content);
-    if (!isMarkdown) return content; // Already HTML or empty
-    
-    // Basic markdown to HTML conversion for editor
-    let html = content
-      .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-      .replace(/^## (.*$)/gim, "<h2>$1</h2>")
-      .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/g, "<em>$1</em>")
-      .replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1" />')
-      .replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>')
-      .replace(/^\- (.*$)/gim, "<li>$1</li>")
-      .replace(/^(\d+)\. (.*$)/gim, "<li>$2</li>")
-      .split("\n")
-      .map((line) => {
-        if (line.trim() && !line.match(/^<(h[1-6]|li|img|a|ul|ol)/)) {
-          return `<p>${line}</p>`;
-        }
-        return line;
-      })
-      .join("\n");
-    
-    return html;
-  };
-
   const [formData, setFormData] = useState<BlogPost>({
     title: post?.title || "",
     slug: post?.slug || "",
-    content: post?.content ? convertMarkdownToHTML(post.content) : "",
+    content: post?.content || "",
     excerpt: post?.excerpt || "",
     author: post?.author || "",
     published: post?.published || false,
     featuredImage: post?.featuredImage || null,
     tags: post?.tags || [],
     faqs: post?.faqs || [],
+    seo: post?.seo || {
+      robotsIndex: true,
+      robotsFollow: true,
+    },
   });
 
   const [tagInput, setTagInput] = useState("");
   const [seoAnalyzing, setSeoAnalyzing] = useState(false);
   const [seoAnalysis, setSeoAnalysis] = useState<any>(post?.seoAnalysis || null);
   const [showSeoReport, setShowSeoReport] = useState(false);
+  const [fixing, setFixing] = useState(false);
 
   // Fetch current user session
   useEffect(() => {
@@ -127,6 +120,19 @@ export default function BlogForm({ post }: BlogFormProps) {
       const url = post ? `/api/cms/blog/${post.id}` : "/api/cms/blog";
       const method = post ? "PUT" : "POST";
 
+      // Convert JSON content to HTML before saving
+      let contentToSave = formData.content;
+      try {
+        const parsed = JSON.parse(formData.content);
+        if (parsed.blocks && Array.isArray(parsed.blocks)) {
+          const { blocksToHTML } = require("@/app/admin/blog/_components/editor/utils/serializer");
+          contentToSave = blocksToHTML(parsed);
+        }
+      } catch {
+        // If parsing fails, assume it's already HTML or invalid JSON
+        // Keep the original content
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -134,6 +140,7 @@ export default function BlogForm({ post }: BlogFormProps) {
         },
         body: JSON.stringify({
           ...formData,
+          content: contentToSave, // Use converted HTML content
           published: publish,
           author: currentUser?.name || currentUser?.email || formData.author,
         }),
@@ -159,6 +166,48 @@ export default function BlogForm({ post }: BlogFormProps) {
       setError(err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFixWordPressIssues = async () => {
+    if (!post?.id) {
+      toast.error("No post to fix");
+      return;
+    }
+
+    setFixing(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/cms/blog/${post.id}/fix`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update form data with fixed content
+        setFormData((prev) => ({
+          ...prev,
+          title: data.title,
+          content: data.content,
+          excerpt: data.excerpt,
+        }));
+        toast.success("WordPress issues fixed successfully!");
+        
+        // Reload the page to show updated content
+        router.refresh();
+      } else {
+        throw new Error(data.error || "Failed to fix WordPress issues");
+      }
+    } catch (err: any) {
+      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setFixing(false);
     }
   };
 
@@ -191,6 +240,7 @@ export default function BlogForm({ post }: BlogFormProps) {
           content: formData.content,
           excerpt: formData.excerpt,
           featuredImage: formData.featuredImage,
+          seo: formData.seo,
         },
       };
 
@@ -301,9 +351,32 @@ export default function BlogForm({ post }: BlogFormProps) {
           <div className="space-y-2">
             <Label>Content *</Label>
             <div className="min-h-[600px]">
-              <VisualEditor
-                content={formData.content}
-                onChange={(content) => setFormData((prev) => ({ ...prev, content }))}
+              <BlogEditor
+                value={(() => {
+                  // If content is HTML, try to parse it to blocks
+                  if (formData.content && !formData.content.trim().startsWith("{")) {
+                    // It's HTML, need to parse it
+                    if (typeof window !== "undefined") {
+                      try {
+                        const { htmlToBlocks } = require("@/app/admin/blog/_components/editor/utils/parser");
+                        const blocks = htmlToBlocks(formData.content);
+                        return JSON.stringify(blocks);
+                      } catch (error) {
+                        console.error("Error parsing HTML to blocks:", error);
+                        // Fallback to empty
+                        return JSON.stringify({ version: "1.0", blocks: [] });
+                      }
+                    }
+                    // Server-side, return empty
+                    return JSON.stringify({ version: "1.0", blocks: [] });
+                  }
+                  // Already JSON or empty
+                  return formData.content || JSON.stringify({ version: "1.0", blocks: [] });
+                })()}
+                onChange={(jsonContent) => {
+                  // Store as JSON internally
+                  setFormData((prev) => ({ ...prev, content: jsonContent }));
+                }}
               />
             </div>
           </div>
@@ -376,6 +449,17 @@ export default function BlogForm({ post }: BlogFormProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* SEO Editor */}
+      <SEOEditor
+        seo={formData.seo || { robotsIndex: true, robotsFollow: true }}
+        onChange={(seo) => setFormData((prev) => ({ ...prev, seo }))}
+        title={formData.title}
+        excerpt={formData.excerpt}
+        featuredImage={formData.featuredImage}
+        slug={formData.slug}
+        seoScore={post?.seoScore || seoAnalysis?.overall?.score || null}
+      />
 
       {/* FAQs Section */}
       <Card>
@@ -535,6 +619,24 @@ export default function BlogForm({ post }: BlogFormProps) {
           )}
         </Button>
         <div className="flex space-x-3">
+          {post && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleFixWordPressIssues}
+              disabled={fixing}
+              title="Fix common WordPress import issues like HTML tags, entities, and formatting"
+            >
+              {fixing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Fixing...
+                </>
+              ) : (
+                "Fix WordPress Issues"
+              )}
+            </Button>
+          )}
           <Button
             type="button"
             variant="outline"

@@ -9,6 +9,7 @@ import { Calendar, User, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import DOMPurify from "dompurify";
 import { toast } from "sonner";
+import BlogPlaceholderImage from "@/components/blog/blog-placeholder-image";
 
 interface FAQ {
   question: string;
@@ -132,16 +133,18 @@ export default function BlogPostPage() {
           )}
         </div>
 
-        {post.featuredImage && (
-          <div className="relative h-96 w-full mb-8 rounded-lg overflow-hidden">
+        <div className="relative h-96 w-full mb-8 rounded-lg overflow-hidden">
+          {post.featuredImage ? (
             <Image
               src={post.featuredImage}
               alt={post.title}
               fill
               className="object-cover"
             />
-          </div>
-        )}
+          ) : (
+            <BlogPlaceholderImage title={post.title} size="large" />
+          )}
+        </div>
 
         <header className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
@@ -186,8 +189,8 @@ export default function BlogPostPage() {
             try {
               const parsed = JSON.parse(post.content);
               if (parsed.blocks && Array.isArray(parsed.blocks)) {
-                // Convert blocks to HTML
-                const { blocksToHTML } = require("@/lib/editor/serializer");
+                // Convert blocks to HTML using the new block editor serializer
+                const { blocksToHTML } = require("@/app/admin/blog/_components/editor/utils/serializer");
                 contentToRender = blocksToHTML(parsed);
               }
             } catch {
@@ -219,7 +222,7 @@ export default function BlogPostPage() {
               return (
                 <div
                   dangerouslySetInnerHTML={{ __html: processedHTML }}
-                  className="[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-4 [&_a]:text-brand-primary [&_a]:hover:underline dark:[&_a]:text-neon-blue [&_div[data-grid-row]]:grid [&_div[data-grid-row]]:grid-cols-12 [&_div[data-grid-row]]:gap-4 [&_div[data-grid-column]]:grid-column [&_img[data-align='left']]:float-left [&_img[data-align='left']]:mr-4 [&_img[data-align='left']]:mb-4 [&_img[data-align='right']]:float-right [&_img[data-align='right']]:ml-4 [&_img[data-align='right']]:mb-4 [&_img[data-align='center']]:block [&_img[data-align='center']]:mx-auto [&_img[data-align='full-width']]:block [&_img[data-align='full-width']]:w-full"
+                  className="[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-4 [&_a]:text-brand-primary [&_a]:hover:underline dark:[&_a]:text-neon-blue [&_div[data-grid-row]]:grid [&_div[data-grid-row]]:grid-cols-12 [&_div[data-grid-row]]:gap-4 [&_div[data-grid-column]]:grid-column [&_img[data-align='left']]:float-left [&_img[data-align='left']]:mr-4 [&_img[data-align='left']]:mb-4 [&_img[data-align='right']]:float-right [&_img[data-align='right']]:ml-4 [&_img[data-align='right']]:mb-4 [&_img[data-align='center']]:block [&_img[data-align='center']]:mx-auto [&_img[data-align='full-width']]:block [&_img[data-align='full-width']]:w-full [&_.columns-container]:my-6 [&_.columns-container]:gap-4 [&_figure]:my-4 [&_figure_img]:w-full [&_figure_img]:h-auto [&_figure_img]:rounded-lg [&_figcaption]:text-sm [&_figcaption]:text-gray-600 [&_figcaption]:dark:text-gray-400 [&_figcaption]:mt-2 [&_figcaption]:text-center [&_.btn-primary]:inline-block [&_.btn-primary]:px-6 [&_.btn-primary]:py-3 [&_.btn-primary]:bg-brand-primary [&_.btn-primary]:text-white [&_.btn-primary]:rounded-lg [&_.btn-primary]:font-semibold [&_.btn-primary]:hover:bg-opacity-90 [&_.btn-primary]:transition-colors [&_.btn-primary]:my-4 [&_.btn-secondary]:inline-block [&_.btn-secondary]:px-6 [&_.btn-secondary]:py-3 [&_.btn-secondary]:bg-gray-200 [&_.btn-secondary]:dark:bg-gray-700 [&_.btn-secondary]:text-gray-900 [&_.btn-secondary]:dark:text-white [&_.btn-secondary]:rounded-lg [&_.btn-secondary]:font-semibold [&_.btn-secondary]:hover:bg-opacity-90 [&_.btn-secondary]:transition-colors [&_.btn-secondary]:my-4 [&_pre]:bg-gray-900 [&_pre]:dark:bg-gray-800 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4 [&_code]:bg-gray-100 [&_code]:dark:bg-gray-800 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm"
                 />
               );
             } else {

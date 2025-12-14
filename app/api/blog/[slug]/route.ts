@@ -71,14 +71,14 @@ export async function GET(
       // Transform WordPress post
       const transformed = await client.transformPost(wpPost);
 
-      // Save to Firebase
+      // Save to Firebase as draft (must be manually published)
       const postData: any = {
         title: transformed.title,
         slug: transformed.slug,
         content: transformed.content,
         excerpt: transformed.excerpt,
         author: transformed.author,
-        published: transformed.published,
+        published: false, // Always save as draft when syncing from WordPress
         featuredImage: transformed.featuredImage,
         tags: transformed.tags,
         wordpressId: transformed.wordpressId,
@@ -87,11 +87,7 @@ export async function GET(
           ? new Date(transformed.createdAt)
           : FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
-        publishedAt: transformed.publishedAt
-          ? new Date(transformed.publishedAt)
-          : transformed.published
-          ? FieldValue.serverTimestamp()
-          : null,
+        publishedAt: null, // No publishedAt for drafts
       };
 
       const docRef = await db.collection("blog").add(postData);
