@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebase/config";
 import { FieldValue } from "firebase-admin/firestore";
+import { sendLeadNotificationEmail } from "@/lib/email/send-email";
 
 interface LeadData {
   name: string;
@@ -67,6 +68,22 @@ export async function POST(request: NextRequest) {
     } catch (dbError) {
       console.error("Error storing lead in Firestore:", dbError);
       // Don't fail the request if logging fails
+    }
+
+    // Send admin notification email (non-blocking)
+    try {
+      await sendLeadNotificationEmail(
+        body.name,
+        body.email,
+        body.company,
+        body.projectDescription,
+        body.budgetTimeline,
+        body.openToCall,
+        body.preferredCallTime
+      );
+    } catch (emailError) {
+      console.error("Error sending lead notification email:", emailError);
+      // Don't fail the request if email fails
     }
 
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebase/config";
 import { FieldValue } from "firebase-admin/firestore";
+import { sendNewsletterConfirmationEmail } from "@/lib/email/send-email";
 
 interface NewsletterData {
   email: string;
@@ -73,6 +74,14 @@ export async function POST(request: NextRequest) {
     } catch (dbError) {
       console.error("Error storing newsletter subscription in Firestore:", dbError);
       // Don't fail the request if logging fails
+    }
+
+    // Send confirmation email (non-blocking)
+    try {
+      await sendNewsletterConfirmationEmail(body.email);
+    } catch (emailError) {
+      console.error("Error sending newsletter confirmation email:", emailError);
+      // Don't fail the request if email fails
     }
 
     return NextResponse.json(
