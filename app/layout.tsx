@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { OrganizationStructuredData } from "@/components/seo/structured-data";
 import AdminRouteHandler from "@/components/admin/admin-route-handler";
+import FirebaseAnalyticsProvider from "@/components/analytics/firebase-analytics-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geometric" });
 
@@ -69,7 +70,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans`}>
+      <body className={`${inter.variable} font-sans`} suppressHydrationWarning>
         <OrganizationStructuredData />
         <ThemeProvider
           attribute="class"
@@ -77,11 +78,17 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange={false}
         >
-          <AdminRouteHandler>
-            {children}
-          </AdminRouteHandler>
+          <FirebaseAnalyticsProvider>
+            <AdminRouteHandler>
+              {children}
+            </AdminRouteHandler>
+          </FirebaseAnalyticsProvider>
         </ThemeProvider>
-        {/* Google Analytics 4 - Replace G-XXXXXXXXXX with your actual GA4 Measurement ID */}
+        {/* 
+          Note: Firebase Analytics and Google Analytics 4 are the same service.
+          Firebase Analytics automatically sends data to GA4 using the measurementId from firebaseConfig.
+          The gtag script below is kept as a fallback, but Firebase Analytics is the primary tracking method.
+        */}
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
           <>
             <script

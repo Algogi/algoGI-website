@@ -24,15 +24,15 @@ export async function POST(request: NextRequest) {
     let allowedTypes: string[] = [];
     let maxSize = 5 * 1024 * 1024; // Default 5MB
 
-    if (folder === "downloads") {
-      // Allow PDF and JSON files for downloads folder
+    if (folder === "downloads" || folder.startsWith("careers/")) {
+      // Allow PDF and JSON files for downloads and careers folders
       allowedTypes = [
         "application/pdf",
         "application/json",
         "text/json",
         "text/plain", // Some systems may report JSON as text/plain
       ];
-      maxSize = 50 * 1024 * 1024; // 50MB for downloads
+      maxSize = folder === "downloads" ? 50 * 1024 * 1024 : 10 * 1024 * 1024; // 50MB for downloads, 10MB for careers
     } else {
       // Allow images for other folders (images, etc.)
       allowedTypes = [
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Also check file extension as fallback
     const fileExtension = file.name.toLowerCase().split(".").pop();
-    const allowedExtensions = folder === "downloads" 
+    const allowedExtensions = folder === "downloads" || folder.startsWith("careers/")
       ? ["pdf", "json"] 
       : ["jpg", "jpeg", "png", "webp", "gif", "svg"];
 
