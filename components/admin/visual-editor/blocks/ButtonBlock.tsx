@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { ButtonBlock as ButtonBlockType } from "@/lib/editor/blocks/types";
 import { Input } from "@/components/ui/input";
 
 interface ButtonBlockProps {
-  block: Block;
+  block: ButtonBlockType;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<ButtonBlockType>) => void;
 }
 
 export default function ButtonBlock({ block, isSelected, onUpdate }: ButtonBlockProps) {

@@ -69,7 +69,7 @@ function elementToBlock(element: HTMLElement): Block | null {
     case "h5":
     case "h6": {
       const level = parseInt(tagName.charAt(1)) as 1 | 2 | 3 | 4 | 5 | 6;
-      const block = createBlock("heading") as Block;
+      const block: any = createBlock("heading");
       block.data.level = level;
       block.data.text = element.textContent || "";
       const align = element.style.textAlign;
@@ -80,7 +80,7 @@ function elementToBlock(element: HTMLElement): Block | null {
     }
 
     case "p": {
-      const block = createBlock("paragraph") as Block;
+      const block = createBlock("paragraph") as any;
       block.data.text = element.textContent || "";
       const align = element.style.textAlign;
       if (align) {
@@ -90,7 +90,7 @@ function elementToBlock(element: HTMLElement): Block | null {
     }
 
     case "img": {
-      const block = createBlock("image") as Block;
+      const block = createBlock("image") as any;
       block.data.src = element.getAttribute("src") || "";
       block.data.alt = element.getAttribute("alt") || "";
       const width = element.getAttribute("width");
@@ -106,7 +106,7 @@ function elementToBlock(element: HTMLElement): Block | null {
 
     case "ul":
     case "ol": {
-      const block = createBlock("list") as Block;
+      const block = createBlock("list") as any;
       block.data.ordered = tagName === "ol";
       block.data.items = Array.from(element.querySelectorAll("li")).map(
         (li) => li.textContent || ""
@@ -115,7 +115,7 @@ function elementToBlock(element: HTMLElement): Block | null {
     }
 
     case "blockquote": {
-      const block = createBlock("quote") as Block;
+      const block = createBlock("quote") as any;
       const p = element.querySelector("p");
       block.data.text = p?.textContent || element.textContent || "";
       const cite = element.querySelector("cite");
@@ -132,13 +132,13 @@ function elementToBlock(element: HTMLElement): Block | null {
     case "a": {
       // Check if it looks like a button
       if (element.classList.contains("btn") || element.classList.contains("button")) {
-        const block = createBlock("button") as Block;
+        const block = createBlock("button") as any;
         block.data.text = element.textContent || "";
         block.data.url = element.getAttribute("href") || "#";
         return block;
       }
       // Otherwise, treat as regular link in paragraph
-      const block = createBlock("paragraph") as Block;
+      const block = createBlock("paragraph") as any;
       block.data.text = element.textContent || "";
       return block;
     }
@@ -146,7 +146,7 @@ function elementToBlock(element: HTMLElement): Block | null {
     case "div": {
       // Check if it's a columns container
       if (element.classList.contains("columns-container")) {
-        const block = createBlock("columns") as Block;
+        const block = createBlock("columns") as any;
         const style = element.getAttribute("style") || "";
         const columnsMatch = style.match(/grid-template-columns:\s*repeat\((\d+)/);
         const gapMatch = style.match(/gap:\s*(\d+)px/);
@@ -186,7 +186,7 @@ function elementToBlock(element: HTMLElement): Block | null {
       // Check if it's a spacer
       const heightMatch = element.style.height?.match(/(\d+)px/);
       if (heightMatch) {
-        const block = createBlock("spacer") as Block;
+        const block = createBlock("spacer") as any;
         block.data.height = parseInt(heightMatch[1]);
         return block;
       }
@@ -194,7 +194,7 @@ function elementToBlock(element: HTMLElement): Block | null {
       // Otherwise, try to extract text content
       const text = element.textContent?.trim();
       if (text) {
-        const block = createBlock("paragraph") as Block;
+        const block = createBlock("paragraph") as any;
         block.data = { ...block.data, text };
         return block;
       }
@@ -205,7 +205,7 @@ function elementToBlock(element: HTMLElement): Block | null {
       // For unknown elements, try to extract text content
       const text = element.textContent?.trim();
       if (text) {
-        const block = createBlock("paragraph") as Block;
+        const block = createBlock("paragraph") as any;
         block.data = { ...block.data, text };
         return block;
       }

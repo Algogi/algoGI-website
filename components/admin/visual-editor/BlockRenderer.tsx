@@ -68,7 +68,7 @@ export default function BlockRenderer({
       case "quote":
         return <QuoteBlock block={block} isSelected={isSelected} onUpdate={onUpdate} />;
       default:
-        return <div>Unknown block type: {block.type}</div>;
+        return <div>Unknown block type: {(block as any).type}</div>;
     }
   };
 

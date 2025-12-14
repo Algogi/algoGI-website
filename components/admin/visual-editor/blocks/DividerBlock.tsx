@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { DividerBlock as DividerBlockType } from "@/lib/editor/blocks/types";
 
 interface DividerBlockProps {
-  block: Block;
+  block: DividerBlockType;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<DividerBlockType>) => void;
 }
 
 export default function DividerBlock({ block, isSelected, onUpdate }: DividerBlockProps) {

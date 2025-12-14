@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2, GripVertical } from "lucide-react";
+import { toast } from "sonner";
 
 export interface FormField {
   id: string;
@@ -121,7 +122,7 @@ export default function FormBuilder({ fields, onChange }: FormBuilderProps) {
 
   const saveField = () => {
     if (!editingField || editingField.label.trim() === "") {
-      alert("Field label is required");
+      toast.error("Field label is required");
       return;
     }
 

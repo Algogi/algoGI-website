@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { ListBlock as ListBlockType } from "@/lib/editor/blocks/types";
 
 interface ListBlockProps {
-  block: Block;
+  block: ListBlockType;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<ListBlockType>) => void;
 }
 
 export default function ListBlock({ block, isSelected, onUpdate }: ListBlockProps) {

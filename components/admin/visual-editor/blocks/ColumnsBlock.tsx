@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { ColumnsBlock as ColumnsBlockType, Block } from "@/lib/editor/blocks/types";
 import { useDroppable } from "@dnd-kit/core";
 import { createBlock } from "@/lib/editor/blocks/registry";
 import BlockRenderer from "../BlockRenderer";
@@ -9,9 +9,9 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ColumnsBlockProps {
-  block: Block;
+  block: ColumnsBlockType;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<ColumnsBlockType>) => void;
   onDelete?: (id: string) => void;
 }
 
@@ -44,7 +44,7 @@ export default function ColumnsBlock({ block, isSelected, onUpdate, onDelete }: 
     (columnIndex: number, blockId: string, updates: Partial<Block>) => {
       const newColumnChildren = [...columnChildren];
       newColumnChildren[columnIndex] = newColumnChildren[columnIndex].map((b) =>
-        b.id === blockId ? { ...b, ...updates } : b
+        b.id === blockId ? { ...b, ...updates } as Block : b
       );
       onUpdate({
         data: { ...block.data, children: newColumnChildren },
@@ -105,7 +105,7 @@ export default function ColumnsBlock({ block, isSelected, onUpdate, onDelete }: 
               ))}
               {(!columnChildren[index] || columnChildren[index].length === 0) && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-4">
-                  Drop blocks here or click "Add Block"
+                  Drop blocks here or click &quot;Add Block&quot;
                 </p>
               )}
             </div>

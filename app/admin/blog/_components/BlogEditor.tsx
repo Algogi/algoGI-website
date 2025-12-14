@@ -131,7 +131,7 @@ export default function BlogEditor({ value, onChange, onImageUpload }: BlogEdito
         <div className="bg-white dark:bg-gray-800 min-h-[600px] py-6 px-6">
           {content.blocks.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
-              <p className="mb-4">No blocks yet. Click "Add Block" to get started.</p>
+              <p className="mb-4">No blocks yet. Click &quot;Add Block&quot; to get started.</p>
               <BlockMenu onAddBlock={handleAddBlock} />
             </div>
           ) : (

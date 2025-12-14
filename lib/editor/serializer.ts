@@ -13,20 +13,23 @@ export function blocksToHTML(content: EditorContent): string {
 function blockToHTML(block: Block): string {
   switch (block.type) {
     case "heading": {
-      const level = block.data.level || 1;
-      const text = block.data.text || "";
+      const headingBlock = block as any;
+      const level = headingBlock.data.level || 1;
+      const text = headingBlock.data.text || "";
       const align = block.style?.align || "left";
       return `<h${level} style="text-align: ${align}">${escapeHTML(text)}</h${level}>`;
     }
     
     case "paragraph": {
-      const text = block.data.text || "";
+      const paragraphBlock = block as any;
+      const text = paragraphBlock.data.text || "";
       const align = block.style?.align || "left";
       return `<p style="text-align: ${align}">${escapeHTML(text)}</p>`;
     }
     
     case "image": {
-      const { src, alt, caption, width, height } = block.data;
+      const imageBlock = block as any;
+      const { src, alt, caption, width, height } = imageBlock.data;
       const align = block.style?.align || "center";
       let imgTag = `<img src="${escapeHTML(src)}" alt="${escapeHTML(alt || "")}"`;
       
@@ -43,7 +46,8 @@ function blockToHTML(block: Block): string {
     }
     
     case "columns": {
-      const { columns, children, gap } = block.data;
+      const columnsBlock = block as any;
+      const { columns, children, gap } = columnsBlock.data;
       const gapStyle = gap ? `gap: ${gap}px;` : "";
       const gridCols = `grid-template-columns: repeat(${columns}, 1fr);`;
       
@@ -58,32 +62,37 @@ function blockToHTML(block: Block): string {
     }
     
     case "button": {
-      const { text, url, variant } = block.data;
+      const buttonBlock = block as any;
+      const { text, url, variant } = buttonBlock.data;
       const variantClass = variant ? `btn-${variant}` : "btn-primary";
       return `<a href="${escapeHTML(url)}" class="${variantClass}">${escapeHTML(text)}</a>`;
     }
     
     case "spacer": {
-      const height = block.data.height || 40;
+      const spacerBlock = block as any;
+      const height = spacerBlock.data.height || 40;
       return `<div style="height: ${height}px;"></div>`;
     }
     
     case "divider": {
-      const { style, color } = block.data;
+      const dividerBlock = block as any;
+      const { style, color } = dividerBlock.data;
       const borderStyle = style || "solid";
       const borderColor = color || "#e5e7eb";
       return `<hr style="border-style: ${borderStyle}; border-color: ${borderColor};" />`;
     }
     
     case "list": {
-      const { items, ordered } = block.data;
+      const listBlock = block as any;
+      const { items, ordered } = listBlock.data;
       const tag = ordered ? "ol" : "ul";
       const itemsHTML = items.map((item: string) => `<li>${escapeHTML(item)}</li>`).join("");
       return `<${tag}>${itemsHTML}</${tag}>`;
     }
     
     case "quote": {
-      const { text, author } = block.data;
+      const quoteBlock = block as any;
+      const { text, author } = quoteBlock.data;
       let quoteHTML = `<blockquote><p>${escapeHTML(text)}</p>`;
       if (author) {
         quoteHTML += `<cite>${escapeHTML(author)}</cite>`;

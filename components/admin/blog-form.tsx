@@ -21,22 +21,6 @@ interface FAQ {
   answer: string;
 }
 
-interface SEOData {
-  metaTitle?: string;
-  metaDescription?: string;
-  metaKeywords?: string[];
-  focusKeyword?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  twitterTitle?: string;
-  twitterDescription?: string;
-  twitterImage?: string;
-  canonicalUrl?: string;
-  robotsIndex?: boolean;
-  robotsFollow?: boolean;
-}
-
 interface BlogPost {
   id?: string;
   title: string;

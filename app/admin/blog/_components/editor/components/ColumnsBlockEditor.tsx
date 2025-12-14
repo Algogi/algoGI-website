@@ -91,9 +91,16 @@ export default function ColumnsBlockEditor({
   const handleUpdateBlockInColumn = (columnIndex: number, blockId: string, updates: Partial<import("../types").Block>) => {
     const newColumns = [...block.data.columns];
     if (newColumns[columnIndex]) {
-      newColumns[columnIndex] = newColumns[columnIndex].map((b) =>
-        b.id === blockId ? { ...b, ...updates, data: updates.data ? { ...b.data, ...updates.data } : b.data } : b
-      );
+      newColumns[columnIndex] = newColumns[columnIndex].map((b) => {
+        if (b.id === blockId) {
+          return {
+            ...b,
+            ...updates,
+            data: updates.data ? { ...b.data, ...updates.data } : b.data,
+          } as import("../types").Block;
+        }
+        return b;
+      });
     }
     onUpdate({
       data: {

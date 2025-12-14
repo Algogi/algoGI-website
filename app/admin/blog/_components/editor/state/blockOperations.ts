@@ -157,7 +157,7 @@ export function updateBlock(content: EditorContent, blockId: string, updates: Pa
           ...block,
           ...updates,
           data: updates.data ? { ...block.data, ...updates.data } : block.data,
-        };
+        } as Block;
       }
       return block;
     }),

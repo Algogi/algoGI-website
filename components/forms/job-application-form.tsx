@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 interface FormField {
   id: string;
@@ -255,12 +256,12 @@ export default function JobApplicationForm({
                 if (file) {
                   // Validate file type for resume
                   if (field.id === "resume" && file.type !== "application/pdf") {
-                    alert("Resume must be a PDF file");
+                    toast.error("Resume must be a PDF file");
                     e.target.value = "";
                     return;
                   }
                   if (file.size > 10 * 1024 * 1024) {
-                    alert("File size must be less than 10MB");
+                    toast.error("File size must be less than 10MB");
                     e.target.value = "";
                     return;
                   }

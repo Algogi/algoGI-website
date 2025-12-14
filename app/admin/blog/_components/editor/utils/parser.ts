@@ -243,7 +243,7 @@ function elementToBlock(element: HTMLElement): Block | null {
     case "div": {
       // Check if it's a columns container
       if (element.classList.contains("columns-container")) {
-        const columnsBlock = blockOps.createColumnsBlock(2);
+        const columnsBlock = blockOps.createColumnsBlock(2) as import("../types").ColumnsBlock;
         const style = element.getAttribute("style") || "";
         const columnsMatch = style.match(/grid-template-columns:\s*repeat\((\d+)/);
         const gapMatch = style.match(/gap:\s*(\d+)px/);

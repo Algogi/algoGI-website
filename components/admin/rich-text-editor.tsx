@@ -74,7 +74,6 @@ export default function RichTextEditor({
       ResizableImage.configure({
         inline: true,
         allowBase64: true,
-        draggable: true,
       }),
       Link.configure({
         openOnClick: false,

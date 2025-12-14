@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import  Link  from "next/link";
+import { toast } from "sonner";
 
 // Dynamically import the rich text editor to avoid SSR issues
 const RichTextEditor = dynamic(() => import("./rich-text-editor"), { ssr: false });
@@ -173,7 +174,7 @@ export default function JobForm({ job }: JobFormProps) {
             router.push(`/admin/careers/${data.id}`);
           }
           setError(null);
-          alert("Job saved successfully!");
+          toast.success("Job saved successfully!");
         }
       } else {
         throw new Error(data.error || "Failed to save job");

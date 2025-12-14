@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { QuoteBlock as QuoteBlockType } from "@/lib/editor/blocks/types";
 
 interface QuoteBlockProps {
-  block: Block;
+  block: QuoteBlockType;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<QuoteBlockType>) => void;
 }
 
 export default function QuoteBlock({ block, isSelected, onUpdate }: QuoteBlockProps) {

@@ -14,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface Job {
   id: string;
@@ -31,6 +33,8 @@ export default function CareersPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     fetchJobs();
@@ -49,13 +53,16 @@ export default function CareersPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this job? Applications will be preserved.")) {
-      return;
-    }
+  const handleDeleteClick = (id: string) => {
+    setJobToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!jobToDelete) return;
 
     try {
-      const response = await fetch(`/api/cms/careers/${id}`, {
+      const response = await fetch(`/api/cms/careers/${jobToDelete}`, {
         method: "DELETE",
       });
 
@@ -64,8 +71,12 @@ export default function CareersPage() {
         throw new Error(data.error || "Failed to delete");
       }
       fetchJobs();
+      toast.success("Job deleted successfully");
     } catch (err: any) {
-      alert("Error deleting job: " + err.message);
+      toast.error("Error deleting job: " + err.message);
+    } finally {
+      setDeleteDialogOpen(false);
+      setJobToDelete(null);
     }
   };
 
@@ -186,7 +197,7 @@ export default function CareersPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(job.id)}
+                            onClick={() => handleDeleteClick(job.id)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -200,6 +211,17 @@ export default function CareersPage() {
           </CardContent>
         </Card>
       )}
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Job"
+        description="Are you sure you want to delete this job? Applications will be preserved."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        variant="destructive"
+      />
     </div>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { SpacerBlock as SpacerBlockType } from "@/lib/editor/blocks/types";
 
 interface SpacerBlockProps {
-  block: Block;
+  block: SpacerBlockType;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<SpacerBlockType>) => void;
 }
 
 export default function SpacerBlock({ block, isSelected, onUpdate }: SpacerBlockProps) {

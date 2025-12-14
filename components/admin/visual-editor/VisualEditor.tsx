@@ -55,7 +55,7 @@ export default function VisualEditor({ content, onChange }: VisualEditorProps) {
     (blockType: string) => {
       const { createBlock } = require("@/lib/editor/blocks/registry");
       const newBlock = createBlock(blockType as any);
-      const newContent = {
+      const newContent: EditorContent = {
         ...editorContent,
         blocks: [...editorContent.blocks, newBlock],
       };
@@ -68,7 +68,7 @@ export default function VisualEditor({ content, onChange }: VisualEditorProps) {
   const handleUpdateBlock = useCallback(
     (blockId: string, updates: Partial<Block>) => {
       setEditorContent((prev) => {
-        const newContent = {
+        const newContent: EditorContent = {
           ...prev,
           blocks: prev.blocks.map((block) => {
             if (block.id === blockId) {
@@ -78,7 +78,7 @@ export default function VisualEditor({ content, onChange }: VisualEditorProps) {
                 ...updates,
                 data: updates.data ? { ...block.data, ...updates.data } : block.data,
                 style: updates.style ? { ...block.style, ...updates.style } : block.style,
-              };
+              } as Block;
               return mergedBlock;
             }
             // Return a new object reference to ensure React detects the change
@@ -153,11 +153,11 @@ export default function VisualEditor({ content, onChange }: VisualEditorProps) {
             
             const updatedBlocks = prev.blocks.map((b) =>
               b.id === parentBlockId
-                ? { ...b, data: { ...b.data, children: newColumnChildren } }
+                ? { ...b, data: { ...b.data, children: newColumnChildren } } as Block
                 : b
             );
             
-            const newContent = {
+            const newContent: EditorContent = {
               ...prev,
               blocks: updatedBlocks,
             };
@@ -186,7 +186,7 @@ export default function VisualEditor({ content, onChange }: VisualEditorProps) {
         if (targetIndex !== -1) {
           const newBlocks = [...editorContent.blocks];
           newBlocks.splice(targetIndex, 0, newBlock);
-          const newContent = {
+          const newContent: EditorContent = {
             ...editorContent,
             blocks: newBlocks,
           };
@@ -207,7 +207,7 @@ export default function VisualEditor({ content, onChange }: VisualEditorProps) {
         const [removed] = newBlocks.splice(oldIndex, 1);
         newBlocks.splice(newIndex, 0, removed);
 
-        const newContent = {
+        const newContent: EditorContent = {
           ...editorContent,
           blocks: newBlocks,
         };
@@ -302,7 +302,14 @@ export default function VisualEditor({ content, onChange }: VisualEditorProps) {
             <DragOverlay>
               {draggedBlock && (
                 <div className="opacity-50">
-                  <BlockRenderer block={draggedBlock} isSelected={false} isDragging={true} />
+                  <BlockRenderer 
+                    block={draggedBlock} 
+                    isSelected={false} 
+                    isDragging={true}
+                    onSelect={() => {}}
+                    onUpdate={() => {}}
+                    onDelete={() => {}}
+                  />
                 </div>
               )}
             </DragOverlay>

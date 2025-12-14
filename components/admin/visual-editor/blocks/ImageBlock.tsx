@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { ImageBlock as ImageBlockType } from "@/lib/editor/blocks/types";
 import ImageGallerySelector from "@/components/admin/image-gallery-selector";
 import { Resizable } from "react-resizable";
 import "react-resizable/css/styles.css";
 
 interface ImageBlockProps {
-  block: Block;
+  block: ImageBlockType;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<ImageBlockType>) => void;
 }
 
 export default function ImageBlock({ block, isSelected, onUpdate }: ImageBlockProps) {

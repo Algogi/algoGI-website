@@ -14,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface ApplicationForm {
   id: string;
@@ -28,6 +30,8 @@ export default function ApplicationFormsPage() {
   const [forms, setForms] = useState<ApplicationForm[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [formToDelete, setFormToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     fetchForms();
@@ -46,13 +50,16 @@ export default function ApplicationFormsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this form? It cannot be deleted if it's being used by any jobs.")) {
-      return;
-    }
+  const handleDeleteClick = (id: string) => {
+    setFormToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!formToDelete) return;
 
     try {
-      const response = await fetch(`/api/cms/application-forms/${id}`, {
+      const response = await fetch(`/api/cms/application-forms/${formToDelete}`, {
         method: "DELETE",
       });
 
@@ -61,8 +68,12 @@ export default function ApplicationFormsPage() {
         throw new Error(data.error || "Failed to delete");
       }
       fetchForms();
+      toast.success("Form deleted successfully");
     } catch (err: any) {
-      alert("Error deleting form: " + err.message);
+      toast.error("Error deleting form: " + err.message);
+    } finally {
+      setDeleteDialogOpen(false);
+      setFormToDelete(null);
     }
   };
 
@@ -163,7 +174,7 @@ export default function ApplicationFormsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(form.id)}
+                            onClick={() => handleDeleteClick(form.id)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -177,6 +188,17 @@ export default function ApplicationFormsPage() {
           </CardContent>
         </Card>
       )}
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Form"
+        description="Are you sure you want to delete this form? It cannot be deleted if it's being used by any jobs."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        variant="destructive"
+      />
     </div>
   );
 }

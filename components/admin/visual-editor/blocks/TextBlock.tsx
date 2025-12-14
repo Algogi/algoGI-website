@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Block } from "@/lib/editor/blocks/types";
+import { HeadingBlock, ParagraphBlock } from "@/lib/editor/blocks/types";
 
 interface TextBlockProps {
-  block: Block;
+  block: HeadingBlock | ParagraphBlock;
   isSelected: boolean;
-  onUpdate: (updates: Partial<Block>) => void;
+  onUpdate: (updates: Partial<HeadingBlock | ParagraphBlock>) => void;
 }
 
 export default function TextBlock({ block, isSelected, onUpdate }: TextBlockProps) {
@@ -54,8 +54,10 @@ export default function TextBlock({ block, isSelected, onUpdate }: TextBlockProp
     e.stopPropagation();
   };
 
-  const Tag = block.type === "heading" ? `h${block.data.level || 1}` : "p";
-  const align = block.style?.align || "left";
+  const headingLevel = block.type === "heading" ? (block as HeadingBlock).data.level || 1 : 1;
+  const Tag = block.type === "heading" ? `h${headingLevel}` : "p";
+  const alignValue = block.style?.align || "left";
+  const align = alignValue === "full" ? "left" : alignValue as "left" | "center" | "right";
 
   if (isEditing) {
     return (
@@ -74,16 +76,17 @@ export default function TextBlock({ block, isSelected, onUpdate }: TextBlockProp
         className={`w-full border-2 border-brand-primary rounded p-2 focus:outline-none resize-none ${
           block.type === "heading" ? "text-2xl font-bold" : ""
         }`}
-        style={{ textAlign: align }}
+        style={{ textAlign: align as React.CSSProperties["textAlign"] }}
         rows={block.type === "heading" ? 1 : 3}
       />
     );
   }
 
+  const TagComponent = Tag as keyof JSX.IntrinsicElements;
   return (
-    <Tag
+    <TagComponent
       className={`cursor-text ${isSelected ? "ring-2 ring-brand-primary" : ""}`}
-      style={{ textAlign: align }}
+      style={{ textAlign: align as React.CSSProperties["textAlign"] }}
       onClick={() => setIsEditing(true)}
       dangerouslySetInnerHTML={{ __html: localText.replace(/\n/g, "<br />") }}
     />

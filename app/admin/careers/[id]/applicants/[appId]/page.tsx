@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface StatusHistoryEntry {
   status: string;
@@ -128,7 +129,7 @@ export default function ApplicantDetailPage() {
       // Refresh applicant data
       await fetchApplicant();
       setStatusNotes("");
-      alert("Status updated successfully!");
+      toast.success("Status updated successfully!");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -164,7 +165,7 @@ export default function ApplicantDetailPage() {
         throw new Error("Failed to generate download link");
       }
     } catch (err: any) {
-      alert("Error downloading resume: " + err.message);
+      toast.error("Error downloading resume: " + err.message);
     }
   };
 
@@ -188,7 +189,7 @@ export default function ApplicantDetailPage() {
 
   const handleSendEmail = async () => {
     if (!applicant || !emailSubject.trim() || !emailBody.trim()) {
-      alert("Please fill in both subject and message");
+      toast.error("Please fill in both subject and message");
       return;
     }
 
@@ -212,12 +213,12 @@ export default function ApplicantDetailPage() {
         throw new Error(data.error || "Failed to send email");
       }
 
-      alert("Email sent successfully!");
+      toast.success("Email sent successfully!");
       setEmailDialogOpen(false);
       setEmailSubject("");
       setEmailBody("");
     } catch (err: any) {
-      alert("Error sending email: " + err.message);
+      toast.error("Error sending email: " + err.message);
     } finally {
       setSendingEmail(false);
     }
