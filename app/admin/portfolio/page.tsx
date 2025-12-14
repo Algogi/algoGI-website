@@ -6,6 +6,8 @@ import { Plus, Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface PortfolioItem {
   id: string;
@@ -19,6 +21,8 @@ export default function PortfolioPage() {
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPortfolio();
@@ -37,20 +41,27 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this portfolio item?")) {
-      return;
-    }
+  const handleDeleteClick = (id: string) => {
+    setDeleteItemId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteItemId) return;
 
     try {
-      const response = await fetch(`/api/cms/portfolio/${id}`, {
+      const response = await fetch(`/api/cms/portfolio/${deleteItemId}`, {
         method: "DELETE",
       });
 
       if (!response.ok) throw new Error("Failed to delete");
       fetchPortfolio();
+      toast.success("Portfolio item deleted successfully");
     } catch (err: any) {
-      alert("Error deleting portfolio item: " + err.message);
+      toast.error("Error deleting portfolio item: " + err.message);
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteItemId(null);
     }
   };
 
@@ -128,7 +139,7 @@ export default function PortfolioPage() {
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDeleteClick(item.id)}
                       className="inline-flex items-center px-3 py-2 border border-red-600 shadow-sm text-sm leading-4 font-medium rounded-md text-red-400 bg-dark-surface hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
@@ -141,6 +152,17 @@ export default function PortfolioPage() {
           )}
         </ul>
       </div>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Portfolio Item"
+        description="Are you sure you want to delete this portfolio item? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        variant="destructive"
+      />
     </div>
   );
 }

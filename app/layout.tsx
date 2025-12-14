@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { OrganizationStructuredData } from "@/components/seo/structured-data";
 import AdminRouteHandler from "@/components/admin/admin-route-handler";
+import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geometric" });
 
@@ -69,7 +70,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans`}>
+      <body className={`${inter.variable} font-sans`} suppressHydrationWarning>
         <OrganizationStructuredData />
         <ThemeProvider
           attribute="class"
@@ -80,6 +81,7 @@ export default function RootLayout({
           <AdminRouteHandler>
             {children}
           </AdminRouteHandler>
+          <Toaster />
         </ThemeProvider>
         {/* Google Analytics 4 - Replace G-XXXXXXXXXX with your actual GA4 Measurement ID */}
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (

@@ -15,6 +15,7 @@ export default function SiteHeader() {
     { href: "/", label: "Home" },
     { href: "/services", label: "Services" },
     { href: "/case-studies", label: "Portfolio" },
+    { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
     // { href: "/contact", label: "Contact" },
   ];

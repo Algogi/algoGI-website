@@ -35,9 +35,14 @@ export async function GET(
       published: data.published || false,
       featuredImage: data.featuredImage || null,
       tags: data.tags || [],
+      faqs: data.faqs || [],
       publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
       createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
       updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+      seoScore: data.seoScore || null,
+      seoAnalysis: data.seoAnalysis || null,
+      wordpressId: data.wordpressId || null,
+      migratedAt: data.migratedAt?.toDate?.()?.toISOString() || null,
     });
   } catch (error) {
     console.error("Error fetching blog post:", error);
@@ -94,6 +99,7 @@ export async function PUT(
     if (body.author !== undefined) updateData.author = body.author;
     if (body.featuredImage !== undefined) updateData.featuredImage = body.featuredImage;
     if (body.tags !== undefined) updateData.tags = body.tags;
+    if (body.faqs !== undefined) updateData.faqs = body.faqs;
 
     // Handle published status
     if (body.published !== undefined) {
@@ -118,9 +124,14 @@ export async function PUT(
       published: data.published || false,
       featuredImage: data.featuredImage || null,
       tags: data.tags || [],
+      faqs: data.faqs || [],
       publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
       createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
       updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+      seoScore: data.seoScore || null,
+      seoAnalysis: data.seoAnalysis || null,
+      wordpressId: data.wordpressId || null,
+      migratedAt: data.migratedAt?.toDate?.()?.toISOString() || null,
     });
   } catch (error) {
     console.error("Error updating blog post:", error);

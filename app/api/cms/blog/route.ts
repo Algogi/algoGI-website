@@ -42,6 +42,9 @@ export async function GET(request: NextRequest) {
         publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+        seoScore: data.seoScore || null,
+        wordpressId: data.wordpressId || null,
+        migratedAt: data.migratedAt?.toDate?.()?.toISOString() || null,
       };
     });
 
@@ -95,6 +98,7 @@ export async function POST(request: NextRequest) {
       published: body.published || false,
       featuredImage: body.featuredImage || null,
       tags: body.tags || [],
+      faqs: body.faqs || [],
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
       publishedAt: body.published ? FieldValue.serverTimestamp() : null,
