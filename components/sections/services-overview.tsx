@@ -83,7 +83,9 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
               className="mt-6 text-neon-blue font-semibold flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
               initial={false}
             >
+              <Link href="/services">
               Learn More <span>→</span>
+              </Link>
             </motion.div>
           </div>
         </motion.div>

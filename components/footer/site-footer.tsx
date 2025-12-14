@@ -68,9 +68,9 @@ export default function SiteFooter() {
 
   const footerLinks = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
     { href: "/services", label: "Services" },
     { href: "/case-studies", label: "Portfolio" },
+    { href: "/about", label: "About" },
   ];
 
   const services = [
@@ -196,7 +196,7 @@ export default function SiteFooter() {
           {/* Middle Column - Services */}
           <div>
             <h4 className="text-white font-bold mb-6 text-lg">Services</h4>
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-8">
               {services.map((service, index) => (
                 <li key={index}>
                   <Link
@@ -208,6 +208,23 @@ export default function SiteFooter() {
                 </li>
               ))}
             </ul>
+            {/* Social Media Icons */}
+            <div className="flex gap-3">
+              {socialLinks.map((social, index) => (
+                <motion.a
+                  key={index}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-10 h-10 rounded-full bg-dark-card border border-gray-600 flex items-center justify-center hover:border-neon-blue hover:bg-neon-blue/10 transition-all duration-300"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-5 h-5 text-gray-400 hover:text-neon-blue transition-colors" />
+                </motion.a>
+              ))}
+            </div>
           </div>
 
           {/* Right Column - Contact Info & Social Media */}
@@ -220,6 +237,12 @@ export default function SiteFooter() {
                   <Phone className="w-4 h-4 text-neon-blue" />
                   <a href="tel:+15402688778" className="hover:text-neon-blue transition-colors">
                     +1 540 268 8778
+                  </a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-neon-blue flex-shrink-0" />
+                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
+                    info@algogi.com
                   </a>
                 </div>
                 <div className="flex items-start gap-2">
@@ -241,6 +264,12 @@ export default function SiteFooter() {
                     +91 877 017 0371
                   </a>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-neon-blue flex-shrink-0" />
+                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
+                    info@algogi.com
+                  </a>
+                </div>
                 <div className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 text-neon-blue mt-1 flex-shrink-0" />
                   <span>
@@ -248,24 +277,6 @@ export default function SiteFooter() {
                   </span>
                 </div>
               </div>
-            </div>
-
-            {/* Social Media Icons */}
-            <div className="flex gap-3">
-              {socialLinks.map((social, index) => (
-                <motion.a
-                  key={index}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-10 h-10 rounded-full bg-dark-card border border-gray-600 flex items-center justify-center hover:border-neon-blue hover:bg-neon-blue/10 transition-all duration-300"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5 text-gray-400 hover:text-neon-blue transition-colors" />
-                </motion.a>
-              ))}
             </div>
           </div>
         </div>

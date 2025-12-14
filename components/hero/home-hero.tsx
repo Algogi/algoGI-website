@@ -172,7 +172,7 @@ export default function HomeHero() {
                   transition={{ delay: 1.2, duration: 0.8 }}
                   className="text-base md:text-lg text-logo-color mb-8 leading-relaxed max-w-2xl"
                 >
-                  We design and deploy Applied General Intelligence systems - AI-powered automations, analytice, and agents that improve revenue, operations, and decision-making today, not someday.
+                  We design and deploy Applied General Intelligence systems - AI-powered automations, analytics, and agents that improve revenue, operations, and decision-making today, not someday.
                 </motion.p>
 
                 <motion.ul
