@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Edit, Trash2, Star } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface Testimonial {
   id: string;
@@ -16,6 +18,8 @@ export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTestimonialId, setDeleteTestimonialId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTestimonials();
@@ -34,20 +38,27 @@ export default function TestimonialsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this testimonial?")) {
-      return;
-    }
+  const handleDeleteClick = (id: string) => {
+    setDeleteTestimonialId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTestimonialId) return;
 
     try {
-      const response = await fetch(`/api/cms/testimonials/${id}`, {
+      const response = await fetch(`/api/cms/testimonials/${deleteTestimonialId}`, {
         method: "DELETE",
       });
 
       if (!response.ok) throw new Error("Failed to delete");
       fetchTestimonials();
+      toast.success("Testimonial deleted successfully");
     } catch (err: any) {
-      alert("Error deleting testimonial: " + err.message);
+      toast.error("Error deleting testimonial: " + err.message);
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteTestimonialId(null);
     }
   };
 
@@ -136,7 +147,7 @@ export default function TestimonialsPage() {
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(testimonial.id)}
+                      onClick={() => handleDeleteClick(testimonial.id)}
                       className="inline-flex items-center px-3 py-2 border border-red-300 dark:border-red-600 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 dark:text-red-400 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
@@ -149,6 +160,17 @@ export default function TestimonialsPage() {
           )}
         </ul>
       </div>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Testimonial"
+        description="Are you sure you want to delete this testimonial? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        variant="destructive"
+      />
     </div>
   );
 }

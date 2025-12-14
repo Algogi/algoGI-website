@@ -97,7 +97,7 @@ function ProjectCard({
         </div>
         <div className="mb-3">
           <h3 
-            className="text-xl font-semibold text-white mb-1 group-hover:text-brand-primary transition-colors cursor-pointer line-clamp-2"
+            className="text-xl font-semibold text-white dark:text-gray-900 mb-1 group-hover:text-brand-primary transition-colors cursor-pointer line-clamp-2"
             onClick={onClick}
             title={study.title}
           >
@@ -105,7 +105,7 @@ function ProjectCard({
           </h3>
           {study.client && (
             <p 
-              className="text-sm text-gray-400 line-clamp-1"
+              className="text-sm text-gray-400 dark:text-gray-600 line-clamp-1"
               title={study.client}
             >
               {study.client}
@@ -113,7 +113,7 @@ function ProjectCard({
           )}
         </div>
         <p 
-          className="text-gray-300 text-sm mb-4 line-clamp-3 leading-relaxed cursor-pointer"
+          className="text-gray-300 dark:text-gray-700 text-sm mb-4 line-clamp-3 leading-relaxed cursor-pointer"
           onClick={onClick}
         >
           {study.solution}
@@ -122,7 +122,7 @@ function ProjectCard({
           {study.techStack.map((tech, idx) => (
             <span
               key={idx}
-              className="text-xs text-gray-400 bg-dark-card px-2 py-1 rounded border border-neon-blue/10"
+              className="text-xs text-gray-400 dark:text-gray-700 bg-dark-card dark:bg-gray-100 px-2 py-1 rounded border border-neon-blue/10 dark:border-neon-blue/20"
             >
               {tech}
             </span>
@@ -270,10 +270,10 @@ export default function CaseStudiesPage() {
             transition={{ duration: 0.6 }}
             className="text-center neon-card rounded-2xl p-12 border border-brand-primary/30 dark:border-brand-primary/30 border-brand-primary/40"
           >
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="text-3xl font-bold text-white dark:text-gray-900 mb-4">
               See our full portfolio of AI solutions and automation templates
             </h2>
-            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-300 dark:text-gray-700 mb-8 max-w-2xl mx-auto">
               Explore more innovative AI solutions, workflow automation examples, and free automation templates designed to accelerate your business.
             </p>
             <Link

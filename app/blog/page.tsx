@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, User, ArrowRight } from "lucide-react";
+import BlogPlaceholderImage from "@/components/blog/blog-placeholder-image";
 
 interface BlogPost {
   id: string;
@@ -53,10 +54,10 @@ export default function BlogPage() {
     <div className="section-padding bg-dark-bg">
       <div className="container-custom">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-6">
             Blog
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 max-w-4xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 dark:text-gray-200 max-w-4xl mx-auto">
             Insights, tutorials, and updates from the AlgoGI team
           </p>
         </div>
@@ -71,21 +72,23 @@ export default function BlogPage() {
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className="group bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                className="group bg-white border border-neon-blue/20 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow public-blog-card"
               >
-                {post.featuredImage && (
-                  <div className="relative h-48 w-full">
+                <div className="relative h-48 w-full">
+                  {post.featuredImage ? (
                     <Image
                       src={post.featuredImage}
                       alt={post.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                  </div>
-                )}
+                  ) : (
+                    <BlogPlaceholderImage title={post.title} size="small" />
+                  )}
+                </div>
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-brand-primary transition-colors">
+                    <h2 className="text-xl font-semibold text-gray-900 public-blog-title group-hover:text-brand-primary transition-colors">
                       {post.title}
                     </h2>
                     {!post.published && (
@@ -94,10 +97,10 @@ export default function BlogPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
+                  <p className="text-gray-600 public-blog-excerpt text-sm mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
+                  <div className="flex items-center justify-between text-xs text-gray-500 public-blog-meta">
                     <div className="flex items-center space-x-4">
                       {post.author && (
                         <div className="flex items-center">
@@ -112,7 +115,7 @@ export default function BlogPage() {
                         </div>
                       )}
                     </div>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-gray-500 public-blog-arrow" />
                   </div>
                   {post.tags && post.tags.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-2">

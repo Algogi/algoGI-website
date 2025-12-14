@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import BlogForm from "@/components/admin/blog-form";
+import { toast } from "sonner";
 
 export default function EditBlogPage() {
   const params = useParams();
@@ -26,7 +27,7 @@ export default function EditBlogPage() {
         throw new Error("Failed to fetch blog post");
       }
     } catch (err: any) {
-      alert("Error fetching blog post: " + err.message);
+      toast.error("Error fetching blog post: " + err.message);
       router.push("/admin/blog");
     } finally {
       setLoading(false);

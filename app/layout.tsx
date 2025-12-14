@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { OrganizationStructuredData } from "@/components/seo/structured-data";
 import AdminRouteHandler from "@/components/admin/admin-route-handler";
 import FirebaseAnalyticsProvider from "@/components/analytics/firebase-analytics-provider";
+import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geometric" });
 
@@ -83,6 +84,7 @@ export default function RootLayout({
               {children}
             </AdminRouteHandler>
           </FirebaseAnalyticsProvider>
+          <Toaster />
         </ThemeProvider>
         {/* 
           Note: Firebase Analytics and Google Analytics 4 are the same service.

@@ -1,4 +1,21 @@
 /** @type {import('next').NextConfig} */
+// Extract WordPress domain from environment variable if available
+const getWordPressDomain = () => {
+  const wpUrl = process.env.WORDPRESS_API_URL;
+  if (wpUrl) {
+    try {
+      const url = new URL(wpUrl);
+      return url.hostname;
+    } catch {
+      // If URL parsing fails, return null
+      return null;
+    }
+  }
+  return null;
+};
+
+const wordpressDomain = getWordPressDomain();
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -13,6 +30,33 @@ const nextConfig = {
         hostname: 'storage.googleapis.com',
         pathname: '/**',
       },
+      // WordPress image domains - dynamically added from WORDPRESS_API_URL
+      ...(wordpressDomain
+        ? [
+            {
+              protocol: 'https',
+              hostname: wordpressDomain,
+              pathname: '/**',
+            },
+            {
+              protocol: 'http',
+              hostname: wordpressDomain,
+              pathname: '/**',
+            },
+          ]
+        : [
+            // Fallback: add common WordPress domain if env var not set
+            {
+              protocol: 'https',
+              hostname: 'algogi.com',
+              pathname: '/**',
+            },
+            {
+              protocol: 'http',
+              hostname: 'algogi.com',
+              pathname: '/**',
+            },
+          ]),
     ],
   },
 };

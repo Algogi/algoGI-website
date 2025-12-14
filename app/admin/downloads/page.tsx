@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -130,12 +131,12 @@ export default function DownloadsPage() {
 
       const data = await response.json();
       if (response.ok) {
-        alert(`File uploaded successfully: ${data.fileName}`);
+        toast.success(`File uploaded successfully: ${data.fileName}`);
       } else {
         throw new Error(data.error || "Upload failed");
       }
     } catch (err: any) {
-      alert("Error uploading file: " + err.message);
+      toast.error("Error uploading file: " + err.message);
     } finally {
       setUploading(false);
     }

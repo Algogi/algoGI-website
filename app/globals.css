@@ -207,6 +207,10 @@
     background-color: #ffffff;
   }
 
+  html:not(.light) .bg-dark-card {
+    background-color: #1a1a1a;
+  }
+
   html.light .bg-dark-border {
     background-color: #e5e7eb;
   }
@@ -330,6 +334,46 @@
 
   html:not(.light) [class*="text-gray-300"] {
     color: #d1d5db !important;
+  }
+
+  html:not(.light) [class*="text-gray-200"] {
+    color: #e5e7eb !important;
+  }
+
+  /* Prose content text colors for dark mode */
+  html:not(.light) .prose p {
+    color: #e5e7eb !important;
+  }
+
+  html:not(.light) .prose li {
+    color: #e5e7eb !important;
+  }
+
+  html:not(.light) .prose ul {
+    color: #e5e7eb !important;
+  }
+
+  html:not(.light) .prose ol {
+    color: #e5e7eb !important;
+  }
+
+  /* Prose headings visibility in dark mode */
+  html:not(.light) .prose h1,
+  html:not(.light) .prose h2,
+  html:not(.light) .prose h3,
+  html:not(.light) .prose h4,
+  html:not(.light) .prose h5,
+  html:not(.light) .prose h6 {
+    color: #ffffff !important;
+  }
+
+  /* Prose strong/bold text visibility in dark mode */
+  html:not(.light) .prose strong {
+    color: #ffffff !important;
+  }
+
+  html:not(.light) .prose b {
+    color: #ffffff !important;
   }
 
   /* Table component overrides for light mode */
@@ -480,13 +524,104 @@
     box-shadow: 0 0 30px rgba(74, 58, 255, 0.3);
   }
 
+  /* Dark mode override - use dark-card color when not in light mode */
+  html:not(.light) .neon-card {
+    background-color: #1a1a1a; /* dark-card color */
+  }
+
   html.light .neon-card {
+    background-color: #ffffff; /* white background in light mode */
     border-color: rgba(74, 58, 255, 0.3);
   }
   
   html.light .neon-card:hover {
     border-color: rgba(74, 58, 255, 0.6);
     box-shadow: 0 0 30px rgba(74, 58, 255, 0.2);
+  }
+
+  /* Admin blog list dark mode fixes */
+  html:not(.light) .admin-blog-list {
+    background-color: #1a1a1a; /* dark-card */
+  }
+
+  html:not(.light) .admin-blog-list .divide-y {
+    border-color: #2a2a2a; /* dark-border */
+  }
+
+  html:not(.light) .admin-blog-title {
+    color: #ffffff;
+  }
+
+  html:not(.light) .admin-blog-excerpt {
+    color: #9ca3af; /* gray-400 */
+  }
+
+  html:not(.light) .admin-blog-meta {
+    color: #6b7280; /* gray-500 */
+  }
+
+  html:not(.light) .admin-blog-published {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #4ade80; /* green-400 */
+  }
+
+  html:not(.light) .admin-blog-draft {
+    background-color: #374151; /* gray-700 */
+    color: #d1d5db; /* gray-300 */
+  }
+
+  html:not(.light) .admin-blog-edit-btn {
+    border-color: #4b5563; /* gray-600 */
+    color: #d1d5db; /* gray-300 */
+    background-color: #374151; /* gray-700 */
+  }
+
+  html:not(.light) .admin-blog-edit-btn:hover {
+    background-color: #4b5563; /* gray-600 */
+  }
+
+  /* Public blog cards dark mode fixes */
+  html:not(.light) .public-blog-card {
+    background-color: #1a1a1a !important; /* dark-card */
+    box-shadow: 0 0 30px rgba(74, 58, 255, 0.3) !important;
+  }
+
+  html:not(.light) .public-blog-card:hover {
+    box-shadow: 0 0 40px rgba(74, 58, 255, 0.4) !important;
+  }
+
+  html:not(.light) .public-blog-title {
+    color: #ffffff !important;
+  }
+
+  html:not(.light) .public-blog-title:hover {
+    color: #00f0ff !important; /* neon-blue */
+  }
+
+  html:not(.light) .public-blog-excerpt {
+    color: #d1d5db !important; /* gray-300 */
+  }
+
+  html:not(.light) .public-blog-meta {
+    color: #9ca3af !important; /* gray-400 */
+  }
+
+  html:not(.light) .public-blog-arrow {
+    color: #9ca3af !important; /* gray-400 */
+  }
+
+  /* Admin blog empty state dark mode */
+  html:not(.light) .admin-blog-empty {
+    background-color: #1a1a1a; /* dark-card */
+    border-color: #2a2a2a; /* dark-border */
+  }
+
+  html:not(.light) .admin-blog-empty-title {
+    color: #ffffff;
+  }
+
+  html:not(.light) .admin-blog-empty-text {
+    color: #9ca3af; /* gray-400 */
   }
 
   /* Grid background */
@@ -834,6 +969,355 @@ html.light .react-datepicker__navigation-icon::before {
 
 html.light .datepicker-popper .react-datepicker {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 40px rgba(0, 136, 204, 0.2) !important;
+}
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0.75em 0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9ca3af;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75em 0;
+}
+
+.ProseMirror h3 {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 0.83em 0;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+  margin: 1em 0;
+}
+
+.ProseMirror li {
+  margin: 0.25em 0;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror a {
+  color: #4A3AFF;
+  text-decoration: underline;
+}
+
+.ProseMirror a:hover {
+  color: #3a2ae6;
+}
+
+/* 12-Column Grid System */
+.grid-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  border: 2px dashed rgba(74, 58, 255, 0.3);
+  border-radius: 0.5rem;
+}
+
+.grid-column {
+  min-height: 50px;
+  padding: 0.5rem;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  border-radius: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+html:not(.light) .grid-column {
+  background-color: rgba(26, 26, 26, 0.5);
+  border-color: rgba(75, 85, 99, 0.5);
+}
+
+.grid-column::before {
+  content: attr(data-span) "/12";
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #4A3AFF;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0 0.25rem 0 0.25rem;
+}
+
+/* Image Positioning and Resizing */
+.tiptap img,
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.tiptap img[data-align="left"],
+.ProseMirror img[data-align="left"] {
+  float: left;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+  clear: left;
+}
+
+.tiptap img[data-align="right"],
+.ProseMirror img[data-align="right"] {
+  float: right;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  clear: right;
+}
+
+.tiptap img[data-align="center"],
+.ProseMirror img[data-align="center"] {
+  display: block;
+  margin: 1rem auto;
+  clear: both;
+}
+
+.tiptap img[data-align="full-width"],
+.ProseMirror img[data-align="full-width"] {
+  display: block;
+  width: 100%;
+  margin: 1rem 0;
+  clear: both;
+}
+
+/* Image Resize Handles */
+.tiptap img.ProseMirror-selectednode,
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid #4A3AFF;
+  outline-offset: 2px;
+  cursor: move;
+}
+
+.tiptap img,
+.ProseMirror img {
+  cursor: move;
+}
+
+.tiptap img:hover,
+.ProseMirror img:hover {
+  opacity: 0.9;
+}
+
+/* Draggable elements */
+.ProseMirror [draggable="true"] {
+  cursor: move;
+}
+
+.ProseMirror [draggable="true"]:hover {
+  opacity: 0.8;
+}
+
+/* Grid Overlay */
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.grid-overlay-line {
+  border-left: 1px dashed rgba(59, 130, 246, 0.3);
+  height: 100%;
+}
+
+html:not(.light) .grid-overlay-line {
+  border-left-color: rgba(96, 165, 250, 0.3);
+}
+
+/* Responsive Grid */
+@media (max-width: 768px) {
+  .grid-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .grid-column {
+    grid-column: span 12 !important;
+  }
+}
+
+/* Visual Editor Styles */
+.visual-editor-canvas {
+  min-height: 600px;
+}
+
+.columns-container {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Responsive: stack columns on mobile */
+@media (max-width: 768px) {
+  .columns-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.columns-container .column-1,
+.columns-container .column-2,
+.columns-container .column-3,
+.columns-container .column-4 {
+  min-height: 100px;
+}
+
+/* Block Selection */
+.block-selected {
+  outline: 2px solid #4A3AFF;
+  outline-offset: 2px;
+}
+
+/* Resize Handle Styles */
+.react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  box-sizing: border-box;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNiIgaGVpZ2h0PSI2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxnIGZpbGw9IiM0QTNBQUYiIGZpbGwtb3BhY2l0eT0iMC41Ij48cGF0aCBkPSJtIDAgMCBMIDYgNiBNIDYgMCBMIDAgNiIvPjwvZz48L3N2Zz4=');
+  background-position: bottom right;
+  padding: 0 3px 3px 0;
+}
+
+.react-resizable-handle-se {
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}
+
+.react-resizable-handle-sw {
+  bottom: 0;
+  left: 0;
+  cursor: sw-resize;
+}
+
+.react-resizable-handle-nw {
+  top: 0;
+  left: 0;
+  cursor: nw-resize;
+}
+
+.react-resizable-handle-ne {
+  top: 0;
+  right: 0;
+  cursor: ne-resize;
+}
+
+.react-resizable-handle-w,
+.react-resizable-handle-e {
+  top: 50%;
+  margin-top: -10px;
+  cursor: ew-resize;
+}
+
+.react-resizable-handle-w {
+  left: 0;
+}
+
+.react-resizable-handle-e {
+  right: 0;
+}
+
+.react-resizable-handle-n,
+.react-resizable-handle-s {
+  left: 50%;
+  margin-left: -10px;
+  cursor: ns-resize;
+}
+
+.react-resizable-handle-n {
+  top: 0;
+}
+
+.react-resizable-handle-s {
+  bottom: 0;
+}
+
+.ProseMirror code {
+  background-color: #f3f4f6;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+.ProseMirror pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1em;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.ProseMirror pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+html:not(.light) .ProseMirror {
+  color: #e5e7eb;
+}
+
+html:not(.light) .ProseMirror h1,
+html:not(.light) .ProseMirror h2,
+html:not(.light) .ProseMirror h3 {
+  color: #ffffff;
+}
+
+html:not(.light) .ProseMirror blockquote {
+  border-left-color: #4b5563;
+  color: #d1d5db;
+}
+
+html:not(.light) .ProseMirror code {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+html:not(.light) .ProseMirror a {
+  color: #00f0ff;
+}
+
+html:not(.light) .ProseMirror a:hover {
+  color: #00d4e6;
 }
 
 
