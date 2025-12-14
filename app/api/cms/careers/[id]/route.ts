@@ -48,6 +48,7 @@ export async function GET(
       type: data.type,
       jdContent: data.jdContent || "",
       jdPdfUrl: data.jdPdfUrl || null,
+      excerpt: data.excerpt || "",
       formFields: formFields,
       applicationFormId: data.applicationFormId || null,
       formSource: data.applicationFormId ? "template" : "custom",
@@ -114,8 +115,9 @@ export async function PUT(
     if (body.type !== undefined) updateData.type = body.type;
     if (body.jdContent !== undefined) updateData.jdContent = body.jdContent;
     if (body.jdPdfUrl !== undefined) updateData.jdPdfUrl = body.jdPdfUrl;
+    if (body.excerpt !== undefined) updateData.excerpt = body.excerpt;
     
-    // Handle form source: template or custom
+    // Handle form source: template or custom - ensure mutual exclusivity
     if (body.applicationFormId !== undefined) {
       updateData.applicationFormId = body.applicationFormId;
       // Clear formFields when using template
@@ -153,6 +155,7 @@ export async function PUT(
       type: data.type,
       jdContent: data.jdContent || "",
       jdPdfUrl: data.jdPdfUrl || null,
+      excerpt: data.excerpt || "",
       formFields: data.formFields || [],
       applicationFormId: data.applicationFormId || null,
       formSource: data.applicationFormId ? "template" : "custom",

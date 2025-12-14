@@ -14,6 +14,18 @@ export async function GET(
     }
 
     const db = getDb();
+    
+    // Fetch job title once for all applications
+    let jobTitle = "";
+    try {
+      const jobDoc = await db.collection("jobs").doc(id).get();
+      if (jobDoc.exists) {
+        jobTitle = jobDoc.data()?.title || "";
+      }
+    } catch (error) {
+      console.error("Error fetching job title:", error);
+    }
+    
     const applicationsSnapshot = await db
       .collection("applications")
       .where("jobId", "==", id)
@@ -25,7 +37,7 @@ export async function GET(
       return {
         id: doc.id,
         jobId: data.jobId,
-        jobTitle: data.jobTitle,
+        jobTitle: jobTitle, // Fetch from jobId
         name: data.name,
         email: data.email,
         status: data.status || "applied",

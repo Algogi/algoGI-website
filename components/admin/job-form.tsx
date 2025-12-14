@@ -141,6 +141,10 @@ export default function JobForm({ job }: JobFormProps) {
         jdContent: formData.jdSource === "richtext" ? formData.jdContent : "",
       };
 
+      // Remove computed fields that should not be stored
+      delete submitData.formSource;
+      delete submitData.jdSource;
+
       // If using template, only send applicationFormId
       if (formData.formSource === "template") {
         submitData.applicationFormId = formData.applicationFormId;
@@ -444,7 +448,7 @@ export default function JobForm({ job }: JobFormProps) {
                 </p>
               )}
               <p className="text-xs text-muted-foreground">
-                Don't see the form you need?{" "}
+                Don&apos;t see the form you need?{" "}
                 <Link href="/admin/application-forms/new" className="text-primary hover:underline" target="_blank">
                   Create a new form template →
                 </Link>

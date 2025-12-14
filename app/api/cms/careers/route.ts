@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
         department: data.department,
         location: data.location,
         type: data.type,
+        excerpt: data.excerpt || "",
         status: data.status || "draft",
         formFields: data.formFields || [],
         applicationFormId: data.applicationFormId || null,
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
       type: body.type,
       jdContent: body.jdContent || "",
       jdPdfUrl: body.jdPdfUrl || null,
+      excerpt: body.excerpt || "",
       status: body.status || "draft",
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
@@ -87,13 +89,13 @@ export async function POST(request: NextRequest) {
       publishedAt: body.status === "published" ? FieldValue.serverTimestamp() : null,
     };
 
-    // Handle form source: template or custom
+    // Handle form source: template or custom - ensure mutual exclusivity
     if (body.applicationFormId) {
       jobData.applicationFormId = body.applicationFormId;
-      // Don't store formFields when using template
+      jobData.formFields = null; // Explicitly set to null when using template
     } else {
       jobData.formFields = body.formFields || [];
-      jobData.applicationFormId = null;
+      jobData.applicationFormId = null; // Explicitly set to null when using custom
     }
 
     const docRef = await db.collection("jobs").add(jobData);

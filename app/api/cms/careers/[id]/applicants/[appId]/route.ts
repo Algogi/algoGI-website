@@ -26,10 +26,24 @@ export async function GET(
     }
 
     const data = doc.data()!;
+    
+    // Fetch job title from jobId
+    let jobTitle = "";
+    if (data.jobId) {
+      try {
+        const jobDoc = await db.collection("jobs").doc(data.jobId).get();
+        if (jobDoc.exists) {
+          jobTitle = jobDoc.data()?.title || "";
+        }
+      } catch (error) {
+        console.error("Error fetching job title:", error);
+      }
+    }
+    
     return NextResponse.json({
       id: doc.id,
       jobId: data.jobId,
-      jobTitle: data.jobTitle,
+      jobTitle: jobTitle, // Fetch from jobId
       name: data.name,
       email: data.email,
       applicantData: data.applicantData || {},
@@ -116,12 +130,25 @@ export async function PUT(
       });
       updateData.statusHistory = statusHistory;
 
+      // Fetch job title for email
+      let jobTitle = "";
+      if (currentData.jobId) {
+        try {
+          const jobDoc = await db.collection("jobs").doc(currentData.jobId).get();
+          if (jobDoc.exists) {
+            jobTitle = jobDoc.data()?.title || "";
+          }
+        } catch (error) {
+          console.error("Error fetching job title for email:", error);
+        }
+      }
+      
       // Send status change email (non-blocking)
       try {
         await sendStatusChangeEmail(
           currentData.email,
           currentData.name,
-          currentData.jobTitle,
+          jobTitle,
           body.status,
           body.notes || ""
         );
@@ -153,11 +180,24 @@ export async function PUT(
 
     const updatedDoc = await docRef.get();
     const data = updatedDoc.data()!;
+    
+    // Fetch job title from jobId
+    let jobTitle = "";
+    if (data.jobId) {
+      try {
+        const jobDoc = await db.collection("jobs").doc(data.jobId).get();
+        if (jobDoc.exists) {
+          jobTitle = jobDoc.data()?.title || "";
+        }
+      } catch (error) {
+        console.error("Error fetching job title:", error);
+      }
+    }
 
     return NextResponse.json({
       id: updatedDoc.id,
       jobId: data.jobId,
-      jobTitle: data.jobTitle,
+      jobTitle: jobTitle, // Fetch from jobId
       name: data.name,
       email: data.email,
       applicantData: data.applicantData || {},

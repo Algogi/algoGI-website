@@ -10,11 +10,14 @@ interface Job {
   slug: string;
   department: string;
   location: string;
-  type: string;
+  type: "full-time" | "part-time" | "contract" | "internship";
   jdContent: string;
   jdPdfUrl?: string | null;
-  formFields: any[];
-  status: string;
+  jdSource: "richtext" | "pdf";
+  formFields?: any[];
+  applicationFormId?: string | null;
+  formSource: "template" | "custom";
+  status: "draft" | "published" | "closed";
   excerpt?: string;
 }
 
@@ -42,7 +45,13 @@ export default function EditJobPage() {
         throw new Error("Failed to fetch job");
       }
       const data = await response.json();
-      setJob(data);
+      // Compute jdSource if not provided by API
+      const jobData: Job = {
+        ...data,
+        jdSource: data.jdSource || (data.jdPdfUrl ? "pdf" : "richtext"),
+        formSource: data.formSource || (data.applicationFormId ? "template" : "custom"),
+      };
+      setJob(jobData);
     } catch (err: any) {
       setError(err.message);
     } finally {

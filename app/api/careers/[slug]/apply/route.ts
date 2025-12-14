@@ -181,7 +181,6 @@ export async function POST(
     const now = new Date();
     const applicationData = {
       jobId,
-      jobTitle: jobData.title,
       name,
       email,
       applicantData,

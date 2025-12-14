@@ -88,7 +88,7 @@ export default function CareersPage() {
           Join Our <span className="text-gradient">Team</span>
         </h1>
         <p className="text-xl text-gray-400 max-w-2xl">
-          We're always looking for talented individuals to join our team. Explore our open positions and find your next opportunity.
+          We&apos;re always looking for talented individuals to join our team. Explore our open positions and find your next opportunity.
         </p>
       </div>
 
