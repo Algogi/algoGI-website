@@ -258,6 +258,15 @@
     background-color: #0088cc;
   }
 
+  /* Mobile sidebar light mode overrides */
+  html.light .mobile-sidebar {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+  }
+
+  html.light .mobile-sidebar-overlay {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+  }
+
   html.light .text-destructive {
     color: #dc2626;
   }

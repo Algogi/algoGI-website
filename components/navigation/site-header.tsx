@@ -129,7 +129,7 @@ export default function SiteHeader() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden mobile-sidebar-overlay"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
@@ -143,7 +143,7 @@ export default function SiteHeader() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-y-0 right-0 z-[70] w-80 bg-[rgba(30,30,30,0.95)] backdrop-blur-xl border-l border-gray-500/20 md:hidden shadow-2xl"
+            className="fixed inset-y-0 right-0 z-[70] w-80 bg-[rgba(30,30,30,0.95)] backdrop-blur-xl border-l border-gray-500/20 md:hidden shadow-2xl mobile-sidebar"
           >
             <div className="flex flex-col h-full">
               {/* Sidebar Header */}
