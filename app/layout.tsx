@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geometric" });
 
+const baseUrl = process.env.NEXTAUTH_URL || "https://algogi.com";
+
 export const metadata: Metadata = {
   title: {
     default: "AlgoGI - AI Agent Development & Intelligent Automation Solutions",
@@ -38,14 +40,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://algogi.com",
+    url: baseUrl,
     siteName: "AlgoGI",
     title: "AlgoGI - AI Agent Development & Intelligent Automation Solutions",
     description:
       "We specialize in AI agent development and AI-enabled software solutions that deliver agility, performance, and measurable impact.",
     images: [
       {
-        url: "https://algogi.com/images/og-image.png",
+        url: `${baseUrl}/images/og-image.png`,
         width: 1200,
         height: 630,
         alt: "AlgoGI - AI Agent Development & Intelligent Automation Solutions",
@@ -57,10 +59,10 @@ export const metadata: Metadata = {
     title: "AlgoGI - AI Agent Development & Intelligent Automation Solutions",
     description:
       "We specialize in AI agent development and AI-enabled software solutions that deliver agility, performance, and measurable impact.",
-    images: ["https://algogi.com/images/og-image.png"],
+    images: [`${baseUrl}/images/og-image.png`],
   },
   alternates: {
-    canonical: "https://algogi.com",
+    canonical: baseUrl,
   },
 };
 

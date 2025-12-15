@@ -1,15 +1,12 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Calendar, User, ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import DOMPurify from "dompurify";
-import { toast } from "sonner";
+import type { Metadata } from "next";
 import BlogPlaceholderImage from "@/components/blog/blog-placeholder-image";
+import { getDb } from "@/lib/firebase/config";
 
 interface FAQ {
   question: string;
@@ -30,254 +27,163 @@ interface BlogPost {
   faqs?: FAQ[];
 }
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const pathname = usePathname();
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+async function fetchPostBySlug(slug: string): Promise<BlogPost | null> {
+  try {
+    const db = getDb();
+    const snapshot = await db
+      .collection("blog")
+      .where("slug", "==", slug)
+      .where("published", "==", true)
+      .limit(1)
+      .get();
 
-  useEffect(() => {
-    // Check if user is admin
-    fetch("/api/auth/session")
-      .then((res) => res.json())
-      .then((data) => {
-        setIsAdmin(data.authenticated === true);
-      })
-      .catch(() => setIsAdmin(false));
+    if (snapshot.empty) return null;
+    const doc = snapshot.docs[0];
+    const data = doc.data();
 
-    if (params.slug) {
-      fetchPost(params.slug as string);
-    }
-  }, [params.slug]);
-
-  const fetchPost = async (slug: string) => {
-    try {
-      const response = await fetch(`/api/blog/${slug}`);
-      if (response.ok) {
-        const data = await response.json();
-        setPost(data);
-      }
-    } catch (error) {
-      console.error("Error fetching blog post:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="section-padding bg-dark-bg">
-        <div className="container-custom text-center py-12">
-          <div className="text-gray-500">Loading...</div>
-        </div>
-      </div>
-    );
+    return {
+      id: doc.id,
+      title: data.title,
+      slug: data.slug,
+      content: data.content || "",
+      excerpt: data.excerpt || "",
+      author: data.author || "AlgoGI Team",
+      published: data.published || false,
+      featuredImage: data.featuredImage || null,
+      tags: data.tags || [],
+      publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
+      faqs: data.faqs || [],
+    };
+  } catch (error) {
+    console.error("Error fetching blog post:", error);
+    return null;
   }
+}
+
+export async function generateStaticParams() {
+  try {
+    const db = getDb();
+    const snapshot = await db.collection("blog").where("published", "==", true).get();
+    return snapshot.docs.map((doc) => ({ slug: doc.data().slug }));
+  } catch {
+    return [];
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await fetchPostBySlug(slug);
+  const baseUrl = process.env.NEXTAUTH_URL || "https://algogi.com";
 
   if (!post) {
-    return (
-      <div className="section-padding bg-dark-bg">
-        <div className="container-custom text-center py-12">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Post not found</h1>
-          <Link href="/blog" className="text-brand-primary hover:underline">
-            ← Back to blog
-          </Link>
-        </div>
-      </div>
-    );
+    return {
+      title: "Blog post not found | AlgoGI",
+      description: "The requested blog post could not be found.",
+    };
   }
+
+  const description = post.excerpt || post.content.slice(0, 160);
+  const publishedDate = post.publishedAt
+    ? new Date(post.publishedAt).toISOString().split("T")[0]
+    : undefined;
+
+  return {
+    title: `${post.title} | AlgoGI`,
+    description,
+    keywords: post.tags,
+    openGraph: {
+      title: post.title,
+      description,
+      type: "article",
+      publishedTime: publishedDate,
+    },
+    alternates: {
+      canonical: `${baseUrl}/blog/${slug}`,
+    },
+  };
+}
+
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const post = await fetchPostBySlug(slug);
+
+  if (!post) {
+    notFound();
+  }
+
+  const publishedDate = post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : "Unpublished";
+  const content = post.content || post.excerpt || "No content available.";
 
   return (
     <article className="section-padding bg-dark-bg">
-      <div className="container-custom max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/blog"
-            className="inline-flex items-center text-brand-primary hover:text-brand-primary/80"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to blog
-          </Link>
-          {isAdmin && !post.published && (
-            <div className="flex items-center space-x-3">
-              <span className="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-full">
-                Draft
-              </span>
-              <a
-                href={`/admin/blog/${post.id}`}
-                className="px-3 py-1 text-sm font-medium text-white bg-brand-primary hover:bg-brand-primary/90 rounded-md"
-              >
-                Edit
-              </a>
-              <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch(`/api/cms/blog/${post.id}`, {
-                      method: "PUT",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ ...post, published: true }),
-                    });
-                    if (response.ok) {
-                      window.location.reload();
-                    }
-                  } catch (error) {
-                    toast.error("Failed to publish post");
-                  }
-                }}
-                className="px-3 py-1 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
-              >
-                Publish
-              </button>
-            </div>
-          )}
-        </div>
+      <div className="container-custom max-w-5xl">
+        <Link href="/blog" className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary/80 mb-6">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Blog
+        </Link>
 
-        <div className="relative h-96 w-full mb-8 rounded-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-neon-blue/10">
           {post.featuredImage ? (
-            <Image
-              src={post.featuredImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-            />
+            <div className="relative h-72 w-full">
+              <Image src={post.featuredImage} alt={post.title} fill className="object-cover" priority />
+            </div>
           ) : (
-            <BlogPlaceholderImage title={post.title} size="large" />
-          )}
-        </div>
-
-        <header className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            {post.title}
-          </h1>
-          <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-300">
-            {post.author && (
-              <div className="flex items-center">
-                <User className="w-4 h-4 mr-2" />
-                {post.author}
-              </div>
-            )}
-            {post.publishedAt && (
-              <div className="flex items-center">
-                <Calendar className="w-4 h-4 mr-2" />
-                {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </div>
-            )}
-          </div>
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 text-sm bg-brand-primary/10 text-brand-primary rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="h-72 w-full bg-gray-100 flex items-center justify-center">
+              <BlogPlaceholderImage title={post.title} size="large" />
             </div>
           )}
-        </header>
 
-        <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-200 prose-a:text-brand-primary dark:prose-a:text-neon-blue prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-brand-primary dark:prose-code:text-neon-blue prose-pre:bg-gray-900 dark:prose-pre:bg-gray-800 prose-li:text-gray-700 dark:prose-li:text-gray-200 prose-ul:text-gray-700 dark:prose-ul:text-gray-200 prose-ol:text-gray-700 dark:prose-ol:text-gray-200">
-          {(() => {
-            // Check if content is JSON (block-based editor format)
-            let contentToRender = post.content;
-            try {
-              const parsed = JSON.parse(post.content);
-              if (parsed.blocks && Array.isArray(parsed.blocks)) {
-                // Convert blocks to HTML using the new block editor serializer
-                const { blocksToHTML } = require("@/app/admin/blog/_components/editor/utils/serializer");
-                contentToRender = blocksToHTML(parsed);
-              }
-            } catch {
-              // Not JSON, continue with original content
-            }
-            
-            // Check if content is HTML (contains HTML tags) or Markdown
-            const isHTML = /<[a-z][\s\S]*>/i.test(contentToRender);
-            
-            if (isHTML) {
-              // Render HTML content safely
-              const sanitizedHTML = DOMPurify.sanitize(contentToRender, {
-                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'a', 'img', 'code', 'pre', 'div', 'span', 'figure', 'figcaption'],
-                ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel', 'width', 'height', 'data-align'],
-                ALLOW_DATA_ATTR: true,
-              });
-              
-              // Process links in HTML
-              const processedHTML = sanitizedHTML.replace(/<a\s+href=["']([^"']+)["'][^>]*>/gi, (match, href) => {
-                if (href && (href.includes('algogi.com') || href.includes('www.algogi.com'))) {
-                  return `<a href="${pathname}" class="text-brand-primary hover:underline">`;
-                }
-                if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
-                  return match.replace('>', ' target="_blank" rel="noopener noreferrer">');
-                }
-                return match;
-              });
-              
-              return (
-                <div
-                  dangerouslySetInnerHTML={{ __html: processedHTML }}
-                  className="[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-4 [&_a]:text-brand-primary [&_a]:hover:underline dark:[&_a]:text-neon-blue [&_div[data-grid-row]]:grid [&_div[data-grid-row]]:grid-cols-12 [&_div[data-grid-row]]:gap-4 [&_div[data-grid-column]]:grid-column [&_img[data-align='left']]:float-left [&_img[data-align='left']]:mr-4 [&_img[data-align='left']]:mb-4 [&_img[data-align='right']]:float-right [&_img[data-align='right']]:ml-4 [&_img[data-align='right']]:mb-4 [&_img[data-align='center']]:block [&_img[data-align='center']]:mx-auto [&_img[data-align='full-width']]:block [&_img[data-align='full-width']]:w-full [&_.columns-container]:my-6 [&_.columns-container]:gap-4 [&_figure]:my-4 [&_figure_img]:w-full [&_figure_img]:h-auto [&_figure_img]:rounded-lg [&_figcaption]:text-sm [&_figcaption]:text-gray-600 [&_figcaption]:dark:text-gray-400 [&_figcaption]:mt-2 [&_figcaption]:text-center [&_.btn-primary]:inline-block [&_.btn-primary]:px-6 [&_.btn-primary]:py-3 [&_.btn-primary]:bg-brand-primary [&_.btn-primary]:text-white [&_.btn-primary]:rounded-lg [&_.btn-primary]:font-semibold [&_.btn-primary]:hover:bg-opacity-90 [&_.btn-primary]:transition-colors [&_.btn-primary]:my-4 [&_.btn-secondary]:inline-block [&_.btn-secondary]:px-6 [&_.btn-secondary]:py-3 [&_.btn-secondary]:bg-gray-200 [&_.btn-secondary]:dark:bg-gray-700 [&_.btn-secondary]:text-gray-900 [&_.btn-secondary]:dark:text-white [&_.btn-secondary]:rounded-lg [&_.btn-secondary]:font-semibold [&_.btn-secondary]:hover:bg-opacity-90 [&_.btn-secondary]:transition-colors [&_.btn-secondary]:my-4 [&_pre]:bg-gray-900 [&_pre]:dark:bg-gray-800 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4 [&_code]:bg-gray-100 [&_code]:dark:bg-gray-800 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm"
-                />
-              );
-            } else {
-              // Render Markdown content (backward compatibility)
-              return (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    a: ({ node, href, ...props }) => {
-                      // Transform algogi.com links to current blog post URL
-                      if (href && (href.includes('algogi.com') || href.includes('www.algogi.com'))) {
-                        // Redirect to current blog post URL
-                        return <Link href={pathname} {...props} />;
-                      }
-                      // For external links, open in new tab
-                      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
-                        return <a href={href} target="_blank" rel="noopener noreferrer" {...props} />;
-                      }
-                      // For relative links, use Next.js Link
-                      if (href && href.startsWith('/')) {
-                        return <Link href={href} {...props} />;
-                      }
-                      // Default fallback
-                      return <a href={href} {...props} />;
-                    },
-                  }}
-                >
-                  {contentToRender}
-                </ReactMarkdown>
-              );
-            }
-          })()}
-        </div>
+          <div className="p-8 md:p-10 lg:p-12">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
+              <div className="inline-flex items-center gap-2 bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full">
+                <User className="w-4 h-4" />
+                {post.author || "AlgoGI Team"}
+              </div>
+              <div className="inline-flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                {publishedDate}
+              </div>
+            </div>
 
-        {/* FAQs Section */}
-        {post.faqs && post.faqs.length > 0 && (
-          <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Frequently Asked Questions</h2>
-            <div className="space-y-6">
-              {post.faqs.map((faq, index) => (
-                <div
-                  key={index}
-                  className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-6"
-                >
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                    {faq.question}
-                  </h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {faq.answer}
-                  </p>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{post.title}</h1>
+
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {post.tags.map((tag) => (
+                  <span key={tag} className="px-3 py-1 text-xs font-semibold bg-brand-primary/10 text-brand-primary rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-brand-primary">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+            </div>
+
+            {post.faqs && post.faqs.length > 0 && (
+              <div className="mt-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+                <div className="space-y-4">
+                  {post.faqs.map((faq, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{faq.question}</h3>
+                      <p className="text-gray-700">{faq.answer}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </article>
   );

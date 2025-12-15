@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+const baseUrl = process.env.NEXTAUTH_URL || "https://algogi.com";
+
 export const metadata: Metadata = {
   title: "Contact Us - Get Your AI Project Started | AlgoGI",
   description:
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
     title: "Contact Us - Get Your AI Project Started | AlgoGI",
     description:
       "Contact AlgoGI to discuss your AI and software development needs. Get a clear plan in your inbox within 24 hours. Speak directly with senior engineers.",
-    url: "https://algogi.com/contact",
+    url: `${baseUrl}/contact`,
     type: "website",
   },
   twitter: {
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
       "Contact AlgoGI to discuss your AI and software development needs. Get a clear plan in your inbox within 24 hours.",
   },
   alternates: {
-    canonical: "https://algogi.com/contact",
+    canonical: `${baseUrl}/contact`,
   },
 };
 

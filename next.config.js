@@ -16,8 +16,17 @@ const getWordPressDomain = () => {
 
 const wordpressDomain = getWordPressDomain();
 
+const oneYear = 60 * 60 * 24 * 365;
+
 const nextConfig = {
   reactStrictMode: true,
+  compress: true,
+  poweredByHeader: false,
+  productionBrowserSourceMaps: false,
+  generateEtags: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   images: {
     remotePatterns: [
       {
@@ -58,6 +67,22 @@ const nextConfig = {
             },
           ]),
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:all*(svg|jpg|jpeg|png|gif|webp|avif|ico)',
+        headers: [
+          { key: 'Cache-Control', value: `public, max-age=${oneYear}, immutable` },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: `public, max-age=${oneYear}, immutable` },
+        ],
+      },
+    ];
   },
 };
 

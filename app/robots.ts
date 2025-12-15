@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://algogi.com";
+  const baseUrl = process.env.NEXTAUTH_URL || "https://algogi.com";
 
   return {
     rules: [

@@ -1,10 +1,9 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, User, ArrowRight } from "lucide-react";
 import BlogPlaceholderImage from "@/components/blog/blog-placeholder-image";
+import type { Metadata } from "next";
+import { getDb } from "@/lib/firebase/config";
 
 interface BlogPost {
   id: string;
@@ -18,37 +17,47 @@ interface BlogPost {
   publishedAt: string | null;
 }
 
-export default function BlogPage() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+export const revalidate = 300;
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+const baseUrl = process.env.NEXTAUTH_URL || "https://algogi.com";
 
-  const fetchPosts = async () => {
-    try {
-      const response = await fetch("/api/blog");
-      if (response.ok) {
-        const data = await response.json();
-        setPosts(data);
-      }
-    } catch (error) {
-      console.error("Error fetching blog posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+export const metadata: Metadata = {
+  title: "Blog | AI Engineering Insights from AlgoGI",
+  description: "Insights, tutorials, and updates on AI agents, automation, and engineering from the AlgoGI team.",
+  alternates: { canonical: `${baseUrl}/blog` },
+};
 
-  if (loading) {
-    return (
-      <div className="section-padding bg-dark-bg">
-        <div className="container-custom text-center py-12">
-          <div className="text-gray-500">Loading blog posts...</div>
-        </div>
-      </div>
-    );
+async function getPosts(): Promise<BlogPost[]> {
+  try {
+    const db = getDb();
+    const snapshot = await db
+      .collection("blog")
+      .where("published", "==", true)
+      .orderBy("publishedAt", "desc")
+      .get();
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title,
+        slug: data.slug,
+        excerpt: data.excerpt || "",
+        author: data.author || "",
+        published: data.published || false,
+        featuredImage: data.featuredImage || null,
+        tags: data.tags || [],
+        publishedAt: data.publishedAt?.toDate?.()?.toISOString() || null,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching blog posts:", error);
+    return [];
   }
+}
+
+export default async function BlogPage() {
+  const posts = await getPosts();
 
   return (
     <div className="section-padding bg-dark-bg">

@@ -14,6 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const service = getServiceBySlug(slug);
+  const baseUrl = process.env.NEXTAUTH_URL || "https://algogi.com";
 
   if (!service) {
     return {
@@ -41,7 +42,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${serviceTitle} | AlgoGI`,
       description: service.description,
-      url: `https://algogi.com/services/${slug}`,
+      url: `${baseUrl}/services/${slug}`,
       type: "website",
     },
     twitter: {
@@ -50,7 +51,7 @@ export async function generateMetadata({
       description: service.description,
     },
     alternates: {
-      canonical: `https://algogi.com/services/${slug}`,
+      canonical: `${baseUrl}/services/${slug}`,
     },
   };
 }
