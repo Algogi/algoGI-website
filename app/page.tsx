@@ -8,8 +8,10 @@ import TechnologiesSection from "@/components/sections/technologies-section";
 import HowWeWork from "@/components/sections/how-we-work";
 import LeadCaptureForm from "@/components/forms/lead-capture-form";
 import TrustSignals from "@/components/sections/trust-signals";
+import { useScrollTracking } from "@/lib/hooks/use-scroll-tracking";
 
 export default function HomePage() {
+  useScrollTracking();
   return (
     <>
       <HomeHero />

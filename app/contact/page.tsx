@@ -1,5 +1,7 @@
 "use client";
 
+import { useScrollTracking } from "@/lib/hooks/use-scroll-tracking";
+
 import LeadCaptureForm from "@/components/forms/lead-capture-form";
 import { motion } from "framer-motion";
 import { 
@@ -21,6 +23,8 @@ import {
 import { ContactPageStructuredData } from "@/components/seo/structured-data";
 
 export default function ContactPage() {
+  useScrollTracking();
+  
   const trustIndicators = [
     { icon: Clock, value: "24h", label: "Response Time" },
     { icon: CheckCircle2, value: "100+", label: "Projects Delivered" },

@@ -105,6 +105,18 @@ export default function JobApplicationForm({
     value: any,
     type: string
   ) => {
+    // Track job application start on first field interaction
+    if (Object.keys(formData).length === 0 && Object.keys(files).length === 0) {
+      import("@/lib/firebase/analytics").then(({ logAnalyticsEvent, AnalyticsEvents }) => {
+        logAnalyticsEvent(AnalyticsEvents.JOB_APPLICATION_START, {
+          job_id: jobId,
+          job_title: jobTitle,
+          job_slug: jobSlug,
+          page_path: typeof window !== "undefined" ? window.location.pathname : "",
+        });
+      });
+    }
+
     if (type === "file") {
       const file = value as File;
       setFiles((prev) => ({ ...prev, [fieldId]: file }));
@@ -149,6 +161,18 @@ export default function JobApplicationForm({
       const data = await response.json();
 
       if (response.ok) {
+        // Track successful job application submission
+        const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+        await logAnalyticsEvent(AnalyticsEvents.JOB_APPLICATION_SUBMIT, {
+          job_id: jobId,
+          job_title: jobTitle,
+          job_slug: jobSlug,
+          has_resume: Object.keys(files).some(key => key.toLowerCase().includes("resume")),
+          has_cover_letter: !!coverLetterField && !!formData[coverLetterField.id],
+          status: "success",
+          page_path: typeof window !== "undefined" ? window.location.pathname : "",
+        });
+
         setSubmitStatus({
           type: "success",
           message:
@@ -161,6 +185,19 @@ export default function JobApplicationForm({
         throw new Error(data.error || "Submission failed");
       }
     } catch (error: any) {
+      // Track job application error
+      const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+      await logAnalyticsEvent(AnalyticsEvents.JOB_APPLICATION_SUBMIT, {
+        job_id: jobId,
+        job_title: jobTitle,
+        job_slug: jobSlug,
+        has_resume: Object.keys(files).some(key => key.toLowerCase().includes("resume")),
+        has_cover_letter: !!coverLetterField && !!formData[coverLetterField.id],
+        status: "error",
+        error_message: error.message || "Unknown error",
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      });
+
       setSubmitStatus({
         type: "error",
         message: error.message || "Something went wrong. Please try again.",

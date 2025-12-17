@@ -131,27 +131,159 @@ export default function JobApplicationForm({ jobId, jobTitle }: { jobId: string;
 }
 ```
 
+## Helper Functions
+
+### Track Link Clicks
+
+```typescript
+import { trackLinkClick } from "@/lib/firebase/analytics";
+
+// Internal navigation link
+trackLinkClick("/services", "Services", "header", false);
+
+// External link
+trackLinkClick("https://example.com", "External Site", "footer", true);
+```
+
+### Track CTA Clicks
+
+```typescript
+import { trackCTAClick } from "@/lib/firebase/analytics";
+
+trackCTAClick("Get Started", "hero", "/contact");
+```
+
+### Track Modal Interactions
+
+```typescript
+import { trackModalOpen, trackModalClose } from "@/lib/firebase/analytics";
+
+// When modal opens
+trackModalOpen("case_study", "case-study-123");
+
+// When modal closes (with time spent)
+const timeSpent = 45; // seconds
+trackModalClose("case_study", "case-study-123", timeSpent);
+```
+
+### Track Scroll Depth
+
+```typescript
+import { trackScrollDepth } from "@/lib/firebase/analytics";
+
+trackScrollDepth(50, "/services"); // 50% scroll depth
+```
+
+### Use Scroll Tracking Hook
+
+```typescript
+import { useScrollTracking } from "@/lib/hooks/use-scroll-tracking";
+
+export default function MyPage() {
+  useScrollTracking(); // Automatically tracks scroll depth and time on page
+  return <div>Page content</div>;
+}
+```
+
 ## Available Event Types
 
 All predefined events are available in `AnalyticsEvents`:
 
+### Page Views & Content
 - `PAGE_VIEW` - Automatic page view tracking (handled by FirebaseAnalyticsProvider)
-- `BUTTON_CLICK` - Button clicks
-- `FORM_SUBMIT` - Form submissions
-- `LINK_CLICK` - Link clicks
-- `CONTACT_FORM_SUBMIT` - Contact form submissions
-- `LEAD_FORM_SUBMIT` - Lead form submissions
-- `NEWSLETTER_SUBSCRIBE` - Newsletter subscriptions
-- `JOB_APPLICATION_START` - Job application started
-- `JOB_APPLICATION_SUBMIT` - Job application submitted
-- `JOB_VIEW` - Job listing viewed
-- `FILE_DOWNLOAD` - File downloads
-- `CASE_STUDY_DOWNLOAD` - Case study downloads
 - `SERVICE_VIEW` - Service page views
 - `BLOG_VIEW` - Blog post views
+- `JOB_VIEW` - Job listing views
+- `CASE_STUDY_VIEW` - Case study views (when modal opens)
 - `PORTFOLIO_VIEW` - Portfolio item views
-- `CTA_CLICK` - CTA button clicks
+
+### Forms
+- `FORM_SUBMIT` - Generic form submissions
+- `CONTACT_FORM_SUBMIT` - Contact form submissions
+- `LEAD_FORM_SUBMIT` - Lead capture form submissions
+- `NEWSLETTER_SUBSCRIBE` - Newsletter subscriptions
+- `JOB_APPLICATION_START` - Job application started (first field interaction)
+- `JOB_APPLICATION_SUBMIT` - Job application submitted
+- `DOWNLOAD_FORM_SUBMIT` - Download form submissions
+
+### Downloads
+- `FILE_DOWNLOAD` - Generic file downloads
+- `CASE_STUDY_DOWNLOAD` - Case study downloads
+- `DOWNLOAD_START` - Download form modal opened
+- `DOWNLOAD_COMPLETE` - Download successfully initiated
+
+### CTAs & Buttons
+- `BUTTON_CLICK` - Generic button clicks
+- `CTA_CLICK` - Primary CTA button clicks
 - `FLOATING_CTA_CLICK` - Floating CTA clicks
+- `CONTACT_BUTTON_CLICK` - Contact button clicks
+- `FLOATING_CTA_VIEW` - Floating CTA becomes visible
+
+### Navigation
+- `LINK_CLICK` - Generic link clicks
+- `NAVIGATION_CLICK` - Header navigation link clicks
+- `FOOTER_LINK_CLICK` - Footer link clicks
+- `EXTERNAL_LINK_CLICK` - External link clicks (social, email, phone)
+
+### Modals
+- `MODAL_OPEN` - When any modal opens
+- `MODAL_CLOSE` - When modal closes
+- `MODAL_DOWNLOAD_CLICK` - Download button in case study modal
+
+### Engagement
+- `SCROLL_DEPTH` - User scroll depth milestones (25%, 50%, 75%, 100%)
+- `TIME_ON_PAGE` - Time spent on page (for key pages)
+- `THEME_TOGGLE` - Theme switch (light/dark)
+
+### Chat Widget
+- `CHAT_WIDGET_OPEN` - When chat widget is opened
+- `CHAT_WIDGET_MESSAGE_SENT` - When user sends a message
+
+## Event Parameter Standards
+
+All events follow consistent parameter naming conventions:
+
+- Use `snake_case` for parameter names
+- Include `page_path` for context (automatically added by helpers)
+- Include relevant IDs (job_id, service_slug, etc.)
+- Include `status` for success/error tracking ("success" or "error")
+- Include `error_message` when status is "error"
+
+### Example Event Parameters
+
+```typescript
+// Form submission
+{
+  form_location: "contact_page",
+  has_company: true,
+  open_to_call: false,
+  status: "success",
+  page_path: "/contact"
+}
+
+// Service view
+{
+  service_slug: "ai-agent-development",
+  service_name: "AI Agent Development",
+  page_path: "/services/ai-agent-development"
+}
+
+// CTA click
+{
+  cta_text: "Get Started",
+  cta_location: "hero",
+  cta_destination: "/contact",
+  page_path: "/"
+}
+
+// Modal interaction
+{
+  modal_type: "case_study",
+  modal_content_id: "case-study-123",
+  time_spent: 45, // seconds
+  page_path: "/case-studies"
+}
+```
 
 ## Custom Events
 
@@ -163,6 +295,98 @@ import { logAnalyticsEvent } from "@/lib/firebase/analytics";
 logAnalyticsEvent("custom_event_name", {
   custom_param_1: "value1",
   custom_param_2: "value2",
+  page_path: window.location.pathname,
 });
+```
+
+## Implementation Examples
+
+### Form Submission Tracking
+
+```typescript
+// In form submit handler
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  
+  try {
+    const response = await fetch("/api/lead", {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
+
+    if (response.ok) {
+      await logAnalyticsEvent(AnalyticsEvents.LEAD_FORM_SUBMIT, {
+        form_location: "contact_page",
+        has_company: !!formData.company,
+        open_to_call: formData.openToCall || false,
+        status: "success",
+        page_path: window.location.pathname,
+      });
+    }
+  } catch (error) {
+    await logAnalyticsEvent(AnalyticsEvents.LEAD_FORM_SUBMIT, {
+      form_location: "contact_page",
+      status: "error",
+      error_message: error instanceof Error ? error.message : "Unknown error",
+      page_path: window.location.pathname,
+    });
+  }
+};
+```
+
+### Modal Tracking
+
+```typescript
+import { useState, useEffect, useRef } from "react";
+import { trackModalOpen, trackModalClose } from "@/lib/firebase/analytics";
+
+export default function MyModal({ isOpen, onClose, contentId }: Props) {
+  const openTimeRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      openTimeRef.current = Date.now();
+      trackModalOpen("my_modal", contentId);
+    }
+  }, [isOpen, contentId]);
+
+  const handleClose = () => {
+    if (openTimeRef.current) {
+      const timeSpent = Math.floor((Date.now() - openTimeRef.current) / 1000);
+      trackModalClose("my_modal", contentId, timeSpent);
+      openTimeRef.current = null;
+    }
+    onClose();
+  };
+
+  return <div>Modal content</div>;
+}
+```
+
+### Scroll Depth Tracking
+
+```typescript
+// Using the hook (recommended)
+import { useScrollTracking } from "@/lib/hooks/use-scroll-tracking";
+
+export default function MyPage() {
+  useScrollTracking(); // Automatically tracks 25%, 50%, 75%, 100% milestones
+  return <div>Page content</div>;
+}
+
+// Manual tracking
+import { trackScrollDepth } from "@/lib/firebase/analytics";
+
+useEffect(() => {
+  const handleScroll = () => {
+    const scrollPercentage = calculateScrollPercentage();
+    if (scrollPercentage >= 50 && !tracked50) {
+      trackScrollDepth(50, window.location.pathname);
+      setTracked50(true);
+    }
+  };
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 ```
 

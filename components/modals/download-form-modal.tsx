@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import DownloadForm from "@/components/forms/download-form";
+import { useEffect, useRef } from "react";
+import { trackModalOpen, trackModalClose, logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface DownloadFormModalProps {
   isOpen: boolean;
@@ -19,10 +21,35 @@ export default function DownloadFormModal({
   fileType,
   caseStudyTitle,
 }: DownloadFormModalProps) {
+  const openTimeRef = useRef<number | null>(null);
+
+  // Track modal open
+  useEffect(() => {
+    if (isOpen) {
+      openTimeRef.current = Date.now();
+      trackModalOpen("download", fileIdentifier);
+      logAnalyticsEvent(AnalyticsEvents.DOWNLOAD_START, {
+        case_study_title: caseStudyTitle,
+        file_type: fileType,
+        file_identifier: fileIdentifier,
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      });
+    }
+  }, [isOpen, fileIdentifier, fileType, caseStudyTitle]);
+
+  const handleClose = () => {
+    if (openTimeRef.current) {
+      const timeSpent = Math.floor((Date.now() - openTimeRef.current) / 1000);
+      trackModalClose("download", fileIdentifier, timeSpent);
+      openTimeRef.current = null;
+    }
+    onClose();
+  };
+
   const handleSuccess = () => {
     // Close modal after successful submission
     setTimeout(() => {
-      onClose();
+      handleClose();
     }, 500);
   };
 
@@ -34,7 +61,7 @@ export default function DownloadFormModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
           />
           <motion.div

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Linkedin, Twitter, Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import AlgogiLogo from "@/components/logo/algogi-logo";
+import { trackLinkClick } from "@/lib/firebase/analytics";
 
 export default function SiteFooter() {
   const [email, setEmail] = useState("");
@@ -38,6 +39,15 @@ export default function SiteFooter() {
       const data = await response.json();
 
       if (response.ok) {
+        // Track newsletter subscription
+        const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+        await logAnalyticsEvent(AnalyticsEvents.NEWSLETTER_SUBSCRIBE, {
+          source: "footer",
+          agreed_to_marketing: agreedToMarketing,
+          status: "success",
+          page_path: typeof window !== "undefined" ? window.location.pathname : "",
+        });
+
         setSubmitStatus({
           type: "success",
           message: "Thank you for subscribing!",
@@ -45,12 +55,32 @@ export default function SiteFooter() {
         setEmail("");
         setAgreedToMarketing(false);
       } else {
+        // Track newsletter subscription error
+        const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+        await logAnalyticsEvent(AnalyticsEvents.NEWSLETTER_SUBSCRIBE, {
+          source: "footer",
+          agreed_to_marketing: agreedToMarketing,
+          status: "error",
+          error_message: data.error || "Unknown error",
+          page_path: typeof window !== "undefined" ? window.location.pathname : "",
+        });
+
         setSubmitStatus({
           type: "error",
           message: data.error || "Something went wrong. Please try again.",
         });
       }
     } catch (error) {
+      // Track newsletter subscription error
+      const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+      await logAnalyticsEvent(AnalyticsEvents.NEWSLETTER_SUBSCRIBE, {
+        source: "footer",
+        agreed_to_marketing: agreedToMarketing,
+        status: "error",
+        error_message: error instanceof Error ? error.message : "Unknown error",
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      });
+
       setSubmitStatus({
         type: "error",
         message: "Failed to subscribe. Please try again later.",
@@ -105,6 +135,7 @@ export default function SiteFooter() {
               <a
                 href="mailto:info@algogi.com"
                 className="btn-primary flex items-center gap-2"
+                onClick={() => trackLinkClick("mailto:info@algogi.com", "Email Us: info@algogi.com", "footer", true)}
               >
                 <Mail className="w-5 h-5" />
                 Email Us: info@algogi.com
@@ -186,6 +217,7 @@ export default function SiteFooter() {
                   key={index}
                   href={link.href}
                   className="text-gray-400 hover:text-neon-blue transition-colors duration-300"
+                  onClick={() => trackLinkClick(link.href, link.label, "footer", false)}
                 >
                   {link.label}
                 </Link>
@@ -202,6 +234,7 @@ export default function SiteFooter() {
                   <Link
                     href="/services"
                     className="text-gray-400 hover:text-neon-blue transition-colors duration-300 text-sm leading-relaxed block"
+                    onClick={() => trackLinkClick("/services", service, "footer", false)}
                   >
                     {service}
                   </Link>
@@ -220,6 +253,7 @@ export default function SiteFooter() {
                   whileTap={{ scale: 0.9 }}
                   className="w-10 h-10 rounded-full bg-dark-card border border-gray-600 flex items-center justify-center hover:border-neon-blue hover:bg-neon-blue/10 transition-all duration-300"
                   aria-label={social.label}
+                  onClick={() => trackLinkClick(social.href, social.label, "footer", true)}
                 >
                   <social.icon className="w-5 h-5 text-gray-400 hover:text-neon-blue transition-colors" />
                 </motion.a>
@@ -235,13 +269,21 @@ export default function SiteFooter() {
               <div className="space-y-3 text-sm text-gray-400">
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-neon-blue" />
-                  <a href="tel:+15402688778" className="hover:text-neon-blue transition-colors">
+                  <a 
+                    href="tel:+15402688778" 
+                    className="hover:text-neon-blue transition-colors"
+                    onClick={() => trackLinkClick("tel:+15402688778", "+1 540 268 8778", "footer", true)}
+                  >
                     +1 540 268 8778
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-neon-blue flex-shrink-0" />
-                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
+                  <a 
+                    href="mailto:info@algogi.com" 
+                    className="hover:text-neon-blue transition-colors"
+                    onClick={() => trackLinkClick("mailto:info@algogi.com", "info@algogi.com", "footer", true)}
+                  >
                     info@algogi.com
                   </a>
                 </div>
@@ -260,13 +302,21 @@ export default function SiteFooter() {
               <div className="space-y-3 text-sm text-gray-400">
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-neon-blue" />
-                  <a href="tel:+918770170371" className="hover:text-neon-blue transition-colors">
+                  <a 
+                    href="tel:+918770170371" 
+                    className="hover:text-neon-blue transition-colors"
+                    onClick={() => trackLinkClick("tel:+918770170371", "+91 877 017 0371", "footer", true)}
+                  >
                     +91 877 017 0371
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-neon-blue flex-shrink-0" />
-                  <a href="mailto:info@algogi.com" className="hover:text-neon-blue transition-colors">
+                  <a 
+                    href="mailto:info@algogi.com" 
+                    className="hover:text-neon-blue transition-colors"
+                    onClick={() => trackLinkClick("mailto:info@algogi.com", "info@algogi.com", "footer", true)}
+                  >
                     info@algogi.com
                   </a>
                 </div>

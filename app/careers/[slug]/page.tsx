@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import JobApplicationForm from "@/components/forms/job-application-form";
 import parse from "html-react-parser";
 import PDFViewer from "@/components/pdf-viewer";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface Job {
   id: string;
@@ -47,6 +48,14 @@ export default function JobDetailPage() {
       }
       const data = await response.json();
       setJob(data);
+      // Track job view
+      logAnalyticsEvent(AnalyticsEvents.JOB_VIEW, {
+        job_slug: slug,
+        job_title: data.title,
+        job_location: data.location || "",
+        job_type: data.type || "",
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      });
     } catch (err: any) {
       setError(err.message);
     } finally {

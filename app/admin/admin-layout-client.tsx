@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import AlgogiLogo from "@/components/logo/algogi-logo";
-import { LogOut, LayoutDashboard, Briefcase, MessageSquare, Download, ExternalLink, Image as ImageIcon, FileText, Mail, Users, Menu, X, BookOpen, Sun, Moon, UserCircle, ClipboardList } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, MessageSquare, Download, ExternalLink, Image as ImageIcon, FileText, Mail, Users, Menu, X, BookOpen, Sun, Moon, UserCircle, ClipboardList, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -66,6 +66,7 @@ export default function AdminLayoutClient({ children, session }: AdminLayoutClie
     { href: "/admin/leads", label: "Leads", icon: Mail },
     { href: "/admin/newsletter", label: "Newsletter", icon: Users },
     { href: "/admin/downloads", label: "Downloads", icon: Download },
+    { href: "/admin/analytics", label: "Analytics", icon: Activity },
     { href: "/admin/media", label: "Media", icon: ImageIcon },
     { href: "/admin/files", label: "Files", icon: FileText },
   ];

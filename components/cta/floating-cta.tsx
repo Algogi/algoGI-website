@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { MessageSquare, X } from "lucide-react";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 export default function FloatingCTA() {
   const [isVisible, setIsVisible] = useState(false);
@@ -13,6 +14,13 @@ export default function FloatingCTA() {
     // Show CTA after user scrolls down 300px
     const handleScroll = () => {
       if (window.scrollY > 300 && !isDismissed) {
+        if (!isVisible) {
+          // Track when floating CTA becomes visible
+          logAnalyticsEvent(AnalyticsEvents.FLOATING_CTA_VIEW, {
+            scroll_position: window.scrollY,
+            page_path: window.location.pathname,
+          });
+        }
         setIsVisible(true);
       } else if (window.scrollY <= 300) {
         setIsVisible(false);
@@ -21,7 +29,7 @@ export default function FloatingCTA() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isDismissed]);
+  }, [isDismissed, isVisible]);
 
   const handleDismiss = () => {
     setIsDismissed(true);
@@ -71,7 +79,15 @@ export default function FloatingCTA() {
                 <Link
                   href="/contact"
                   className="btn-primary text-sm md:text-base px-4 md:px-6 py-2 md:py-3 whitespace-nowrap flex-shrink-0"
-                  onClick={() => setIsVisible(false)}
+                  onClick={() => {
+                    logAnalyticsEvent(AnalyticsEvents.FLOATING_CTA_CLICK, {
+                      cta_text: "Get Started",
+                      cta_destination: "/contact",
+                      scroll_position: window.scrollY,
+                      page_path: window.location.pathname,
+                    });
+                    setIsVisible(false);
+                  }}
                 >
                   Get Started
                 </Link>

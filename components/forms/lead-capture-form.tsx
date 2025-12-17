@@ -54,13 +54,14 @@ export default function LeadCaptureForm() {
     setSubmitStatus({ type: null, message: "" });
 
     // Track form submission event
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "form_submit", {
-        event_category: "Lead Generation",
-        event_label: "Project Brief Form",
-        value: 1,
-      });
-    }
+    const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+    await logAnalyticsEvent(AnalyticsEvents.LEAD_FORM_SUBMIT, {
+      form_location: "contact_page",
+      has_company: !!formData.company,
+      open_to_call: formData.openToCall || false,
+      preferred_call_time: formData.preferredCallTime || "",
+      page_path: typeof window !== "undefined" ? window.location.pathname : "",
+    });
 
     try {
       const response = await fetch("/api/lead", {
@@ -73,13 +74,15 @@ export default function LeadCaptureForm() {
 
       if (response.ok) {
         // Track successful submission
-        if (typeof window !== "undefined" && (window as any).gtag) {
-          (window as any).gtag("event", "conversion", {
-            send_to: "AW-CONVERSION_ID/CONVERSION_LABEL",
-            value: 1.0,
-            currency: "USD",
-          });
-        }
+        const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+        await logAnalyticsEvent(AnalyticsEvents.LEAD_FORM_SUBMIT, {
+          form_location: "contact_page",
+          has_company: !!formData.company,
+          open_to_call: formData.openToCall || false,
+          preferred_call_time: formData.preferredCallTime || "",
+          status: "success",
+          page_path: typeof window !== "undefined" ? window.location.pathname : "",
+        });
 
         setSubmitStatus({
           type: "success",
@@ -100,12 +103,15 @@ export default function LeadCaptureForm() {
       }
     } catch (error) {
       // Track form error
-      if (typeof window !== "undefined" && (window as any).gtag) {
-        (window as any).gtag("event", "form_error", {
-          event_category: "Lead Generation",
-          event_label: "Project Brief Form Error",
-        });
-      }
+      const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+      await logAnalyticsEvent(AnalyticsEvents.LEAD_FORM_SUBMIT, {
+        form_location: "contact_page",
+        has_company: !!formData.company,
+        open_to_call: formData.openToCall || false,
+        status: "error",
+        error_message: error instanceof Error ? error.message : "Unknown error",
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      });
 
       setSubmitStatus({
         type: "error",

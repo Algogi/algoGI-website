@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import AlgogiLogo from "@/components/logo/algogi-logo";
 import ThemeToggle from "@/components/theme/theme-toggle";
+import { logAnalyticsEvent, AnalyticsEvents, trackLinkClick, trackCTAClick } from "@/lib/firebase/analytics";
 
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -70,6 +71,9 @@ export default function SiteHeader() {
                           ? "text-brand-primary" 
                           : "text-logo-color hover:text-brand-primary"
                       }`}
+                      onClick={() => {
+                        trackLinkClick(link.href, link.label, "header", false);
+                      }}
                     >
                       {link.label}
                       <motion.span
@@ -83,7 +87,13 @@ export default function SiteHeader() {
                 );
               })}
               <ThemeToggle />
-              <Link href="/contact" className="btn-primary">
+              <Link 
+                href="/contact" 
+                className="btn-primary"
+                onClick={() => {
+                  trackCTAClick("Contact Us", "header", "/contact");
+                }}
+              >
                 Contact Us
               </Link>
             </div>
@@ -198,7 +208,10 @@ export default function SiteHeader() {
                             ? "text-brand-primary bg-brand-primary/10" 
                             : "text-logo-color hover:text-brand-primary hover:bg-brand-primary/5"
                         }`}
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={() => {
+                          trackLinkClick(link.href, link.label, "mobile", false);
+                          setIsMobileMenuOpen(false);
+                        }}
                       >
                         {isActive && (
                           <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-primary rounded-r" />
@@ -215,7 +228,10 @@ export default function SiteHeader() {
                 <Link
                   href="/contact"
                   className="btn-primary text-center block"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => {
+                    trackCTAClick("Contact Us", "mobile", "/contact");
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
                   Contact Us
                 </Link>

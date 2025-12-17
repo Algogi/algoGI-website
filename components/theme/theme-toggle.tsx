@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -30,8 +31,16 @@ export default function ThemeToggle() {
   }
 
   const handleThemeToggle = () => {
+    const previousTheme = theme || "dark";
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
+    
+    // Track theme toggle
+    logAnalyticsEvent(AnalyticsEvents.THEME_TOGGLE, {
+      new_theme: newTheme,
+      previous_theme: previousTheme,
+      page_path: typeof window !== "undefined" ? window.location.pathname : "",
+    });
     
     // Immediately update the light class
     const html = document.documentElement;

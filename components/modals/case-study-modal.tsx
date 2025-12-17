@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { X, Download, Wrench, Bot } from "lucide-react";
 import DownloadFormModal from "@/components/modals/download-form-modal";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type CaseStudy } from "@/app/case-studies/case-studies-data";
+import { trackModalOpen, trackModalClose, logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface CaseStudyModalProps {
   isOpen: boolean;
@@ -35,6 +36,30 @@ export default function CaseStudyModal({
   study,
 }: CaseStudyModalProps) {
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const openTimeRef = useRef<number | null>(null);
+
+  // Track modal open
+  useEffect(() => {
+    if (isOpen && study) {
+      openTimeRef.current = Date.now();
+      trackModalOpen("case_study", study.title);
+      logAnalyticsEvent(AnalyticsEvents.CASE_STUDY_VIEW, {
+        case_study_title: study.title,
+        case_study_client: study.client || "",
+        is_template: study.isTemplate || false,
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      });
+    }
+  }, [isOpen, study]);
+
+  const handleClose = () => {
+    if (openTimeRef.current) {
+      const timeSpent = Math.floor((Date.now() - openTimeRef.current) / 1000);
+      trackModalClose("case_study", study?.title || "", timeSpent);
+      openTimeRef.current = null;
+    }
+    onClose();
+  };
 
   if (!study) return null;
 
@@ -49,7 +74,7 @@ export default function CaseStudyModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
           />
           <motion.div
@@ -72,7 +97,14 @@ export default function CaseStudyModal({
                 <div className="flex items-center gap-2">
                   {study.downloadFile && (
                     <motion.button
-                      onClick={() => setDownloadModalOpen(true)}
+                      onClick={() => {
+                        logAnalyticsEvent(AnalyticsEvents.MODAL_DOWNLOAD_CLICK, {
+                          case_study_title: study.title,
+                          file_type: "pdf",
+                          page_path: typeof window !== "undefined" ? window.location.pathname : "",
+                        });
+                        setDownloadModalOpen(true);
+                      }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="px-4 py-2 rounded-lg bg-brand-primary/20 dark:bg-brand-primary/10 hover:bg-brand-primary/30 dark:hover:bg-brand-primary/20 border border-brand-primary/40 dark:border-brand-primary/30 transition-colors flex items-center gap-2 text-sm font-semibold text-brand-primary"
@@ -82,7 +114,7 @@ export default function CaseStudyModal({
                     </motion.button>
                   )}
                   <button
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="p-2 hover:bg-dark-surface rounded-lg transition-colors"
                     aria-label="Close modal"
                   >

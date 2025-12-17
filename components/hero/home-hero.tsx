@@ -8,6 +8,7 @@ import SplitText from "@/components/animations/split-text";
 import GlitchText from "@/components/animations/glitch-text";
 import Card3D from "@/components/animations/3d-card";
 import ParallaxSection from "@/components/animations/parallax-section";
+import { trackCTAClick } from "@/lib/firebase/analytics";
 
 export default function HomeHero() {
   return (
@@ -205,10 +206,18 @@ export default function HomeHero() {
                   transition={{ delay: 1.4, duration: 0.8 }}
                   className="flex flex-col sm:flex-row gap-6"
                 >
-                  <Link href="/contact" className="btn-primary">
+                  <Link 
+                    href="/contact" 
+                    className="btn-primary"
+                    onClick={() => trackCTAClick("Start Your AI Transformation", "hero", "/contact")}
+                  >
                     Start Your AI Transformation
                   </Link>
-                  <Link href="/services" className="btn-secondary text-[#201F54] border-[#201F54] hover:border-[#201F54]/80 hover:text-[#201F54]/90 dark:text-logo-color dark:border-logo-color dark:hover:border-logo-color/80 dark:hover:text-logo-color/90">
+                  <Link 
+                    href="/services" 
+                    className="btn-secondary text-[#201F54] border-[#201F54] hover:border-[#201F54]/80 hover:text-[#201F54]/90 dark:text-logo-color dark:border-logo-color dark:hover:border-logo-color/80 dark:hover:text-logo-color/90"
+                    onClick={() => trackCTAClick("Explore Our Solutions", "hero", "/services")}
+                  >
                     Explore Our Solutions
                   </Link>
                 </motion.div>

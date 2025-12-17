@@ -65,6 +65,17 @@ export default function DownloadForm({
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Track successful download form submission
+        const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+        await logAnalyticsEvent(AnalyticsEvents.DOWNLOAD_COMPLETE, {
+          file_identifier: fileIdentifier,
+          file_type: fileType,
+          case_study_title: caseStudyTitle || "",
+          has_company: !!formData.company,
+          status: "success",
+          page_path: typeof window !== "undefined" ? window.location.pathname : "",
+        });
+
         // Email was sent successfully - show success message
         setSubmitStatus({
           type: "success",
@@ -84,6 +95,18 @@ export default function DownloadForm({
         throw new Error(data.error || data.message || "Failed to send email. Please try again later.");
       }
     } catch (error) {
+      // Track download form error
+      const { logAnalyticsEvent, AnalyticsEvents } = await import("@/lib/firebase/analytics");
+      await logAnalyticsEvent(AnalyticsEvents.DOWNLOAD_COMPLETE, {
+        file_identifier: fileIdentifier,
+        file_type: fileType,
+        case_study_title: caseStudyTitle || "",
+        has_company: !!formData.company,
+        status: "error",
+        error_message: error instanceof Error ? error.message : "Unknown error",
+        page_path: typeof window !== "undefined" ? window.location.pathname : "",
+      });
+
       setSubmitStatus({
         type: "error",
         message:

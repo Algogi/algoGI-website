@@ -13,6 +13,58 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "analytics_events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "analytics_events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "eventName",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "analytics_events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "timestamp",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pagePath",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "analytics_events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "eventName",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []
