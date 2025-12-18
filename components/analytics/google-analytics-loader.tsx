@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { hasAnalyticsConsent } from "@/lib/cookies/consent";
-import { firebaseConfig } from "@/lib/firebase/client-config";
 
 /**
  * Google Analytics Loader
@@ -25,7 +24,8 @@ export default function GoogleAnalyticsLoader() {
 
     // Skip loading if measurementId matches Firebase's (prevents double tracking)
     // Firebase Analytics already sends data to GA4 using its measurementId
-    if (measurementId === firebaseConfig.measurementId) {
+    const firebaseMeasurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+    if (measurementId === firebaseMeasurementId) {
       return; // Firebase Analytics already handles this measurementId
     }
 
