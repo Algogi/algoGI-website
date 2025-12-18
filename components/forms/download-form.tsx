@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { motion } from "framer-motion";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface FormData {
   name: string;
@@ -65,6 +66,13 @@ export default function DownloadForm({
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Track successful download request
+        logAnalyticsEvent(AnalyticsEvents.FILE_DOWNLOAD, {
+          file_type: fileType,
+          file_identifier: fileIdentifier,
+          case_study_title: caseStudyTitle,
+        });
+
         // Email was sent successfully - show success message
         setSubmitStatus({
           type: "success",

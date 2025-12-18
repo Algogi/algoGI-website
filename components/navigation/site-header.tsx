@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import AlgogiLogo from "@/components/logo/algogi-logo";
 import ThemeToggle from "@/components/theme/theme-toggle";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -80,6 +81,22 @@ export default function SiteHeader() {
     { href: "/careers", label: "Careers" },
     // { href: "/contact", label: "Contact" },
   ];
+
+  const handleLinkClick = (href: string, label: string) => {
+    logAnalyticsEvent(AnalyticsEvents.LINK_CLICK, {
+      link_text: label,
+      link_destination: href,
+      link_location: "header",
+    });
+  };
+
+  const handleCTAClick = () => {
+    logAnalyticsEvent(AnalyticsEvents.CTA_CLICK, {
+      cta_text: "Contact Us",
+      cta_location: "header",
+      cta_destination: "/contact",
+    });
+  };
 
   return (
     <>
@@ -198,6 +215,7 @@ export default function SiteHeader() {
                   >
                     <Link
                       href={link.href}
+                      onClick={() => handleLinkClick(link.href, link.label)}
                       className={`relative font-semibold transition-colors duration-300 group ${
                         !isScrolled && theme === "light"
                           ? "text-gray-900 hover:text-brand-primary"
@@ -221,7 +239,7 @@ export default function SiteHeader() {
                 );
               })}
               <ThemeToggle />
-              <Link href="/contact" className="btn-primary h-8 sm:h-9 md:h-10 flex items-center justify-center p-3 sm:p-4 md:p-5 text-sm sm:text-base">
+              <Link href="/contact" onClick={handleCTAClick} className="btn-primary h-8 sm:h-9 md:h-10 flex items-center justify-center p-3 sm:p-4 md:p-5 text-sm sm:text-base">
                 Contact Us
               </Link>
             </div>
@@ -338,7 +356,10 @@ export default function SiteHeader() {
                             ? "text-brand-primary bg-brand-primary/10" 
                             : "text-logo-color hover:text-brand-primary hover:bg-brand-primary/5"
                         }`}
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        onClick={() => {
+                          handleLinkClick(link.href, link.label);
+                          setIsMobileMenuOpen(false);
+                        }}
                       >
                         {isActive && (
                           <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-primary rounded-r" />
@@ -355,7 +376,10 @@ export default function SiteHeader() {
                 <Link
                   href="/contact"
                   className="btn-primary text-center block"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => {
+                    handleCTAClick();
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
                   Contact Us
                 </Link>

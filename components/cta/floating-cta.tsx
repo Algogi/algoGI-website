@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { MessageSquare, X } from "lucide-react";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 export default function FloatingCTA() {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,6 +26,15 @@ export default function FloatingCTA() {
 
   const handleDismiss = () => {
     setIsDismissed(true);
+    setIsVisible(false);
+  };
+
+  const handleCTAClick = () => {
+    logAnalyticsEvent(AnalyticsEvents.FLOATING_CTA_CLICK, {
+      cta_text: "Get Started",
+      cta_location: "floating",
+      cta_destination: "/contact",
+    });
     setIsVisible(false);
   };
 
@@ -71,7 +81,7 @@ export default function FloatingCTA() {
                 <Link
                   href="/contact"
                   className="btn-primary text-sm md:text-base px-4 md:px-6 py-2 md:py-3 whitespace-nowrap flex-shrink-0"
-                  onClick={() => setIsVisible(false)}
+                  onClick={handleCTAClick}
                 >
                   Get Started
                 </Link>

@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { X, Download, Wrench, Bot } from "lucide-react";
 import DownloadFormModal from "@/components/modals/download-form-modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { type CaseStudy } from "@/app/case-studies/case-studies-data";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface CaseStudyModalProps {
   isOpen: boolean;
@@ -35,6 +36,26 @@ export default function CaseStudyModal({
   study,
 }: CaseStudyModalProps) {
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && study) {
+      logAnalyticsEvent(AnalyticsEvents.PORTFOLIO_VIEW, {
+        case_study_title: study.title,
+        case_study_client: study.client,
+      });
+    }
+  }, [isOpen, study]);
+
+  const handleDownloadClick = () => {
+    if (study?.downloadFile) {
+      logAnalyticsEvent(AnalyticsEvents.CASE_STUDY_DOWNLOAD, {
+        case_study_title: study.title,
+        case_study_client: study.client,
+        file_type: study.downloadFile.type,
+      });
+    }
+    setDownloadModalOpen(true);
+  };
 
   if (!study) return null;
 
@@ -72,7 +93,7 @@ export default function CaseStudyModal({
                 <div className="flex items-center gap-2">
                   {study.downloadFile && (
                     <motion.button
-                      onClick={() => setDownloadModalOpen(true)}
+                      onClick={handleDownloadClick}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="px-4 py-2 rounded-lg bg-brand-primary/20 dark:bg-brand-primary/10 hover:bg-brand-primary/30 dark:hover:bg-brand-primary/20 border border-brand-primary/40 dark:border-brand-primary/30 transition-colors flex items-center gap-2 text-sm font-semibold text-brand-primary"

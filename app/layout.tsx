@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { OrganizationStructuredData } from "@/components/seo/structured-data";
 import AdminRouteHandler from "@/components/admin/admin-route-handler";
 import FirebaseAnalyticsProvider from "@/components/analytics/firebase-analytics-provider";
+import GoogleAnalyticsLoader from "@/components/analytics/google-analytics-loader";
+import CookieConsent from "@/components/cookie-consent/cookie-consent";
 import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geometric" });
@@ -85,32 +87,17 @@ export default function RootLayout({
             </AdminRouteHandler>
           </FirebaseAnalyticsProvider>
           <Toaster />
+          <CookieConsent />
         </ThemeProvider>
         {/* 
-          Note: Firebase Analytics and Google Analytics 4 are the same service.
-          Firebase Analytics automatically sends data to GA4 using the measurementId from firebaseConfig.
-          The gtag script below is kept as a fallback, but Firebase Analytics is the primary tracking method.
+          Analytics Setup:
+          - Firebase Analytics is the primary tracking method and automatically sends data to GA4
+            using the measurementId from firebaseConfig (G-LDY83N2HS4).
+          - GoogleAnalyticsLoader only loads gtag scripts if NEXT_PUBLIC_GA_MEASUREMENT_ID is set
+            AND it's different from Firebase's measurementId (to prevent double tracking).
+          - Both respect user consent preferences.
         */}
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-          <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
-                    page_path: window.location.pathname,
-                  });
-                `,
-              }}
-            />
-          </>
-        )}
+        <GoogleAnalyticsLoader />
       </body>
     </html>
   );

@@ -1,17 +1,28 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, TrendingUp, Target } from "lucide-react";
 import { getServiceBySlug } from "../services-data";
 import { ServiceStructuredData } from "@/components/seo/structured-data";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 export default function ServiceDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
   const service = getServiceBySlug(slug);
+
+  useEffect(() => {
+    if (service) {
+      logAnalyticsEvent(AnalyticsEvents.SERVICE_VIEW, {
+        service_slug: slug,
+        service_name: service.title.split("-")[0].trim(),
+      });
+    }
+  }, [service, slug]);
 
   if (!service) {
     return (

@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { useEffect } from "react";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface ServiceModalProps {
   isOpen: boolean;
@@ -20,6 +22,15 @@ export default function ServiceModal({
   onClose,
   service,
 }: ServiceModalProps) {
+  useEffect(() => {
+    if (isOpen && service) {
+      logAnalyticsEvent(AnalyticsEvents.SERVICE_VIEW, {
+        service_name: service.title,
+        view_type: "modal",
+      });
+    }
+  }, [isOpen, service]);
+
   if (!service) return null;
 
   return (

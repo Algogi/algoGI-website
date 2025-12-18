@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Linkedin, Twitter, Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import AlgogiLogo from "@/components/logo/algogi-logo";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 export default function SiteFooter() {
   const [email, setEmail] = useState("");
@@ -38,6 +39,12 @@ export default function SiteFooter() {
       const data = await response.json();
 
       if (response.ok) {
+        // Track successful newsletter subscription
+        logAnalyticsEvent(AnalyticsEvents.NEWSLETTER_SUBSCRIBE, {
+          source: "footer",
+          agreed_to_marketing: agreedToMarketing,
+        });
+
         setSubmitStatus({
           type: "success",
           message: "Thank you for subscribing!",

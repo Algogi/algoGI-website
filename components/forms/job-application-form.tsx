@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useRef } from "react";
 import { motion } from "framer-motion";
 import { Upload, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface FormField {
   id: string;
@@ -99,6 +100,7 @@ export default function JobApplicationForm({
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+  const hasTrackedStart = useRef(false);
 
   const handleChange = (
     fieldId: string,
@@ -112,6 +114,17 @@ export default function JobApplicationForm({
       setFormData((prev) => ({ ...prev, [fieldId]: value }));
     } else {
       setFormData((prev) => ({ ...prev, [fieldId]: value }));
+    }
+  };
+
+  const handleFormFocus = () => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      logAnalyticsEvent(AnalyticsEvents.JOB_APPLICATION_START, {
+        job_id: jobId,
+        job_title: jobTitle,
+        job_slug: jobSlug,
+      });
     }
   };
 
@@ -149,6 +162,13 @@ export default function JobApplicationForm({
       const data = await response.json();
 
       if (response.ok) {
+        // Track successful submission
+        logAnalyticsEvent(AnalyticsEvents.JOB_APPLICATION_SUBMIT, {
+          job_id: jobId,
+          job_title: jobTitle,
+          job_slug: jobSlug,
+        });
+
         setSubmitStatus({
           type: "success",
           message:
@@ -157,6 +177,7 @@ export default function JobApplicationForm({
         // Reset form
         setFormData({});
         setFiles({});
+        hasTrackedStart.current = false;
       } else {
         throw new Error(data.error || "Submission failed");
       }
@@ -295,6 +316,7 @@ export default function JobApplicationForm({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       onSubmit={handleSubmit}
+      onFocus={handleFormFocus}
       className="neon-card max-w-2xl mx-auto relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-neon-purple/5 opacity-50" />

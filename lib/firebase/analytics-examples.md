@@ -140,6 +140,7 @@ All predefined events are available in `AnalyticsEvents`:
 - `FORM_SUBMIT` - Form submissions
 - `LINK_CLICK` - Link clicks
 - `CONTACT_FORM_SUBMIT` - Contact form submissions
+- `LEAD_FORM_START` - Lead form started (user begins filling out form)
 - `LEAD_FORM_SUBMIT` - Lead form submissions
 - `NEWSLETTER_SUBSCRIBE` - Newsletter subscriptions
 - `JOB_APPLICATION_START` - Job application started

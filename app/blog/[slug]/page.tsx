@@ -10,6 +10,7 @@ import Link from "next/link";
 import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import BlogPlaceholderImage from "@/components/blog/blog-placeholder-image";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface FAQ {
   question: string;
@@ -57,6 +58,16 @@ export default function BlogPostPage() {
       if (response.ok) {
         const data = await response.json();
         setPost(data);
+        
+        // Track blog view
+        if (data) {
+          logAnalyticsEvent(AnalyticsEvents.BLOG_VIEW, {
+            blog_slug: slug,
+            blog_title: data.title,
+            author: data.author || null,
+            tags: data.tags || [],
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching blog post:", error);

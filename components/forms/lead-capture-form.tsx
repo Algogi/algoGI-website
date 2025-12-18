@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useRef } from "react";
 import { motion } from "framer-motion";
 import DateTimePicker from "./date-time-picker";
+import { logAnalyticsEvent, AnalyticsEvents } from "@/lib/firebase/analytics";
 
 interface FormData {
   name: string;
@@ -29,6 +30,7 @@ export default function LeadCaptureForm() {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+  const hasTrackedStart = useRef(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -48,19 +50,20 @@ export default function LeadCaptureForm() {
     }));
   };
 
+  const handleFormFocus = () => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      logAnalyticsEvent(AnalyticsEvents.LEAD_FORM_START, {
+        form_name: "lead_capture_form",
+        form_location: "contact_page",
+      });
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus({ type: null, message: "" });
-
-    // Track form submission event
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "form_submit", {
-        event_category: "Lead Generation",
-        event_label: "Project Brief Form",
-        value: 1,
-      });
-    }
 
     try {
       const response = await fetch("/api/lead", {
@@ -73,13 +76,11 @@ export default function LeadCaptureForm() {
 
       if (response.ok) {
         // Track successful submission
-        if (typeof window !== "undefined" && (window as any).gtag) {
-          (window as any).gtag("event", "conversion", {
-            send_to: "AW-CONVERSION_ID/CONVERSION_LABEL",
-            value: 1.0,
-            currency: "USD",
-          });
-        }
+        logAnalyticsEvent(AnalyticsEvents.LEAD_FORM_SUBMIT, {
+          form_name: "lead_capture_form",
+          form_location: "contact_page",
+          has_call_preference: formData.openToCall,
+        });
 
         setSubmitStatus({
           type: "success",
@@ -95,18 +96,11 @@ export default function LeadCaptureForm() {
           openToCall: false,
           preferredCallTime: "",
         });
+        hasTrackedStart.current = false;
       } else {
         throw new Error("Submission failed");
       }
     } catch (error) {
-      // Track form error
-      if (typeof window !== "undefined" && (window as any).gtag) {
-        (window as any).gtag("event", "form_error", {
-          event_category: "Lead Generation",
-          event_label: "Project Brief Form Error",
-        });
-      }
-
       setSubmitStatus({
         type: "error",
         message:
@@ -123,6 +117,7 @@ export default function LeadCaptureForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       onSubmit={handleSubmit}
+      onFocus={handleFormFocus}
       className="neon-card max-w-2xl mx-auto relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-neon-purple/5 opacity-50" />
