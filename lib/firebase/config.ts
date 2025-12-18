@@ -43,6 +43,11 @@ export function getDb(): Firestore {
   if (!db) {
     db = initializeFirebase();
   }
-  return db!;
+  if (!db) {
+    throw new Error(
+      "Firebase not initialized. Please set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY in your environment variables."
+    );
+  }
+  return db;
 }
 

@@ -18,6 +18,8 @@ const wordpressDomain = getWordPressDomain();
 
 const nextConfig = {
   reactStrictMode: true,
+  // Turbopack is opt-in via --turbo flag, not enabled by default
+  // This config ensures webpack is used (default)
   images: {
     remotePatterns: [
       {

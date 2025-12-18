@@ -3,7 +3,20 @@ import { getDb } from "@/lib/firebase/config";
 
 export async function GET(request: NextRequest) {
   try {
-    const db = getDb();
+    let db;
+    try {
+      db = getDb();
+    } catch (firebaseError: any) {
+      console.error("Firebase initialization error:", firebaseError);
+      // Return empty array if Firebase is not configured (testimonials are optional)
+      return NextResponse.json([], {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+    }
+    
     const testimonialsRef = db.collection("testimonials");
     
     // Try to fetch with orderBy, fallback to simple get if order field doesn't exist
@@ -41,7 +54,13 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching testimonials:", error);
     // Return empty array if Firestore fails (testimonials are optional)
-    return NextResponse.json([]);
+    // But log the error for debugging
+    return NextResponse.json([], {
+      status: 200, // Still return 200 since testimonials are optional
+      headers: {
+        "Cache-Control": "no-cache",
+      },
+    });
   }
 }
 
