@@ -13,15 +13,24 @@ export default function HomeHero() {
   return (
     <section className="relative section-padding bg-dark-bg overflow-hidden min-h-screen flex items-center grid-background -mt-20 pt-24">
       {/* Dark overlay for more prominence */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-black/95 to-black pointer-events-none z-0" />
+      <div className="absolute inset-0 pointer-events-none z-0" />
       <Tiles3DBackground />
       {/* Subtle radial gradient for depth */}
       <div className="absolute inset-0 pointer-events-none z-0" style={{ background: 'radial-gradient(circle at center, transparent 0%, rgba(74, 58, 255, 0.05) 50%, transparent 100%)' }} />
       {/* Gradient fade at top to blend with header */}
-      <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-dark-bg to-transparent pointer-events-none z-20" />
+      <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none z-20" />
       <div className="container-custom relative z-10">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Single glass container wrapping both sections */}
+          <div className="hero-glass-container relative rounded-3xl p-8 md:p-10 lg:p-12 backdrop-blur-md overflow-hidden">
+            {/* Top-right accent gradient */}
+            <div className="hero-glass-accent-tr absolute top-0 right-0 w-64 h-64 md:w-80 md:h-80 rounded-full blur-3xl pointer-events-none" />
+            
+            {/* Bottom-left accent gradient */}
+            <div className="hero-glass-accent-bl absolute bottom-0 left-0 w-64 h-64 md:w-80 md:h-80 rounded-full blur-3xl pointer-events-none" />
+            
+            {/* Grid container for both sections */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
             {/* Algo + GI - Mobile First (above content) */}
             <ParallaxSection speed={0.3} className="lg:order-2">
               <motion.div
@@ -208,12 +217,13 @@ export default function HomeHero() {
                   <Link href="/contact" className="btn-primary">
                     Start Your AI Transformation
                   </Link>
-                  <Link href="/services" className="btn-secondary text-[#201F54] border-[#201F54] hover:border-[#201F54]/80 hover:text-[#201F54]/90 dark:text-logo-color dark:border-logo-color dark:hover:border-logo-color/80 dark:hover:text-logo-color/90">
+                  <Link href="/services" className="btn-secondary">
                     Explore Our Solutions
                   </Link>
                 </motion.div>
               </div>
             </motion.div>
+            </div>
           </div>
         </div>
       </div>

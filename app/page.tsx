@@ -38,7 +38,7 @@ export default function HomePage() {
                 <p className="text-xl text-gray-300 mb-6 leading-relaxed">
                   From first commit to global rollout, we ship software that actually ships.
                 </p>
-                <p className="text-lg text-gray-400 leading-relaxed">
+                <p className="text-lg text-lead-description leading-relaxed">
                   Tell us what you&apos;re building. Get a clear plan in your inbox. Share a bit about your product, your timeline, and what &apos;success&apos; looks like.
                 </p>
               </div>

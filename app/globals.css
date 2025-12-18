@@ -69,6 +69,15 @@
     color: #6b7280; /* Medium gray for secondary text */
   }
 
+  /* Custom text color for lead capture description */
+  .text-lead-description {
+    color: rgb(75, 85, 99);
+  }
+
+  html:not(.light) .text-lead-description {
+    color: #ffffff;
+  }
+
   /* Logo text color - matches logo component */
   .text-logo-color {
     color: #201F54;
@@ -213,6 +222,34 @@
 
   html.light .bg-dark-border {
     background-color: #e5e7eb;
+  }
+
+  /* Hero glass container theme support */
+  .hero-glass-container {
+    background-color: rgba(26, 26, 26, 0.4); /* dark-card with 40% opacity */
+    border: 1px solid rgba(74, 58, 255, 0.3); /* brand-primary with 30% opacity */
+  }
+
+  html.light .hero-glass-container {
+    background-color: rgba(255, 255, 255, 0.4); /* white with 40% opacity */
+    border: 1px solid rgba(0, 136, 204, 0.3); /* neon-light-blue with 30% opacity */
+  }
+
+  /* Hero glass accent gradients */
+  .hero-glass-accent-tr {
+    background: radial-gradient(circle, rgba(74, 58, 255, 0.3) 0%, rgba(176, 38, 255, 0.2) 100%);
+  }
+
+  html.light .hero-glass-accent-tr {
+    background: radial-gradient(circle, rgba(74, 58, 255, 0.2) 0%, rgba(139, 26, 255, 0.15) 100%);
+  }
+
+  .hero-glass-accent-bl {
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, transparent 100%);
+  }
+
+  html.light .hero-glass-accent-bl {
+    background: radial-gradient(circle, rgba(0, 136, 204, 0.2) 0%, transparent 100%);
   }
 
   /* Light mode overrides for marquee fade gradients */
@@ -406,20 +443,46 @@
   }
   
   .btn-secondary {
-    @apply relative bg-transparent text-neon-blue px-8 py-4 rounded-lg font-bold text-lg border-2 border-neon-blue transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2 focus:ring-offset-dark-bg;
-    @apply hover:bg-neon-blue/10 hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:scale-105;
+    @apply relative px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2 focus:ring-offset-dark-bg;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2a1a4a 100%);
+    color: #00f0ff !important;
+    border: none !important;
+    @apply hover:scale-105 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)];
+  }
+
+  html:not(.light) .btn-secondary {
+    color: #00f0ff !important;
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #2a1a3e 0%, #3a1a5a 100%);
   }
 
   html.light .btn-secondary {
-    color: #0088cc;
-    border-color: #0088cc;
-    --tw-ring-color: #0088cc;
+    background: linear-gradient(135deg, #dbeafe 0%, #e9d5ff 50%, #ddd6fe 100%);
+    color: #201F54 !important;
+    --tw-ring-color: #201F54;
     --tw-ring-offset-color: #ffffff;
   }
   
   html.light .btn-secondary:hover {
-    background-color: rgba(0, 136, 204, 0.1);
-    box-shadow: 0 0 20px rgba(0, 136, 204, 0.25);
+    background: linear-gradient(135deg, #bfdbfe 0%, #d8b4fe 50%, #c4b5fd 100%);
+    color: #201F54 !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+  }
+
+  /* Light mode overrides for button component secondary variant */
+  html.light [class*="from-\[#1a1a2e\]"],
+  html.light [class*="from-\\[#1a1a2e\\]"] {
+    background: linear-gradient(135deg, #dbeafe 0%, #e9d5ff 50%, #ddd6fe 100%) !important;
+    color: #201F54 !important;
+  }
+
+  html.light [class*="from-\[#1a1a2e\]"]:hover,
+  html.light [class*="from-\\[#1a1a2e\\]"]:hover {
+    background: linear-gradient(135deg, #bfdbfe 0%, #d8b4fe 50%, #c4b5fd 100%) !important;
+    color: #201F54 !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2) !important;
   }
   
   .section-padding {
