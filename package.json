@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:coverage": "cross-env COLLECT_COVERAGE=1 playwright test",
+    "coverage:report": "c8 report --reporter=html --reporter=text --reporter=json --temp-directory=coverage/.nyc_output",
+    "coverage:open": "c8 report --reporter=html --temp-directory=coverage/.nyc_output"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -44,7 +51,7 @@
     "googleapis": "^167.0.0",
     "html-react-parser": "^5.2.10",
     "lucide-react": "^0.555.0",
-    "next": "15.0.7",
+    "next": "^16.0.10",
     "next-auth": "^4.24.13",
     "next-themes": "^0.4.6",
     "nodemailer": "^7.0.11",
@@ -72,10 +79,15 @@
     "@types/react-dom": "^18.3.0",
     "@types/react-resizable": "^3.0.8",
     "autoprefixer": "^10.4.19",
+    "c8": "^10.1.3",
+    "cross-env": "^10.1.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.0.0",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.3"
+  },
+  "optionalDependencies": {
+    "@next/swc-win32-x64-msvc": "^16.0.10"
   }
 }

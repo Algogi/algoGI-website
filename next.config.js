@@ -18,6 +18,18 @@ const wordpressDomain = getWordPressDomain();
 
 const nextConfig = {
   reactStrictMode: true,
+  // Enable source maps for coverage collection
+  productionBrowserSourceMaps: true,
+  // Configure Turbopack (Next.js 16+ default)
+  turbopack: {},
+  // Enable webpack source maps in development (for non-Turbopack builds)
+  webpack: (config, { dev, isServer }) => {
+    if (!isServer && !dev) {
+      // Enable source maps for client-side code in production builds
+      config.devtool = 'source-map';
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {

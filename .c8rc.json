@@ -1,0 +1,29 @@
+{
+  "include": [
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/coverage/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "**/*.config.{js,ts}",
+    "**/next-env.d.ts"
+  ],
+  "reporter": [
+    "html",
+    "text",
+    "json"
+  ],
+  "report-dir": "coverage",
+  "temp-dir": "coverage/.nyc_output",
+  "all": true,
+  "check-coverage": false
+}
+

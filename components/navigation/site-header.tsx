@@ -287,7 +287,9 @@ export default function SiteHeader() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden"
+            className={`fixed inset-0 backdrop-blur-sm z-[60] md:hidden ${
+              theme === "light" ? "bg-black/40" : "bg-black/60"
+            }`}
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
@@ -301,11 +303,17 @@ export default function SiteHeader() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-y-0 right-0 z-[70] w-80 bg-[rgba(30,30,30,0.95)] backdrop-blur-xl border-l border-gray-500/20 md:hidden shadow-2xl"
+            className={`fixed inset-y-0 right-0 z-[70] w-80 backdrop-blur-xl border-l md:hidden shadow-2xl ${
+              theme === "light"
+                ? "bg-white/95 border-gray-200/40"
+                : "bg-[rgba(30,30,30,0.95)] border-gray-500/20"
+            }`}
           >
             <div className="flex flex-col h-full">
               {/* Sidebar Header */}
-              <div className="flex items-center justify-between min-h-[80px] px-6 py-4 border-b border-gray-500/20">
+              <div className={`flex items-center justify-between min-h-[80px] px-6 py-4 border-b ${
+                theme === "light" ? "border-gray-200/40" : "border-gray-500/20"
+              }`}>
                 <Link 
                   href="/" 
                   className="flex items-center group relative"
@@ -318,7 +326,9 @@ export default function SiteHeader() {
                 </Link>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-lg text-logo-color hover:text-brand-primary hover:bg-brand-primary/10 focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                  className={`p-2 rounded-lg hover:text-brand-primary hover:bg-brand-primary/10 focus:outline-none focus:ring-2 focus:ring-brand-primary ${
+                    theme === "light" ? "text-gray-900" : "text-logo-color"
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                   aria-label="Close menu"
                 >
@@ -354,6 +364,8 @@ export default function SiteHeader() {
                         className={`font-semibold transition-colors py-3 px-4 block relative rounded-lg ${
                           isActive 
                             ? "text-brand-primary bg-brand-primary/10" 
+                            : theme === "light"
+                            ? "text-gray-900 hover:text-brand-primary hover:bg-brand-primary/5"
                             : "text-logo-color hover:text-brand-primary hover:bg-brand-primary/5"
                         }`}
                         onClick={() => {
@@ -372,7 +384,9 @@ export default function SiteHeader() {
               </nav>
 
               {/* Sidebar Footer */}
-              <div className="border-t border-gray-500/20 px-6 py-4">
+              <div className={`border-t px-6 py-4 ${
+                theme === "light" ? "border-gray-200/40" : "border-gray-500/20"
+              }`}>
                 <Link
                   href="/contact"
                   className="btn-primary text-center block"
