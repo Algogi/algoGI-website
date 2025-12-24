@@ -5,6 +5,7 @@ import { Mail, Building, Calendar, Phone, Globe, Trash2, Eye, Download, Copy, Ch
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -20,6 +21,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 
 interface Lead {
   id: string;
@@ -40,6 +43,8 @@ export default function LeadsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchLeads();
@@ -68,6 +73,49 @@ export default function LeadsPage() {
       setTimeout(() => setCopiedEmail(null), 2000);
     } catch (err) {
       console.error("Failed to copy email:", err);
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(leads.map((lead) => lead.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleRowSelect = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    try {
+      const deletePromises = Array.from(selectedIds).map((id) =>
+        fetch(`/api/cms/leads/${id}`, { method: "DELETE" })
+      );
+
+      const results = await Promise.allSettled(deletePromises);
+      const failed = results.filter((r) => r.status === "rejected").length;
+
+      if (failed > 0) {
+        toast.error(`Failed to delete ${failed} lead(s)`);
+      } else {
+        toast.success(`Deleted ${selectedIds.size} lead(s) successfully`);
+      }
+
+      fetchLeads();
+      setSelectedIds(new Set());
+      setBulkDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast.error("Error deleting leads: " + err.message);
     }
   };
 
@@ -131,7 +179,16 @@ export default function LeadsPage() {
           </p>
         </div>
         {leads.length > 0 && (
-          <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-2">
+            {selectedIds.size > 0 && (
+              <Button
+                variant="destructive"
+                onClick={() => setBulkDeleteDialogOpen(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete ({selectedIds.size})
+              </Button>
+            )}
             <Button onClick={exportToCSV}>
               <Download className="w-4 h-4 mr-2" />
               Export CSV
@@ -167,6 +224,13 @@ export default function LeadsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedIds.size === leads.length && leads.length > 0}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Company</TableHead>
@@ -184,6 +248,18 @@ export default function LeadsPage() {
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => setSelectedLead(lead)}
                     >
+                      <TableCell
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          checked={selectedIds.has(lead.id)}
+                          onCheckedChange={(checked) =>
+                            handleRowSelect(lead.id, checked === true)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select ${lead.name}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{lead.name}</TableCell>
                       <TableCell>
                         <a
@@ -331,6 +407,17 @@ export default function LeadsPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        title="Delete Leads"
+        description={`Are you sure you want to delete ${selectedIds.size} lead(s)? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleBulkDelete}
+        variant="destructive"
+      />
     </div>
   );
 }

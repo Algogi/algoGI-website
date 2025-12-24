@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Download, Eye, Mail, LayoutGrid, Table2 } from "lucide-react";
+import { ArrowLeft, Download, Eye, Mail, LayoutGrid, Table2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -17,6 +18,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 import KanbanBoard from "@/components/admin/kanban-board";
 
 interface Applicant {
@@ -45,6 +48,8 @@ export default function ApplicantsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "kanban">("kanban");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -103,6 +108,49 @@ export default function ApplicantsPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(filteredApplicants.map((app) => app.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleRowSelect = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    try {
+      const deletePromises = Array.from(selectedIds).map((id) =>
+        fetch(`/api/cms/careers/${jobId}/applicants/${id}`, { method: "DELETE" })
+      );
+
+      const results = await Promise.allSettled(deletePromises);
+      const failed = results.filter((r) => r.status === "rejected").length;
+
+      if (failed > 0) {
+        toast.error(`Failed to delete ${failed} applicant(s)`);
+      } else {
+        toast.success(`Deleted ${selectedIds.size} applicant(s) successfully`);
+      }
+
+      fetchData();
+      setSelectedIds(new Set());
+      setBulkDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast.error("Error deleting applicants: " + err.message);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -206,6 +254,15 @@ export default function ApplicantsPage() {
                 Kanban
               </Button>
             </div>
+            {viewMode === "table" && selectedIds.size > 0 && (
+              <Button
+                variant="destructive"
+                onClick={() => setBulkDeleteDialogOpen(true)}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete ({selectedIds.size})
+              </Button>
+            )}
             {applicants.length > 0 && (
               <Button onClick={exportToCSV} variant="outline">
                 <Download className="w-4 h-4 mr-2" />
@@ -239,6 +296,13 @@ export default function ApplicantsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedIds.size === filteredApplicants.length && filteredApplicants.length > 0}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Status</TableHead>
@@ -253,6 +317,18 @@ export default function ApplicantsPage() {
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => router.push(`/admin/careers/${jobId}/applicants/${applicant.id}`)}
                     >
+                      <TableCell
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          checked={selectedIds.has(applicant.id)}
+                          onCheckedChange={(checked) =>
+                            handleRowSelect(applicant.id, checked === true)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select ${applicant.name}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{applicant.name}</TableCell>
                       <TableCell>
                         <a
@@ -311,6 +387,17 @@ export default function ApplicantsPage() {
           }}
         />
       )}
+
+      <ConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        title="Delete Applicants"
+        description={`Are you sure you want to delete ${selectedIds.size} applicant(s)? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleBulkDelete}
+        variant="destructive"
+      />
     </div>
   );
 }

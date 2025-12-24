@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Upload, Download, FileText, Mail, Copy, Check, Calendar, Building, User, Globe } from "lucide-react";
+import { Upload, Download, FileText, Mail, Copy, Check, Calendar, Building, User, Globe, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
   Table,
@@ -22,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface DownloadRecord {
   id: string;
@@ -43,6 +45,8 @@ export default function DownloadsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedDownload, setSelectedDownload] = useState<DownloadRecord | null>(null);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchDownloads();
@@ -61,6 +65,49 @@ export default function DownloadsPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(downloads.map((download) => download.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleRowSelect = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    try {
+      const deletePromises = Array.from(selectedIds).map((id) =>
+        fetch(`/api/cms/downloads/${id}`, { method: "DELETE" })
+      );
+
+      const results = await Promise.allSettled(deletePromises);
+      const failed = results.filter((r) => r.status === "rejected").length;
+
+      if (failed > 0) {
+        toast.error(`Failed to delete ${failed} record(s)`);
+      } else {
+        toast.success(`Deleted ${selectedIds.size} record(s) successfully`);
+      }
+
+      fetchDownloads();
+      setSelectedIds(new Set());
+      setBulkDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast.error("Error deleting records: " + err.message);
     }
   };
 
@@ -229,7 +276,16 @@ export default function DownloadsPage() {
               </CardDescription>
             </div>
             {downloads.length > 0 && (
-              <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+              <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-2">
+                {selectedIds.size > 0 && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setBulkDeleteDialogOpen(true)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete ({selectedIds.size})
+                  </Button>
+                )}
                 <Button onClick={exportToCSV}>
                   <Download className="w-4 h-4 mr-2" />
                   Export CSV
@@ -252,6 +308,13 @@ export default function DownloadsPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-neon-blue/20">
+                    <TableHead className="w-12 text-gray-400">
+                      <Checkbox
+                        checked={selectedIds.size === downloads.length && downloads.length > 0}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead className="text-gray-400">Name</TableHead>
                     <TableHead className="text-gray-400">Email</TableHead>
                     <TableHead className="text-gray-400">Company</TableHead>
@@ -269,6 +332,18 @@ export default function DownloadsPage() {
                       className="cursor-pointer hover:bg-dark-surface/50 border-neon-blue/20"
                       onClick={() => setSelectedDownload(download)}
                     >
+                      <TableCell
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          checked={selectedIds.has(download.id)}
+                          onCheckedChange={(checked) =>
+                            handleRowSelect(download.id, checked === true)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select ${download.name}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium text-white">{download.name}</TableCell>
                       <TableCell>
                         <a
@@ -458,6 +533,17 @@ export default function DownloadsPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        title="Delete Download Records"
+        description={`Are you sure you want to delete ${selectedIds.size} download record(s)? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleBulkDelete}
+        variant="destructive"
+      />
     </div>
   );
 }

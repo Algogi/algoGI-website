@@ -6,6 +6,7 @@ import { Plus, Edit, Trash2, Users, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -35,6 +36,8 @@ export default function CareersPage() {
   const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchJobs();
@@ -56,6 +59,50 @@ export default function CareersPage() {
   const handleDeleteClick = (id: string) => {
     setJobToDelete(id);
     setDeleteDialogOpen(true);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(jobs.map((job) => job.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleRowSelect = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    try {
+      const deletePromises = Array.from(selectedIds).map((id) =>
+        fetch(`/api/cms/careers/${id}`, { method: "DELETE" })
+      );
+
+      const results = await Promise.allSettled(deletePromises);
+      const failed = results.filter((r) => r.status === "rejected").length;
+      const successful = results.filter((r) => r.status === "fulfilled").length;
+
+      if (failed > 0) {
+        toast.error(`Failed to delete ${failed} job(s)`);
+      } else {
+        toast.success(`Deleted ${successful} job(s) successfully`);
+      }
+
+      fetchJobs();
+      setSelectedIds(new Set());
+      setBulkDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast.error("Error deleting jobs: " + err.message);
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -109,7 +156,16 @@ export default function CareersPage() {
             Manage job postings and applications
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-2">
+          {selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete ({selectedIds.size})
+            </Button>
+          )}
           <Button asChild>
             <Link href="/admin/careers/new">
               <Plus className="w-4 h-4 mr-2" />
@@ -148,6 +204,13 @@ export default function CareersPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedIds.size === jobs.length && jobs.length > 0}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Department</TableHead>
                     <TableHead>Location</TableHead>
@@ -160,6 +223,18 @@ export default function CareersPage() {
                 <TableBody>
                   {jobs.map((job) => (
                     <TableRow key={job.id}>
+                      <TableCell
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          checked={selectedIds.has(job.id)}
+                          onCheckedChange={(checked) =>
+                            handleRowSelect(job.id, checked === true)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select ${job.title}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{job.title}</TableCell>
                       <TableCell>{job.department}</TableCell>
                       <TableCell>{job.location}</TableCell>
@@ -220,6 +295,17 @@ export default function CareersPage() {
         confirmText="Delete"
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        title="Delete Jobs"
+        description={`Are you sure you want to delete ${selectedIds.size} job(s)? Applications will be preserved.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleBulkDelete}
         variant="destructive"
       />
     </div>

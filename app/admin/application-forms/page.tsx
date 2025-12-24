@@ -6,6 +6,7 @@ import { Plus, Edit, Trash2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -32,6 +33,8 @@ export default function ApplicationFormsPage() {
   const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [formToDelete, setFormToDelete] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchForms();
@@ -53,6 +56,50 @@ export default function ApplicationFormsPage() {
   const handleDeleteClick = (id: string) => {
     setFormToDelete(id);
     setDeleteDialogOpen(true);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(forms.map((form) => form.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleRowSelect = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    try {
+      const deletePromises = Array.from(selectedIds).map((id) =>
+        fetch(`/api/cms/application-forms/${id}`, { method: "DELETE" })
+      );
+
+      const results = await Promise.allSettled(deletePromises);
+      const failed = results.filter((r) => r.status === "rejected").length;
+      const successful = results.filter((r) => r.status === "fulfilled").length;
+
+      if (failed > 0) {
+        toast.error(`Failed to delete ${failed} form(s)`);
+      } else {
+        toast.success(`Deleted ${successful} form(s) successfully`);
+      }
+
+      fetchForms();
+      setSelectedIds(new Set());
+      setBulkDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast.error("Error deleting forms: " + err.message);
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -96,7 +143,16 @@ export default function ApplicationFormsPage() {
             Create and manage reusable application forms for job postings
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-2">
+          {selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete ({selectedIds.size})
+            </Button>
+          )}
           <Button asChild>
             <Link href="/admin/application-forms/new">
               <Plus className="w-4 h-4 mr-2" />
@@ -135,6 +191,13 @@ export default function ApplicationFormsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedIds.size === forms.length && forms.length > 0}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Fields</TableHead>
@@ -145,6 +208,18 @@ export default function ApplicationFormsPage() {
                 <TableBody>
                   {forms.map((form) => (
                     <TableRow key={form.id}>
+                      <TableCell
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          checked={selectedIds.has(form.id)}
+                          onCheckedChange={(checked) =>
+                            handleRowSelect(form.id, checked === true)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select ${form.name}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium">{form.name}</TableCell>
                       <TableCell className="max-w-md">
                         <p className="text-sm text-muted-foreground truncate">
@@ -197,6 +272,17 @@ export default function ApplicationFormsPage() {
         confirmText="Delete"
         cancelText="Cancel"
         onConfirm={handleConfirmDelete}
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        title="Delete Forms"
+        description={`Are you sure you want to delete ${selectedIds.size} form(s)? Forms cannot be deleted if they're being used by any jobs.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleBulkDelete}
         variant="destructive"
       />
     </div>
