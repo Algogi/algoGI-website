@@ -223,3 +223,37 @@ export async function PUT(
   }
 }
 
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string; appId: string }> }
+) {
+  try {
+    const { appId } = await params;
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const db = getDb();
+    const docRef = db.collection("applications").doc(appId);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return NextResponse.json(
+        { error: "Application not found" },
+        { status: 404 }
+      );
+    }
+
+    await docRef.delete();
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting application:", error);
+    return NextResponse.json(
+      { error: "Failed to delete application" },
+      { status: 500 }
+    );
+  }
+}
+
