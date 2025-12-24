@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { getDb } from "@/lib/firebase/config";
 import { getWordPressClient } from "@/lib/wordpress/client";
+import { downloadAndReplaceImages } from "@/lib/wordpress/image-downloader";
 import { FieldValue } from "firebase-admin/firestore";
 
 export async function POST(request: NextRequest) {
@@ -22,7 +23,13 @@ export async function POST(request: NextRequest) {
       updated: 0,
       skipped: 0,
       errors: [] as string[],
+      imagesDownloaded: 0,
+      imagesFailed: 0,
+      imageErrors: [] as string[],
     };
+
+    // Get WordPress base URL for image filtering
+    const wordpressBaseUrl = client.getBaseUrl();
 
     if (postId) {
       // Sync single post
@@ -35,6 +42,24 @@ export async function POST(request: NextRequest) {
       }
 
       const transformed = await client.transformPost(wpPost);
+
+      // Download and replace images
+      const imageResult = await downloadAndReplaceImages(
+        transformed.content,
+        transformed.featuredImage,
+        wordpressBaseUrl
+      );
+
+      // Update results with image stats
+      results.imagesDownloaded += imageResult.stats.downloaded;
+      results.imagesFailed += imageResult.stats.failed;
+      if (imageResult.stats.errors.length > 0) {
+        results.imageErrors.push(...imageResult.stats.errors);
+      }
+
+      // Use updated content and featured image
+      transformed.content = imageResult.content;
+      transformed.featuredImage = imageResult.featuredImage;
 
       // Check if post exists by wordpressId
       const existingByWpId = await db
@@ -98,6 +123,24 @@ export async function POST(request: NextRequest) {
       for (const wpPost of wpPosts) {
         try {
           const transformed = await client.transformPost(wpPost);
+
+          // Download and replace images
+          const imageResult = await downloadAndReplaceImages(
+            transformed.content,
+            transformed.featuredImage,
+            wordpressBaseUrl
+          );
+
+          // Update results with image stats
+          results.imagesDownloaded += imageResult.stats.downloaded;
+          results.imagesFailed += imageResult.stats.failed;
+          if (imageResult.stats.errors.length > 0) {
+            results.imageErrors.push(...imageResult.stats.errors);
+          }
+
+          // Use updated content and featured image
+          transformed.content = imageResult.content;
+          transformed.featuredImage = imageResult.featuredImage;
 
           // Check if post exists by wordpressId
           const existingByWpId = await db

@@ -100,6 +100,10 @@ class WordPressClient {
     }
   }
 
+  getAuthHeader(): string | null {
+    return this.authHeader;
+  }
+
   private async fetchWithAuth(url: string): Promise<Response> {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
@@ -368,6 +372,10 @@ class WordPressClient {
       createdAt: post.date ? new Date(post.date).toISOString() : null,
       updatedAt: post.modified ? new Date(post.modified).toISOString() : null,
     };
+  }
+
+  getBaseUrl(): string {
+    return this.baseUrl;
   }
 }
 
