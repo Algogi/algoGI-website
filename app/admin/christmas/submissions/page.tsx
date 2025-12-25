@@ -200,6 +200,12 @@ export default function SubmissionsPage() {
                     >
                       Company {sortBy === 'company' && (sortOrder === 'asc' ? '↑' : '↓')}
                     </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-gray-800"
+                      onClick={() => handleSort('companyWebsite')}
+                    >
+                      Company Website {sortBy === 'companyWebsite' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    </TableHead>
                     <TableHead>Phone</TableHead>
                     <TableHead 
                       className="cursor-pointer hover:bg-gray-800"
@@ -218,6 +224,20 @@ export default function SubmissionsPage() {
                       </TableCell>
                       <TableCell>{submission.email}</TableCell>
                       <TableCell>{submission.company}</TableCell>
+                      <TableCell>
+                        {submission.companyWebsite ? (
+                          <a 
+                            href={submission.companyWebsite} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 underline"
+                          >
+                            {submission.companyWebsite}
+                          </a>
+                        ) : (
+                          'N/A'
+                        )}
+                      </TableCell>
                       <TableCell>{submission.phone || 'N/A'}</TableCell>
                       <TableCell>{formatTimestamp(submission.submittedAt)}</TableCell>
                       <TableCell>

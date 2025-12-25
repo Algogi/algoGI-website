@@ -13,6 +13,9 @@ export const christmasFormSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   company: z.string().min(1, 'Company name is required'),
+  companyWebsite: z.string()
+    .min(1, 'Company website is required')
+    .url('Invalid URL format. Please include http:// or https://'),
   email: z.string()
     .email('Invalid email format')
     .refine((email) => isWorkEmail(email), {

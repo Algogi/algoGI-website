@@ -9,6 +9,7 @@ export interface ChristmasSubmission {
   lastName: string;
   email: string;
   company: string;
+  companyWebsite: string;
   phone?: string;
   q1?: string;
   q2?: string;

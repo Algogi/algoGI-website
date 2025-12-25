@@ -149,6 +149,7 @@ export function filterSubmissions(
         sub.lastName,
         sub.email,
         sub.company,
+        sub.companyWebsite,
         sub.phone,
       ]
         .filter(Boolean)
@@ -244,6 +245,7 @@ export function exportSubmissionsToCSV(submissions: ChristmasSubmission[]): stri
     'Last Name',
     'Email',
     'Company',
+    'Company Website',
     'Phone',
     'Q1: AI Tool',
     'Q2: AI Status',
@@ -290,6 +292,7 @@ export function exportSubmissionsToCSV(submissions: ChristmasSubmission[]): stri
       escapeCSV(sub.lastName),
       escapeCSV(sub.email),
       escapeCSV(sub.company),
+      escapeCSV(sub.companyWebsite || ''),
       escapeCSV(sub.phone || ''),
       escapeCSV(sub.q1 || ''),
       escapeCSV(sub.q2 || ''),

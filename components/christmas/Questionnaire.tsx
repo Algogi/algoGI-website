@@ -22,6 +22,7 @@ interface FormData {
   firstName: string;
   lastName: string;
   company: string;
+  companyWebsite: string;
   email: string;
   phone?: string;
 }
@@ -63,11 +64,12 @@ const TEXT_FIELDS = [
   { id: 'firstName', label: 'First name', type: 'text', required: true },
   { id: 'lastName', label: 'Last name', type: 'text', required: true },
   { id: 'company', label: 'Company name', type: 'text', required: true },
+  { id: 'companyWebsite', label: 'Company website', type: 'url', required: true },
   { id: 'email', label: 'Work email', type: 'email', required: true },
   { id: 'phone', label: 'Phone number (optional)', type: 'tel', required: false },
 ];
 
-const TOTAL_STEPS = QUESTIONS.length + TEXT_FIELDS.length + 1; // +1 for final step
+const TOTAL_STEPS = QUESTIONS.length + 1; // 5 questions + 1 contact form page
 
 /**
  * Get question ID and step type from step number
@@ -86,15 +88,15 @@ function getStepInfo(step: number): { questionId?: string; stepType: string } {
     };
   }
   
-  const textFieldIndex = questionIndex - QUESTIONS.length;
-  if (textFieldIndex < TEXT_FIELDS.length) {
+  // After all questions, it's the contact form page
+  if (questionIndex === QUESTIONS.length) {
     return {
-      questionId: TEXT_FIELDS[textFieldIndex].id,
-      stepType: 'text_field',
+      questionId: 'contact-form',
+      stepType: 'contact_form',
     };
   }
   
-  return { stepType: 'final' };
+  return { stepType: 'unknown' };
 }
 
 export default function Questionnaire() {
@@ -105,15 +107,20 @@ export default function Questionnaire() {
     firstName: '',
     lastName: '',
     company: '',
+    companyWebsite: '',
     email: '',
     phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [companyWebsiteError, setCompanyWebsiteError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const questionRefs = useRef<Map<string, HTMLElement>>(new Map());
   const isSubmittedRef = useRef(false);
+  const contactFormFocusedRef = useRef(false);
+  const fieldRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
   // Track question views when step changes
   useEffect(() => {
@@ -122,6 +129,58 @@ export default function Questionnaire() {
       trackQuestionView(currentStep, questionId, stepType);
     }
   }, [currentStep]);
+
+  // Handle focus when navigating to contact form
+  useEffect(() => {
+    const contactFormStep = QUESTIONS.length + 1;
+    if (currentStep === contactFormStep) {
+      // Reset focus flag when entering contact form
+      contactFormFocusedRef.current = false;
+      
+      // Focus on field with error or first empty required field after animation
+      const focusField = () => {
+        let fieldToFocus: string | null = null;
+        
+        if (emailError) {
+          fieldToFocus = 'email';
+        } else if (companyWebsiteError) {
+          fieldToFocus = 'companyWebsite';
+        } else {
+          // Find first empty required field
+          for (const field of TEXT_FIELDS) {
+            if (field.required) {
+              const value = formData[field.id as keyof FormData] as string | undefined;
+              if (!value?.trim()) {
+                fieldToFocus = field.id;
+                break;
+              }
+            }
+          }
+          // Default to first field if all are filled
+          if (!fieldToFocus) {
+            fieldToFocus = TEXT_FIELDS[0]?.id;
+          }
+        }
+        
+        if (fieldToFocus) {
+          const fieldElement = fieldRefs.current.get(fieldToFocus);
+          if (fieldElement && !contactFormFocusedRef.current) {
+            setTimeout(() => {
+              fieldElement.focus();
+              contactFormFocusedRef.current = true;
+            }, 350);
+          }
+        }
+      };
+      
+      focusField();
+    } else {
+      // Reset focus flag when leaving contact form
+      contactFormFocusedRef.current = false;
+    }
+    // Only depend on currentStep and errors - formData is accessed via closure
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, emailError, companyWebsiteError]);
 
   // Track abandonment on page unload
   useEffect(() => {
@@ -166,18 +225,8 @@ export default function Questionnaire() {
           const questionId = QUESTIONS[questionIndex].id;
           canProceedNow = !!formData[questionId as keyof FormData];
         } else {
-          const textFieldIndex = questionIndex - QUESTIONS.length;
-          if (textFieldIndex < TEXT_FIELDS.length) {
-            const field = TEXT_FIELDS[textFieldIndex];
-            if (field.required) {
-              const value = formData[field.id as keyof FormData] as string;
-              canProceedNow = !!value?.trim();
-            } else {
-              canProceedNow = true;
-            }
-          } else {
-            canProceedNow = true;
-          }
+          // On contact form page, don't allow arrow navigation - user must fill form
+          canProceedNow = false;
         }
         
         if (canProceedNow) {
@@ -191,19 +240,10 @@ export default function Questionnaire() {
         if (questionIndex < QUESTIONS.length) {
           const questionId = QUESTIONS[questionIndex].id;
           canProceedNow = !!formData[questionId as keyof FormData];
-        } else {
-          const textFieldIndex = questionIndex - QUESTIONS.length;
-          if (textFieldIndex < TEXT_FIELDS.length) {
-            const field = TEXT_FIELDS[textFieldIndex];
-            if (field.required) {
-              const value = formData[field.id as keyof FormData] as string;
-              canProceedNow = !!value?.trim();
-            } else {
-              canProceedNow = true;
-            }
-          } else {
-            canProceedNow = true;
-          }
+        } else if (questionIndex === QUESTIONS.length) {
+          // On contact form, Enter should submit if all fields are valid
+          // But we'll handle this in the form submission, not here
+          canProceedNow = false;
         }
         
         if (canProceedNow) {
@@ -232,15 +272,24 @@ export default function Questionnaire() {
 
   const handleInputChange = (fieldId: string, value: string) => {
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
-    // Clear email error when user starts typing
+    // Clear errors when user starts typing - validation will happen on blur only
     if (fieldId === 'email' && emailError) {
       setEmailError(null);
+    }
+    if (fieldId === 'companyWebsite' && companyWebsiteError) {
+      setCompanyWebsiteError(null);
+    }
+    // Clear field-specific errors when user starts typing
+    if (fieldErrors[fieldId]) {
+      setFieldErrors((prev) => ({ ...prev, [fieldId]: null }));
     }
   };
 
   const handleEmailBlur = (email: string) => {
+    // Only validate on blur, not while typing
     if (!email.trim()) {
-      setEmailError(null);
+      // If required field is empty, show error
+      setEmailError('Work email is required');
       return;
     }
     
@@ -256,6 +305,36 @@ export default function Questionnaire() {
       setEmailError(getWorkEmailErrorMessage());
     } else {
       setEmailError(null);
+    }
+  };
+
+  const handleCompanyWebsiteBlur = (url: string) => {
+    // Only validate on blur, not while typing
+    if (!url.trim()) {
+      // If required field is empty, show error
+      setCompanyWebsiteError('Company website is required');
+      return;
+    }
+    
+    // URL validation - must start with http:// or https://
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+        setCompanyWebsiteError('URL must start with http:// or https://');
+        return;
+      }
+      setCompanyWebsiteError(null);
+    } catch {
+      setCompanyWebsiteError('Invalid URL format. Please include http:// or https://');
+    }
+  };
+
+  const handleRequiredFieldBlur = (fieldId: string, value: string, fieldLabel: string) => {
+    // Validation only happens on blur for required fields
+    if (!value.trim()) {
+      setFieldErrors((prev) => ({ ...prev, [fieldId]: `${fieldLabel} is required` }));
+    } else {
+      setFieldErrors((prev) => ({ ...prev, [fieldId]: null }));
     }
   };
 
@@ -312,19 +391,30 @@ export default function Questionnaire() {
       }
     }
     
-    // Check text fields
+    // Check contact form fields - if any required field is missing, return contact form step
     for (let i = 0; i < TEXT_FIELDS.length; i++) {
       const field = TEXT_FIELDS[i];
       if (field.required) {
         const value = formData[field.id as keyof FormData] as string;
         if (!value?.trim()) {
-          return QUESTIONS.length + i + 1; // +1 for welcome step
+          return QUESTIONS.length + 1; // Contact form step (after all questions)
         }
         // For email field, also check if it's a work email
         if (field.id === 'email' && value?.trim()) {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!emailRegex.test(value.trim()) || !isWorkEmail(value.trim())) {
-            return QUESTIONS.length + i + 1; // +1 for welcome step
+            return QUESTIONS.length + 1; // Contact form step
+          }
+        }
+        // For company website field, check URL format
+        if (field.id === 'companyWebsite' && value?.trim()) {
+          try {
+            const urlObj = new URL(value.trim());
+            if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+              return QUESTIONS.length + 1; // Contact form step
+            }
+          } catch {
+            return QUESTIONS.length + 1; // Contact form step
           }
         }
       }
@@ -335,50 +425,61 @@ export default function Questionnaire() {
 
 
   const handleSubmit = async () => {
-    // Validate email if filled
-    if (formData.email?.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email.trim())) {
-        toast.error('Invalid email format');
-        const emailStep = QUESTIONS.length + 3 + 1; // email is at index 3 in TEXT_FIELDS
-        setCurrentStep(emailStep);
-        setEmailError('Invalid email format');
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 500);
-        return;
-      }
-      
-      if (!isWorkEmail(formData.email.trim())) {
-        toast.error(getWorkEmailErrorMessage());
-        const emailStep = QUESTIONS.length + 3 + 1; // email is at index 3 in TEXT_FIELDS
-        setCurrentStep(emailStep);
-        setEmailError(getWorkEmailErrorMessage());
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 500);
-        return;
-      }
-    }
+    // Validate all required contact fields
+    const contactFormStep = QUESTIONS.length + 1;
     
-    // Find first missing field
+    // First, check if all required fields are filled (before format validation)
     const missingStep = findFirstMissingField();
-    
     if (missingStep !== null) {
       toast.error('Please fill in all required fields.');
-      // Navigate to the missing step
       setCurrentStep(missingStep);
-      
-      // If it's a text input field, focus it after animation
-      const questionIndex = missingStep - 1;
-      const textFieldIndex = questionIndex - QUESTIONS.length;
-      if (textFieldIndex >= 0 && textFieldIndex < TEXT_FIELDS.length) {
-        // Wait for animation to complete, then focus
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 500);
+      return;
+    }
+    
+    // Now validate format for filled required fields
+    // Validate email
+    if (!formData.email?.trim()) {
+      toast.error('Work email is required');
+      setCurrentStep(contactFormStep);
+      setEmailError('Work email is required');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      toast.error('Invalid email format');
+      setCurrentStep(contactFormStep);
+      setEmailError('Invalid email format');
+      return;
+    }
+    
+    if (!isWorkEmail(formData.email.trim())) {
+      toast.error(getWorkEmailErrorMessage());
+      setCurrentStep(contactFormStep);
+      setEmailError(getWorkEmailErrorMessage());
+      return;
+    }
+    
+    // Validate company website
+    if (!formData.companyWebsite?.trim()) {
+      toast.error('Company website is required');
+      setCurrentStep(contactFormStep);
+      setCompanyWebsiteError('Company website is required');
+      return;
+    }
+    
+    try {
+      const urlObj = new URL(formData.companyWebsite.trim());
+      if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+        toast.error('URL must start with http:// or https://');
+        setCurrentStep(contactFormStep);
+        setCompanyWebsiteError('URL must start with http:// or https://');
+        return;
       }
-      
+    } catch {
+      toast.error('Invalid URL format. Please include http:// or https://');
+      setCurrentStep(contactFormStep);
+      setCompanyWebsiteError('Invalid URL format. Please include http:// or https://');
       return;
     }
 
@@ -400,6 +501,10 @@ export default function Questionnaire() {
         // Check if error is related to email validation
         const errorMessage = result.error?.toLowerCase() || '';
         const isEmailError = errorMessage.includes('email') || errorMessage.includes('invalid') || errorMessage.includes('work email') || errorMessage.includes('personal email');
+        const isWebsiteError = errorMessage.includes('website') || errorMessage.includes('url');
+        
+        // Navigate back to contact form if there's a validation error
+        setCurrentStep(contactFormStep);
         
         // Also check if email format is invalid client-side (for generic validation errors)
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -407,9 +512,6 @@ export default function Questionnaire() {
         const isEmailInvalid = emailValue && (!emailRegex.test(emailValue) || !isWorkEmail(emailValue));
         
         if (isEmailError || isEmailInvalid) {
-          // Navigate to email field (step 9: QUESTIONS.length (5) + email index (3) + 1 for welcome)
-          const emailStep = QUESTIONS.length + 3 + 1; // email is at index 3 in TEXT_FIELDS
-          setCurrentStep(emailStep);
           if (isEmailInvalid && emailValue) {
             if (!emailRegex.test(emailValue)) {
               setEmailError('Invalid email format');
@@ -417,9 +519,10 @@ export default function Questionnaire() {
               setEmailError(getWorkEmailErrorMessage());
             }
           }
-          setTimeout(() => {
-            inputRef.current?.focus();
-          }, 500);
+        }
+        
+        if (isWebsiteError) {
+          setCompanyWebsiteError('Invalid URL format. Please include http:// or https://');
         }
         
         setIsSubmitting(false);
@@ -547,19 +650,15 @@ export default function Questionnaire() {
     );
   };
 
-  const renderTextInput = (field: typeof TEXT_FIELDS[0], stepIndex: number) => {
-    const value = formData[field.id as keyof FormData] as string | undefined || '';
-    const isEmailField = field.id === 'email';
-    const showError = isEmailField && emailError;
-
+  const renderContactForm = () => {
     return (
       <motion.div
-        key={field.id}
+        key="contact-form"
         ref={(el) => {
           if (el) {
-            questionRefs.current.set(field.id, el);
+            questionRefs.current.set('contact-form', el);
           } else {
-            questionRefs.current.delete(field.id);
+            questionRefs.current.delete('contact-form');
           }
         }}
         custom={direction}
@@ -571,103 +670,93 @@ export default function Questionnaire() {
           x: { type: "spring", stiffness: 300, damping: 30 },
           opacity: { duration: 0.2 },
         }}
-        className="space-y-6 w-full px-4"
+        className="space-y-4 sm:space-y-6 w-full px-4 max-w-2xl mx-auto"
       >
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 sm:mb-8 text-center christmas-title drop-shadow-lg">
-          {field.label}
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 text-center christmas-title drop-shadow-lg">
+          Contact Information
         </h2>
-        <div className="space-y-2">
-          <input
-            ref={(el) => {
-              // TypeScript workaround for ref assignment in conditional render
-              const ref = inputRef as { current: HTMLInputElement | null };
-              ref.current = el;
-              // Auto-focus when the input is mounted and animation completes
-              if (el) {
-                requestAnimationFrame(() => {
-                  setTimeout(() => {
-                    el?.focus();
-                  }, 350); // Wait for animation to complete
-                });
-              }
-            }}
-            type={field.type}
-            value={value}
-            onChange={(e) => handleInputChange(field.id, e.target.value)}
-            onBlur={() => {
-              if (isEmailField) {
-                handleEmailBlur(value);
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                if (field.required) {
-                  // For required fields, only proceed if value is filled and valid
-                  if (value.trim()) {
-                    if (isEmailField) {
-                      // Validate email before proceeding
-                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                      if (!emailRegex.test(value.trim())) {
-                        setEmailError('Invalid email format');
-                        return;
-                      }
-                      if (!isWorkEmail(value.trim())) {
-                        setEmailError(getWorkEmailErrorMessage());
-                        return;
-                      }
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                    nextStep();
-                  }
-                } else {
-                  // For optional fields, always allow Enter to proceed
-                  e.preventDefault();
-                  e.stopPropagation();
-                  nextStep();
-                }
-              }
-            }}
-            className={`w-full p-3 sm:p-4 md:p-6 rounded-lg bg-white/10 backdrop-blur-sm text-white text-base sm:text-lg md:text-xl placeholder-gray-300 border-2 transition-all ${
-              showError
-                ? 'border-red-500 focus:border-red-500'
-                : 'border-red-500/50 focus:border-red-500'
-            } focus:outline-none`}
-            placeholder={`Enter your ${field.label.toLowerCase()}`}
-            required={field.required}
-          />
-          {showError && (
-            <motion.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-red-400 text-sm sm:text-base font-medium drop-shadow-sm"
-            >
-              {emailError}
-            </motion.p>
-          )}
-        </div>
-      </motion.div>
-    );
-  };
+        <div className="space-y-4 sm:space-y-5">
+          {TEXT_FIELDS.map((field) => {
+            const value = formData[field.id as keyof FormData] as string | undefined || '';
+            const isEmailField = field.id === 'email';
+            const isCompanyWebsiteField = field.id === 'companyWebsite';
+            const showEmailError = isEmailField && emailError;
+            const showWebsiteError = isCompanyWebsiteField && companyWebsiteError;
+            const showFieldError = !isEmailField && !isCompanyWebsiteField && fieldErrors[field.id];
+            const hasError = showEmailError || showWebsiteError || showFieldError;
 
-  const renderFinalStep = () => {
-    return (
-      <motion.div
-        key="final"
-        custom={direction}
-        variants={slideVariants}
-        initial="enter"
-        animate="center"
-        exit="exit"
-        transition={{
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          opacity: { duration: 0.2 },
-        }}
-        className="space-y-6 w-full px-4"
-      >
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 sm:mb-8 text-center christmas-title drop-shadow-lg">
-          Ready to Play?
-        </h2>
+            return (
+              <div key={field.id} className="space-y-2">
+                <label
+                  htmlFor={field.id}
+                  className="block text-base sm:text-lg font-semibold text-white drop-shadow-sm"
+                >
+                  {field.label}
+                  {field.required && <span className="text-red-400 ml-1">*</span>}
+                </label>
+                <input
+                  ref={(el) => {
+                    // Store ref for programmatic focusing, but don't auto-focus here
+                    // Focus is handled in useEffect when step changes
+                    if (el) {
+                      fieldRefs.current.set(field.id, el);
+                    } else {
+                      fieldRefs.current.delete(field.id);
+                    }
+                  }}
+                  id={field.id}
+                  type={field.type}
+                  value={value}
+                  onChange={(e) => handleInputChange(field.id, e.target.value)}
+                  onBlur={() => {
+                    // Validation only happens on blur, not while typing
+                    if (isEmailField) {
+                      handleEmailBlur(value);
+                    } else if (isCompanyWebsiteField) {
+                      handleCompanyWebsiteBlur(value);
+                    } else if (field.required) {
+                      handleRequiredFieldBlur(field.id, value, field.label);
+                    }
+                  }}
+                  className={`w-full p-3 sm:p-4 md:p-5 rounded-lg bg-white/10 backdrop-blur-sm text-white text-base sm:text-lg placeholder-gray-300 border-2 transition-all ${
+                    hasError
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-red-500/50 focus:border-red-500'
+                  } focus:outline-none`}
+                  placeholder={`Enter your ${field.label.toLowerCase()}`}
+                  required={field.required}
+                />
+                {showEmailError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm sm:text-base font-medium drop-shadow-sm"
+                  >
+                    {emailError}
+                  </motion.p>
+                )}
+                {showWebsiteError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm sm:text-base font-medium drop-shadow-sm"
+                  >
+                    {companyWebsiteError}
+                  </motion.p>
+                )}
+                {showFieldError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm sm:text-base font-medium drop-shadow-sm"
+                  >
+                    {fieldErrors[field.id]}
+                  </motion.p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </motion.div>
     );
   };
@@ -683,13 +772,12 @@ export default function Questionnaire() {
       return renderRadioQuestion(QUESTIONS[questionIndex], questionIndex);
     }
 
-    const textFieldIndex = questionIndex - QUESTIONS.length;
-    
-    if (textFieldIndex < TEXT_FIELDS.length) {
-      return renderTextInput(TEXT_FIELDS[textFieldIndex], textFieldIndex);
+    // After all questions, show contact form
+    if (questionIndex === QUESTIONS.length) {
+      return renderContactForm();
     }
 
-    return renderFinalStep();
+    return null;
   };
 
   const totalSlides = TOTAL_STEPS + 1; // +1 for welcome slide
@@ -705,18 +793,8 @@ export default function Questionnaire() {
       return !!formData[questionId as keyof FormData];
     }
     
-    // Check if it's a text input slide
-    const textFieldIndex = questionIndex - QUESTIONS.length;
-    if (textFieldIndex < TEXT_FIELDS.length) {
-      const field = TEXT_FIELDS[textFieldIndex];
-      if (field.required) {
-        const value = formData[field.id as keyof FormData] as string;
-        return !!value?.trim();
-      }
-      return true; // Optional field
-    }
-    
-    return true; // Final slide
+    // On contact form page, canProceed is not used - submit button handles validation
+    return false;
   };
 
   return (
@@ -767,7 +845,14 @@ export default function Questionnaire() {
           {currentStep === TOTAL_STEPS ? (
             <Button
               onClick={handleSubmit}
-              disabled={!formData.firstName || !formData.lastName || !formData.company || !formData.email || isSubmitting}
+              disabled={
+                !formData.firstName || 
+                !formData.lastName || 
+                !formData.company || 
+                !formData.companyWebsite || 
+                !formData.email || 
+                isSubmitting
+              }
               variant="outline"
               className="border-2 border-red-500 text-white hover:bg-red-500/20 hover:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base px-3 sm:px-4 py-2 sm:py-3 shadow-lg"
             >
