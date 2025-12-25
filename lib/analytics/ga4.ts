@@ -86,3 +86,40 @@ export function trackGameComplete(gameName: string, prizeId: string, score?: num
   });
 }
 
+/**
+ * Track questionnaire abandonment
+ * Fired when user leaves the page without completing the questionnaire
+ */
+export function trackQuestionnaireAbandoned(
+  step: number,
+  questionId?: string,
+  stepType?: string,
+  totalSteps?: number
+): void {
+  const progressPercent = totalSteps ? Math.round((step / totalSteps) * 100) : 0;
+  
+  trackGA4Event('questionnaire_abandoned', {
+    step,
+    question_id: questionId || null,
+    step_type: stepType || 'unknown',
+    total_steps: totalSteps || 12,
+    progress_percent: progressPercent,
+  });
+}
+
+/**
+ * Track question view
+ * Fired when user views a specific question/step in the questionnaire
+ */
+export function trackQuestionView(
+  step: number,
+  questionId?: string,
+  stepType?: string
+): void {
+  trackGA4Event('question_view', {
+    step,
+    question_id: questionId || null,
+    step_type: stepType || 'unknown',
+  });
+}
+

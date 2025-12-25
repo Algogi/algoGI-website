@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { submitChristmasForm } from '@/app/christmas/actions';
 import { isWorkEmail, getWorkEmailErrorMessage } from '@/lib/utils/email-validation';
+import { trackQuestionnaireAbandoned, trackQuestionView } from '@/lib/analytics/ga4';
 import ProgressBar from './ProgressBar';
 import ChristmasBackground from './ChristmasBackground';
 import { Button } from '@/components/ui/button';
@@ -68,6 +69,34 @@ const TEXT_FIELDS = [
 
 const TOTAL_STEPS = QUESTIONS.length + TEXT_FIELDS.length + 1; // +1 for final step
 
+/**
+ * Get question ID and step type from step number
+ */
+function getStepInfo(step: number): { questionId?: string; stepType: string } {
+  if (step === 0) {
+    return { stepType: 'welcome' };
+  }
+  
+  const questionIndex = step - 1;
+  
+  if (questionIndex < QUESTIONS.length) {
+    return {
+      questionId: QUESTIONS[questionIndex].id,
+      stepType: 'question',
+    };
+  }
+  
+  const textFieldIndex = questionIndex - QUESTIONS.length;
+  if (textFieldIndex < TEXT_FIELDS.length) {
+    return {
+      questionId: TEXT_FIELDS[textFieldIndex].id,
+      stepType: 'text_field',
+    };
+  }
+  
+  return { stepType: 'final' };
+}
+
 export default function Questionnaire() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
@@ -84,6 +113,42 @@ export default function Questionnaire() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const questionRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const isSubmittedRef = useRef(false);
+
+  // Track question views when step changes
+  useEffect(() => {
+    if (currentStep > 0) {
+      const { questionId, stepType } = getStepInfo(currentStep);
+      trackQuestionView(currentStep, questionId, stepType);
+    }
+  }, [currentStep]);
+
+  // Track abandonment on page unload
+  useEffect(() => {
+    const handleAbandonment = () => {
+      // Don't track if form was successfully submitted
+      if (isSubmittedRef.current) {
+        return;
+      }
+      
+      // Only track if user has progressed past welcome screen
+      if (currentStep > 0) {
+        const { questionId, stepType } = getStepInfo(currentStep);
+        trackQuestionnaireAbandoned(currentStep, questionId, stepType, TOTAL_STEPS);
+      }
+    };
+
+    // Listen for page unload events
+    // beforeunload: desktop browsers, page close/navigation
+    // pagehide: mobile browsers, more reliable for unload tracking
+    window.addEventListener('beforeunload', handleAbandonment);
+    window.addEventListener('pagehide', handleAbandonment);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleAbandonment);
+      window.removeEventListener('pagehide', handleAbandonment);
+    };
+  }, [currentStep]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -359,12 +424,16 @@ export default function Questionnaire() {
         
         setIsSubmitting(false);
       } else {
+        // Mark as submitted before redirect
+        isSubmittedRef.current = true;
         toast.success('Form submitted successfully! Redirecting to games...');
       }
       // If successful, redirect happens in the server action
     } catch (err: any) {
       // Redirect errors are expected and should be ignored
       if (err?.digest?.startsWith('NEXT_REDIRECT')) {
+        // Mark as submitted when redirect happens (successful submission)
+        isSubmittedRef.current = true;
         return;
       }
       toast.error(err?.message || 'Failed to submit form. Please try again.');
