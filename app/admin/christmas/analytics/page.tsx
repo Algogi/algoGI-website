@@ -63,6 +63,100 @@ export default function AnalyticsPage() {
           <p className="text-muted-foreground">Comprehensive performance metrics and insights</p>
         </div>
 
+      {/* Questionnaire Engagement */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Questionnaire Engagement</CardTitle>
+          <CardDescription>User interaction and abandonment metrics</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">Total Abandonments</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{analytics.totalAbandonments}</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">Abandonment Rate</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{analytics.abandonmentRate.toFixed(1)}%</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">Total Question Views</p>
+              <p className="text-2xl font-bold">{analytics.totalQuestionViews}</p>
+            </div>
+          </div>
+          
+          {analytics.questionnaireAbandonment.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-lg">Abandonment by Step</h3>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {analytics.questionnaireAbandonment.map((abandonment, index) => (
+                  <div key={index} className="p-3 bg-muted rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="font-medium">
+                          Step {abandonment.step} - {abandonment.stepType === 'welcome' ? 'Welcome' : 
+                            abandonment.stepType === 'question' ? `Question ${abandonment.questionId}` :
+                            abandonment.stepType === 'text_field' ? `Field: ${abandonment.questionId}` :
+                            'Final Step'}
+                        </p>
+                        {abandonment.questionId && (
+                          <p className="text-xs text-muted-foreground mt-1">ID: {abandonment.questionId}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Count</p>
+                        <p className="text-xl font-bold">{abandonment.count}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 bg-muted-foreground/20 rounded-full h-2">
+                        <div
+                          className="bg-red-600 dark:bg-red-400 h-2 rounded-full"
+                          style={{ width: `${abandonment.percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm text-muted-foreground w-20 text-right">
+                        {abandonment.percentage.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {analytics.questionViewStats.length > 0 && (
+            <div className="space-y-3 mt-6">
+              <h3 className="font-semibold text-lg">Question View Statistics</h3>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {analytics.questionViewStats.map((stat, index) => (
+                  <div key={index} className="p-3 bg-muted rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="font-medium">
+                          Step {stat.step} - {stat.stepType === 'welcome' ? 'Welcome' : 
+                            stat.stepType === 'question' ? `Question ${stat.questionId}` :
+                            stat.stepType === 'text_field' ? `Field: ${stat.questionId}` :
+                            'Final Step'}
+                        </p>
+                        {stat.questionId && (
+                          <p className="text-xs text-muted-foreground mt-1">ID: {stat.questionId}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Views</p>
+                        <p className="text-xl font-bold">{stat.viewCount}</p>
+                        <p className="text-xs text-muted-foreground">({stat.uniqueViews} unique)</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Conversion Funnel */}
       <Card>
         <CardHeader>

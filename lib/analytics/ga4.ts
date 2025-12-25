@@ -105,6 +105,25 @@ export function trackQuestionnaireAbandoned(
     total_steps: totalSteps || 12,
     progress_percent: progressPercent,
   });
+
+  // Also store in Firestore for admin analytics
+  if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
+    fetch('/api/analytics/christmas-events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventType: 'questionnaire_abandoned',
+        step,
+        questionId,
+        stepType,
+        totalSteps,
+        progressPercent,
+      }),
+    }).catch((err) => {
+      // Silently fail - analytics shouldn't break the app
+      console.error('Failed to store abandonment event:', err);
+    });
+  }
 }
 
 /**
@@ -121,5 +140,24 @@ export function trackQuestionView(
     question_id: questionId || null,
     step_type: stepType || 'unknown',
   });
+
+  // Also store in Firestore for admin analytics
+  if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
+    fetch('/api/analytics/christmas-events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventType: 'question_view',
+        step,
+        questionId,
+        stepType,
+        totalSteps: 12,
+        progressPercent: Math.round((step / 12) * 100),
+      }),
+    }).catch((err) => {
+      // Silently fail - analytics shouldn't break the app
+      console.error('Failed to store question view event:', err);
+    });
+  }
 }
 

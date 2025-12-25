@@ -58,6 +58,11 @@ export interface ChristmasAnalytics {
   questionAnalytics: QuestionAnalytics[];
   timeBasedStats: TimeBasedStats;
   conversionFunnel: ConversionFunnel;
+  questionnaireAbandonment: QuestionnaireAbandonment[];
+  questionViewStats: QuestionViewStats[];
+  totalAbandonments: number;
+  totalQuestionViews: number;
+  abandonmentRate: number; // percentage of users who abandoned
 }
 
 export interface PrizeDistribution {
@@ -115,6 +120,22 @@ export interface ConversionFunnel {
   prizeWins: number;
   dropOffRate: number; // submissions -> game plays
   winRate: number; // game plays -> prize wins
+}
+
+export interface QuestionnaireAbandonment {
+  step: number;
+  questionId?: string;
+  stepType: string;
+  count: number;
+  percentage: number;
+}
+
+export interface QuestionViewStats {
+  step: number;
+  questionId?: string;
+  stepType: string;
+  viewCount: number;
+  uniqueViews: number;
 }
 
 /**

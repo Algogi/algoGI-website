@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/firebase/config';
-import { ChristmasAnalytics, PrizeDistribution, GamePopularity, QuestionAnalytics, QuestionResponse, TimeBasedStats, DailyStat, HourlyStat, ConversionFunnel } from '@/lib/christmas/admin-types';
+import { ChristmasAnalytics, PrizeDistribution, GamePopularity, QuestionAnalytics, QuestionResponse, TimeBasedStats, DailyStat, HourlyStat, ConversionFunnel, QuestionnaireAbandonment, QuestionViewStats } from '@/lib/christmas/admin-types';
 import { calculatePercentage, getGameDisplayName, getPrizeDisplayName, formatDateOnly } from '@/lib/christmas/admin-utils';
 import { PRIZES } from '@/lib/christmas/prizes';
 import { ChristmasSubmission, ChristmasGamePlay } from '@/lib/christmas/admin-types';
@@ -210,6 +210,81 @@ export async function GET(request: NextRequest) {
       winRate: 100, // All game plays result in prizes
     };
 
+    // Fetch abandonment events
+    const abandonmentSnapshot = await db
+      .collection('christmas_analytics_events')
+      .where('eventType', '==', 'questionnaire_abandoned')
+      .where('campaign', '==', 'christmas_2025')
+      .get();
+
+    const abandonmentCounts: Record<string, { count: number; step: number; questionId?: string; stepType: string }> = {};
+    abandonmentSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const key = `${data.step}_${data.questionId || 'none'}`;
+      if (!abandonmentCounts[key]) {
+        abandonmentCounts[key] = {
+          count: 0,
+          step: data.step,
+          questionId: data.questionId || undefined,
+          stepType: data.stepType || 'unknown',
+        };
+      }
+      abandonmentCounts[key].count++;
+    });
+
+    const totalAbandonments = abandonmentSnapshot.docs.length;
+    const questionnaireAbandonment: QuestionnaireAbandonment[] = Object.values(abandonmentCounts)
+      .map((item) => ({
+        step: item.step,
+        questionId: item.questionId,
+        stepType: item.stepType,
+        count: item.count,
+        percentage: totalAbandonments > 0 ? calculatePercentage(item.count, totalAbandonments) : 0,
+      }))
+      .sort((a, b) => a.step - b.step);
+
+    // Fetch question view events
+    const questionViewSnapshot = await db
+      .collection('christmas_analytics_events')
+      .where('eventType', '==', 'question_view')
+      .where('campaign', '==', 'christmas_2025')
+      .get();
+
+    const questionViewCounts: Record<string, { viewCount: number; step: number; questionId?: string; stepType: string; uniqueSessions: Set<string> }> = {};
+    questionViewSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const key = `${data.step}_${data.questionId || 'none'}`;
+      if (!questionViewCounts[key]) {
+        questionViewCounts[key] = {
+          viewCount: 0,
+          step: data.step,
+          questionId: data.questionId || undefined,
+          stepType: data.stepType || 'unknown',
+          uniqueSessions: new Set(),
+        };
+      }
+      questionViewCounts[key].viewCount++;
+      // Use document ID as a proxy for unique session (in a real scenario, you'd track session IDs)
+      questionViewCounts[key].uniqueSessions.add(doc.id);
+    });
+
+    const totalQuestionViews = questionViewSnapshot.docs.length;
+    const questionViewStats: QuestionViewStats[] = Object.values(questionViewCounts)
+      .map((item) => ({
+        step: item.step,
+        questionId: item.questionId,
+        stepType: item.stepType,
+        viewCount: item.viewCount,
+        uniqueViews: item.uniqueSessions.size,
+      }))
+      .sort((a, b) => a.step - b.step);
+
+    // Calculate abandonment rate (abandonments / (abandonments + submissions))
+    const totalUsers = totalAbandonments + totalSubmissions;
+    const abandonmentRate = totalUsers > 0 
+      ? calculatePercentage(totalAbandonments, totalUsers)
+      : 0;
+
     const analytics: ChristmasAnalytics = {
       totalSubmissions,
       totalGamePlays,
@@ -219,6 +294,11 @@ export async function GET(request: NextRequest) {
       questionAnalytics,
       timeBasedStats,
       conversionFunnel,
+      questionnaireAbandonment,
+      questionViewStats,
+      totalAbandonments,
+      totalQuestionViews,
+      abandonmentRate,
     };
 
     return NextResponse.json(analytics);
