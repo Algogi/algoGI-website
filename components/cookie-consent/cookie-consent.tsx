@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
   setConsent,
+  getConsent,
   requiresConsent,
   isEURegion,
 } from "@/lib/cookies/consent";
@@ -15,6 +16,8 @@ import { cn } from "@/lib/utils";
 export default function CookieConsent() {
   const [open, setOpen] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [preferences, setPreferences] = useState<{
     analytics: boolean;
     marketing: boolean;
@@ -35,47 +38,150 @@ export default function CookieConsent() {
   }, []);
 
   const handleAcceptAll = () => {
-    setConsent({
-      analytics: true,
-      marketing: true,
-    });
-    setOpen(false);
-    // Analytics will initialize dynamically via consent-changed event
+    if (isSaving) return; // Prevent double-clicks
+    
+    setIsSaving(true);
+    setError(null);
+    
+    try {
+      const success = setConsent({
+        analytics: true,
+        marketing: true,
+      });
+      
+      if (!success) {
+        setError("Failed to save your preferences. Please try again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Verify consent was saved correctly
+      const saved = getConsent();
+      if (!saved || !saved.analytics || !saved.marketing) {
+        setError("Failed to verify your preferences were saved. Please try again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Success - close modal
+      setOpen(false);
+      // Analytics will initialize dynamically via consent-changed event
+    } catch (error) {
+      console.error("Error accepting cookies:", error);
+      setError("An unexpected error occurred. Please try again.");
+      setIsSaving(false);
+    }
   };
 
   const handleRejectAll = () => {
-    setConsent({
-      analytics: false,
-      marketing: false,
-    });
-    setOpen(false);
+    if (isSaving) return; // Prevent double-clicks
+    
+    setIsSaving(true);
+    setError(null);
+    
+    try {
+      const success = setConsent({
+        analytics: false,
+        marketing: false,
+      });
+      
+      if (!success) {
+        setError("Failed to save your preferences. Please try again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Verify consent was saved correctly
+      const saved = getConsent();
+      if (!saved) {
+        setError("Failed to verify your preferences were saved. Please try again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Success - close modal
+      setOpen(false);
+    } catch (error) {
+      console.error("Error rejecting cookies:", error);
+      setError("An unexpected error occurred. Please try again.");
+      setIsSaving(false);
+    }
   };
 
   const handleClose = () => {
-    // For EU regions: treat as reject (GDPR compliance)
-    // For non-EU regions: treat as accept (less restrictive)
-    const isEU = isEURegion();
-    setConsent({
-      analytics: !isEU, // Accept for non-EU, reject for EU
-      marketing: !isEU,
-    });
-    setOpen(false);
+    if (isSaving) return; // Prevent double-clicks
+    
+    setIsSaving(true);
+    setError(null);
+    
+    try {
+      // For EU regions: treat as reject (GDPR compliance)
+      // For non-EU regions: treat as accept (less restrictive)
+      const isEU = isEURegion();
+      const success = setConsent({
+        analytics: !isEU, // Accept for non-EU, reject for EU
+        marketing: !isEU,
+      });
+      
+      if (!success) {
+        setError("Failed to save your preferences. Please try again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Success - close modal
+      setOpen(false);
+    } catch (error) {
+      console.error("Error closing cookie banner:", error);
+      setError("An unexpected error occurred. Please try again.");
+      setIsSaving(false);
+    }
   };
 
   const handleCustomize = () => {
+    setError(null); // Clear any previous errors
     setShowCustomize(true);
   };
 
   const handleSavePreferences = () => {
-    const hasAnalytics = preferences.analytics;
-    const hasMarketing = preferences.marketing;
+    if (isSaving) return; // Prevent double-clicks
     
-    setConsent({
-      analytics: hasAnalytics,
-      marketing: hasMarketing,
-    });
-    setOpen(false);
-    // Analytics will initialize dynamically via consent-changed event
+    setIsSaving(true);
+    setError(null);
+    
+    try {
+      const hasAnalytics = preferences.analytics;
+      const hasMarketing = preferences.marketing;
+      
+      const success = setConsent({
+        analytics: hasAnalytics,
+        marketing: hasMarketing,
+      });
+      
+      if (!success) {
+        setError("Failed to save your preferences. Please try again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Verify consent was saved correctly
+      const saved = getConsent();
+      if (!saved || 
+          saved.analytics !== hasAnalytics || 
+          saved.marketing !== hasMarketing) {
+        setError("Failed to verify your preferences were saved. Please try again.");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Success - close modal
+      setOpen(false);
+      // Analytics will initialize dynamically via consent-changed event
+    } catch (error) {
+      console.error("Error saving preferences:", error);
+      setError("An unexpected error occurred. Please try again.");
+      setIsSaving(false);
+    }
   };
 
   const handleToggleAnalytics = (checked: boolean) => {
@@ -104,6 +210,7 @@ export default function CookieConsent() {
           variant="ghost"
           size="icon"
           onClick={handleClose}
+          disabled={isSaving}
           className="absolute top-2 right-2 sm:right-4 h-6 w-6 rounded-full"
           aria-label="Close cookie banner"
         >
@@ -111,6 +218,11 @@ export default function CookieConsent() {
         </Button>
 
         <div className="flex flex-col gap-2 pr-8 sm:pr-10">
+          {error && (
+            <div className="rounded-md bg-destructive/10 border border-destructive/20 p-2 text-xs text-destructive">
+              {error}
+            </div>
+          )}
           {!showCustomize ? (
             <>
               {/* Main content */}
@@ -128,14 +240,16 @@ export default function CookieConsent() {
                     variant="outline"
                     size="sm"
                     onClick={handleRejectAll}
+                    disabled={isSaving}
                     className="w-full sm:w-auto text-xs h-8"
                   >
-                    Reject All
+                    {isSaving ? "Saving..." : "Reject All"}
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleCustomize}
+                    disabled={isSaving}
                     className="w-full sm:w-auto text-xs h-8"
                   >
                     Customize
@@ -143,9 +257,10 @@ export default function CookieConsent() {
                   <Button
                     size="sm"
                     onClick={handleAcceptAll}
+                    disabled={isSaving}
                     className="w-full sm:w-auto text-xs h-8"
                   >
-                    Accept All
+                    {isSaving ? "Saving..." : "Accept All"}
                   </Button>
                 </div>
               </div>
@@ -207,7 +322,11 @@ export default function CookieConsent() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setShowCustomize(false)}
+                    onClick={() => {
+                      setShowCustomize(false);
+                      setError(null);
+                    }}
+                    disabled={isSaving}
                     className="w-full sm:w-auto text-xs h-8"
                   >
                     Back
@@ -215,9 +334,10 @@ export default function CookieConsent() {
                   <Button
                     size="sm"
                     onClick={handleSavePreferences}
+                    disabled={isSaving}
                     className="w-full sm:w-auto text-xs h-8"
                   >
-                    Save Preferences
+                    {isSaving ? "Saving..." : "Save Preferences"}
                   </Button>
                 </div>
               </div>

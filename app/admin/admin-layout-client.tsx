@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import AlgogiLogo from "@/components/logo/algogi-logo";
-import { LogOut, LayoutDashboard, Briefcase, MessageSquare, Download, ExternalLink, Image as ImageIcon, FileText, Mail, Users, Menu, X, BookOpen, Sun, Moon, UserCircle, ClipboardList } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, MessageSquare, Download, ExternalLink, Image as ImageIcon, FileText, Mail, Users, Menu, X, BookOpen, Sun, Moon, UserCircle, ClipboardList, Gift, Gamepad2, BarChart3, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -25,6 +25,8 @@ export default function AdminLayoutClient({ children, session }: AdminLayoutClie
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const isChristmasActive = pathname.startsWith("/admin/christmas");
+  const [christmasExpanded, setChristmasExpanded] = useState(isChristmasActive);
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -68,6 +70,15 @@ export default function AdminLayoutClient({ children, session }: AdminLayoutClie
     { href: "/admin/downloads", label: "Downloads", icon: Download },
     { href: "/admin/media", label: "Media", icon: ImageIcon },
     { href: "/admin/files", label: "Files", icon: FileText },
+  ];
+
+  const christmasSubItems = [
+    { href: "/admin/christmas", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/christmas/submissions", label: "Submissions", icon: FileText },
+    { href: "/admin/christmas/game-plays", label: "Game Plays", icon: Gamepad2 },
+    { href: "/admin/christmas/analytics", label: "Analytics", icon: BarChart3 },
+    { href: "/admin/christmas/prizes", label: "Prizes", icon: Gift },
+    { href: "/admin/christmas/badges", label: "Badges", icon: Gift },
   ];
 
   return (
@@ -115,6 +126,51 @@ export default function AdminLayoutClient({ children, session }: AdminLayoutClie
                 </Link>
               );
             })}
+            
+            {/* Christmas Campaign Section */}
+            <div className="mt-2">
+              <button
+                onClick={() => setChristmasExpanded(!christmasExpanded)}
+                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isChristmasActive
+                    ? "bg-neon-blue/10 text-neon-blue"
+                    : "text-white hover:bg-dark-surface"
+                }`}
+              >
+                <div className="flex items-center">
+                  <Gift className="w-5 h-5 mr-3" />
+                  Christmas Campaign
+                </div>
+                {christmasExpanded ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
+              {christmasExpanded && (
+                <div className="ml-4 mt-1 space-y-1 border-l border-neon-blue/20 pl-2">
+                  {christmasSubItems.map((item) => {
+                    const Icon = item.icon;
+                    const isSubActive = pathname === item.href || (item.href === "/admin/christmas" && pathname === "/admin/christmas");
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                          isSubActive
+                            ? "bg-neon-blue/10 text-neon-blue"
+                            : "text-gray-400 hover:text-white hover:bg-dark-surface"
+                        }`}
+                        onClick={() => setSidebarOpen(false)}
+                      >
+                        <Icon className="w-4 h-4 mr-3" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* User section */}

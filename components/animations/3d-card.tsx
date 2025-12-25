@@ -29,7 +29,6 @@ export default function Card3D({ children, className = "" }: Card3DProps) {
     const mouseY = e.clientY - rect.top;
     const xPct = mouseX / width - 0.5;
     const yPct = mouseY / height - 0.5;
-
     x.set(xPct);
     y.set(yPct);
   };
@@ -49,7 +48,7 @@ export default function Card3D({ children, className = "" }: Card3DProps) {
         rotateY,
         transformStyle: "preserve-3d",
       }}
-      className={`perspective-1000 transform-3d ${className}`}
+      className={className}
     >
       {children}
     </motion.div>

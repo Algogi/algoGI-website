@@ -4,9 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Brain, Network, Cpu, Sparkles } from "lucide-react";
 import Tiles3DBackground from "./3d-tiles-background";
-import SplitText from "@/components/animations/split-text";
-import GlitchText from "@/components/animations/glitch-text";
-import Card3D from "@/components/animations/3d-card";
 import ParallaxSection from "@/components/animations/parallax-section";
 
 export default function HomeHero() {

@@ -13,11 +13,33 @@ export interface CookieConsent {
 const CONSENT_STORAGE_KEY = "cookie-consent";
 
 /**
+ * Check if localStorage is available and accessible
+ */
+function isLocalStorageAvailable(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  
+  try {
+    const test = "__localStorage_test__";
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Get current consent preferences from localStorage
  */
 export function getConsent(): CookieConsent | null {
   if (typeof window === "undefined") {
     return null; // Server-side, return null
+  }
+
+  if (!isLocalStorageAvailable()) {
+    return null; // localStorage not available
   }
 
   try {
@@ -46,10 +68,16 @@ export function getConsent(): CookieConsent | null {
 /**
  * Save consent preferences to localStorage
  * Dispatches a 'consent-changed' event to notify listeners
+ * @returns true if consent was saved successfully, false otherwise
  */
-export function setConsent(consent: Partial<CookieConsent>): void {
+export function setConsent(consent: Partial<CookieConsent>): boolean {
   if (typeof window === "undefined") {
-    return; // Server-side, skip
+    return false; // Server-side, skip
+  }
+
+  if (!isLocalStorageAvailable()) {
+    console.error("localStorage is not available. Cookie consent cannot be saved.");
+    return false;
   }
 
   try {
@@ -62,12 +90,26 @@ export function setConsent(consent: Partial<CookieConsent>): void {
 
     localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(fullConsent));
     
+    // Verify the consent was actually saved by checking the values match
+    const saved = getConsent();
+    if (!saved || 
+        saved.essential !== fullConsent.essential ||
+        saved.analytics !== fullConsent.analytics ||
+        saved.marketing !== fullConsent.marketing) {
+      console.error("Failed to verify consent was saved to localStorage");
+      return false;
+    }
+    
     // Dispatch consent change event for dynamic analytics initialization
+    // Event is dispatched synchronously after localStorage write completes
     window.dispatchEvent(new CustomEvent("consent-changed", {
       detail: fullConsent,
     }));
+    
+    return true;
   } catch (error) {
     console.error("Error saving consent to localStorage:", error);
+    return false;
   }
 }
 
@@ -103,18 +145,31 @@ export function hasMarketingConsent(): boolean {
 
 /**
  * Clear consent (for testing or user preference reset)
+ * @returns true if consent was cleared successfully, false otherwise
  */
-export function clearConsent(): void {
+export function clearConsent(): boolean {
   if (typeof window === "undefined") {
-    return;
+    return false;
+  }
+
+  if (!isLocalStorageAvailable()) {
+    console.error("localStorage is not available. Cookie consent cannot be cleared.");
+    return false;
   }
 
   try {
     localStorage.removeItem(CONSENT_STORAGE_KEY);
+    // Verify consent was cleared
+    if (getConsent() !== null) {
+      console.error("Failed to verify consent was cleared from localStorage");
+      return false;
+    }
     // Dispatch consent change event
     window.dispatchEvent(new CustomEvent("consent-changed"));
+    return true;
   } catch (error) {
     console.error("Error clearing consent from localStorage:", error);
+    return false;
   }
 }
 

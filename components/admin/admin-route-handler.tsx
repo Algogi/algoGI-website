@@ -54,8 +54,11 @@ export default function AdminRouteHandler({
     }
   }, [isAdminRoute]);
 
-  // Don't render site header/footer/CTA for admin routes
-  if (isAdminRoute) {
+  // Check if it's a Christmas campaign route
+  const isChristmasRoute = pathname?.startsWith('/christmas');
+
+  // Don't render site header/footer/CTA for admin routes or Christmas routes
+  if (isAdminRoute || isChristmasRoute) {
     return <main className="min-h-screen">{children}</main>;
   }
 
