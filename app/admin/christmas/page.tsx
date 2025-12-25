@@ -5,14 +5,18 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Users, Gamepad2, Gift, TrendingUp, ExternalLink, Download, BarChart3, FileText } from 'lucide-react';
+import { Loader2, Users, Gamepad2, Gift, TrendingUp, ExternalLink, Download, BarChart3, FileText, Trash2 } from 'lucide-react';
 import { DashboardStats, PrizeDistribution } from '@/lib/christmas/admin-types';
 import { formatTimestamp, getGameDisplayName, getPrizeDisplayName } from '@/lib/christmas/admin-utils';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { toast } from 'sonner';
 
 export default function ChristmasAdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [purgeDialogOpen, setPurgeDialogOpen] = useState(false);
+  const [purging, setPurging] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -32,6 +36,34 @@ export default function ChristmasAdminDashboard() {
       console.error('Error fetching stats:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePurge = async () => {
+    try {
+      setPurging(true);
+      const response = await fetch('/api/admin/christmas/purge', {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to purge data');
+      }
+
+      const data = await response.json();
+      toast.success(
+        `Successfully purged ${data.totalDeleted} record(s): ${data.deleted.gamePlays} game plays, ${data.deleted.submissions} submissions, ${data.deleted.gameStats} game stats`
+      );
+      
+      // Refresh stats after purge
+      await fetchStats();
+    } catch (err: any) {
+      toast.error('Error purging data: ' + err.message);
+      console.error('Error purging Christmas data:', err);
+    } finally {
+      setPurging(false);
+      setPurgeDialogOpen(false);
     }
   };
 
@@ -322,6 +354,54 @@ export default function ChristmasAdminDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Danger Zone */}
+      <Card className="border-destructive">
+        <CardHeader>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
+          <CardDescription>
+            Irreversible actions that will permanently delete data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between p-4 bg-destructive/10 rounded-lg border border-destructive/20">
+            <div>
+              <p className="font-semibold text-destructive">Purge All Campaign Data</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                This will permanently delete all game plays, submissions, and game statistics for the Christmas 2025 campaign. This action cannot be undone.
+              </p>
+            </div>
+            <Button
+              variant="destructive"
+              onClick={() => setPurgeDialogOpen(true)}
+              disabled={purging}
+            >
+              {purging ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Purging...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Purge Data
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <ConfirmDialog
+        open={purgeDialogOpen}
+        onOpenChange={setPurgeDialogOpen}
+        title="Purge All Christmas Campaign Data"
+        description="Are you absolutely sure you want to delete all Christmas campaign data? This will permanently delete all game plays, submissions, and game statistics. This action cannot be undone."
+        confirmText="Yes, Purge Everything"
+        cancelText="Cancel"
+        onConfirm={handlePurge}
+        variant="destructive"
+      />
     </div>
   );
 }

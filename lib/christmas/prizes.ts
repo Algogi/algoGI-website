@@ -5,46 +5,46 @@ import { Prize } from './types';
  */
 export const PRIZES: Prize[] = [
   {
-    id: 'grand',
+    id: 'gift-100',
     name: '$100 Amazon Gift Card',
-    description: 'Congratulations! You won the chance to win the grand prize! Winner will be announced January 10, 2025.',
+    description: 'You have won a chance to win: $100 Amazon Gift Card. Winners will be announced on January 5th, 2026 on our website and through email.',
     type: 'grand',
     probability: 0.01, // 1%
   },
   {
-    id: 'offer-50',
-    name: '50% Off First Project',
-    description: 'Get 50% off your first AlgoGI project! Contact us to redeem.',
+    id: 'gift-50',
+    name: '$50 Amazon Gift Card',
+    description: 'You have won a chance to win: $50 Amazon Gift Card. Winners will be announced on January 5th, 2026 on our website and through email.',
+    type: 'offer',
+    probability: 0.02, // 2%
+  },
+  {
+    id: 'gift-20',
+    name: '$20 Amazon Gift Card',
+    description: 'You have won a chance to win: $20 Amazon Gift Card. Winners will be announced on January 5th, 2026 on our website and through email.',
     type: 'offer',
     probability: 0.05, // 5%
   },
   {
-    id: 'offer-audit',
-    name: 'Free AI Audit',
-    description: 'Get a free AI strategy audit for your business!',
+    id: 'gift-10',
+    name: '$10 Amazon Gift Card',
+    description: 'You have won a chance to win: $10 Amazon Gift Card. Winners will be announced on January 5th, 2026 on our website and through email.',
     type: 'offer',
     probability: 0.10, // 10%
-  },
-  {
-    id: 'offer-20',
-    name: '20% Discount',
-    description: 'Enjoy 20% off all AlgoGI services!',
-    type: 'offer',
-    probability: 0.15, // 15%
-  },
-  {
-    id: 'fun-nice-try',
-    name: 'Free Consultation',
-    description: 'Get a free consultation with our team to discuss how we can help your business!',
-    type: 'fun',
-    probability: 0.30, // 30%
   },
   {
     id: 'fun-badge',
     name: 'Festive Badge',
     description: 'You earned a festive badge! Share your achievement!',
     type: 'fun',
-    probability: 0.39, // 39% (remaining probability)
+    probability: 0.32, // 32%
+  },
+  {
+    id: 'fun-better-luck',
+    name: 'Better luck next time with the gift card',
+    description: 'Better luck next time with the gift card',
+    type: 'fun',
+    probability: 0.50, // 50% (remaining probability)
   },
 ];
 
