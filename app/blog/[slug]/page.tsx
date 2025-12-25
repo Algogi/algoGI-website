@@ -270,18 +270,18 @@ export default function BlogPostPage() {
 
         {/* FAQs Section */}
         {post.faqs && post.faqs.length > 0 && (
-          <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Frequently Asked Questions</h2>
+          <div className="mt-16 pt-8 border-t border-gray-200 blog-faq-border">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
             <div className="space-y-6">
               {post.faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-6"
+                  className="bg-dark-card border border-gray-200 blog-faq-card-border rounded-lg p-6"
                 >
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     {faq.question}
                   </h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <p className="text-gray-700 leading-relaxed">
                     {faq.answer}
                   </p>
                 </div>

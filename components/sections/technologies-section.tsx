@@ -23,7 +23,7 @@ import {
   SiRedis,
   SiPrisma,
 } from "react-icons/si";
-import { FaBrain, FaAws } from "react-icons/fa";
+import { FaBrain, FaAws, FaCode } from "react-icons/fa";
 
 interface Technology {
   name: string;
@@ -52,6 +52,7 @@ const technologies: Technology[] = [
   { name: "MongoDB", icon: SiMongodb, color: "neon-green" },
   { name: "Redis", icon: SiRedis, color: "neon-red" },
   { name: "Prisma", icon: SiPrisma, color: "neon-purple" },
+  { name: "CUGA", icon: FaCode, color: "neon-cyan" },
 ];
 
 // Duplicate technologies for seamless loop

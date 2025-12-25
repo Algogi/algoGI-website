@@ -377,6 +377,15 @@
     color: #e5e7eb !important;
   }
 
+  /* Blog FAQ section border overrides for dark mode */
+  html:not(.light) .blog-faq-border {
+    border-color: #374151 !important; /* gray-700 */
+  }
+
+  html:not(.light) .blog-faq-card-border {
+    border-color: #374151 !important; /* gray-700 */
+  }
+
   /* Prose content text colors for dark mode */
   html:not(.light) .prose p {
     color: #e5e7eb !important;
