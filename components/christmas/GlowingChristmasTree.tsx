@@ -1,56 +1,74 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { PerformanceMode } from "@/lib/christmas/use-performance-mode";
 
 interface GlowingChristmasTreeProps {
   position?: 'left' | 'right';
   useAbsolute?: boolean;
+  performanceMode?: PerformanceMode;
 }
 
-export default function GlowingChristmasTree({ position = 'right', useAbsolute = false }: GlowingChristmasTreeProps) {
+export default function GlowingChristmasTree({ position = 'right', useAbsolute = false, performanceMode = 'high' }: GlowingChristmasTreeProps) {
   const positioningClass = useAbsolute 
     ? 'absolute inset-0 w-full h-full'
     : `fixed ${position === 'right' ? 'right-0' : 'left-0'} top-0 bottom-0 w-1/2 md:w-2/5 lg:w-1/3 xl:w-1/4`;
   
   return (
-    <div className={`${positioningClass} flex items-center justify-center pointer-events-none z-0 opacity-25 dark:opacity-15`}>
+    <div 
+      className={`${positioningClass} flex items-center justify-center pointer-events-none z-0 opacity-25 dark:opacity-15`}
+      style={{
+        contain: 'layout style paint',
+        transform: 'translateZ(0)',
+      }}
+    >
       <div className="relative w-full h-full flex items-center justify-center">
-        {/* Glow effect layers */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          {/* Outer glow */}
-          <motion.div
-            animate={{
-              opacity: [0.2, 0.4, 0.2],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute w-full h-full max-w-[1000px] max-h-[1000px] rounded-full blur-3xl"
-            style={{
-              background: 'radial-gradient(circle, rgba(22, 163, 74, 0.25) 0%, rgba(220, 38, 38, 0.12) 50%, transparent 70%)',
-            }}
-          />
-          {/* Inner glow */}
-          <motion.div
-            animate={{
-              opacity: [0.3, 0.5, 0.3],
-              scale: [0.9, 1, 0.9],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5,
-            }}
-            className="absolute w-4/5 h-4/5 max-w-[800px] max-h-[800px] rounded-full blur-2xl"
-            style={{
-              background: 'radial-gradient(circle, rgba(34, 197, 94, 0.35) 0%, rgba(239, 68, 68, 0.18) 50%, transparent 70%)',
-            }}
-          />
-        </div>
+        {/* Glow effect layers - disable or simplify in lower modes */}
+        {(performanceMode !== 'minimal') && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            {/* Outer glow */}
+            {(performanceMode === 'high' || performanceMode === 'medium') && (
+              <motion.div
+                animate={{
+                  opacity: [0.2, 0.4, 0.2],
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute w-full h-full max-w-[1000px] max-h-[1000px] rounded-full blur-3xl"
+                style={{
+                  background: 'radial-gradient(circle, rgba(22, 163, 74, 0.25) 0%, rgba(220, 38, 38, 0.12) 50%, transparent 70%)',
+                  willChange: 'transform, opacity',
+                  transform: 'translateZ(0)',
+                }}
+              />
+            )}
+            {/* Inner glow */}
+            {(performanceMode === 'high' || performanceMode === 'medium') && (
+              <motion.div
+                animate={{
+                  opacity: [0.3, 0.5, 0.3],
+                  scale: [0.9, 1, 0.9],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5,
+                }}
+                className="absolute w-4/5 h-4/5 max-w-[800px] max-h-[800px] rounded-full blur-2xl"
+                style={{
+                  background: 'radial-gradient(circle, rgba(34, 197, 94, 0.35) 0%, rgba(239, 68, 68, 0.18) 50%, transparent 70%)',
+                  willChange: 'transform, opacity',
+                  transform: 'translateZ(0)',
+                }}
+              />
+            )}
+          </div>
+        )}
 
         {/* Christmas Tree SVG - Much Larger, positioned on side */}
         <svg
@@ -97,119 +115,191 @@ export default function GlowingChristmasTree({ position = 'right', useAbsolute =
 
         {/* Star on top */}
         <g transform="translate(100, 20)">
-          <motion.g
-            animate={{
-              rotate: [0, 360],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
+          {(performanceMode === 'low' || performanceMode === 'minimal') ? (
+            // Static star for lower modes
             <path
               d="M 0 -15 L 4 -4 L 15 -4 L 6 2 L 9 13 L 0 7 L -9 13 L -6 2 L -15 -4 L -4 -4 Z"
               fill="#F59E0B"
               className="dark:fill-[#FBBF24]"
               style={{ filter: 'drop-shadow(0 0 15px rgba(245, 158, 11, 0.9))' }}
             />
-          </motion.g>
+          ) : (
+            <motion.g
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <path
+                d="M 0 -15 L 4 -4 L 15 -4 L 6 2 L 9 13 L 0 7 L -9 13 L -6 2 L -15 -4 L -4 -4 Z"
+                fill="#F59E0B"
+                className="dark:fill-[#FBBF24]"
+                style={{ filter: 'drop-shadow(0 0 15px rgba(245, 158, 11, 0.9))' }}
+              />
+            </motion.g>
+          )}
         </g>
 
         {/* Ornaments - Red */}
-        <motion.circle
-          cx="70"
-          cy="120"
-          r="6"
-          fill="#DC2626"
-          className="dark:fill-[#EF4444]"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0,
-          }}
-          style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
-        />
-        <motion.circle
-          cx="130"
-          cy="100"
-          r="6"
-          fill="#DC2626"
-          className="dark:fill-[#EF4444]"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-          style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
-        />
-        <motion.circle
-          cx="85"
-          cy="70"
-          r="5"
-          fill="#DC2626"
-          className="dark:fill-[#EF4444]"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.5,
-          }}
-          style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
-        />
+        {(performanceMode === 'low' || performanceMode === 'minimal') ? (
+          // Static ornaments for lower modes
+          <>
+            <circle
+              cx="70"
+              cy="120"
+              r="6"
+              fill="#DC2626"
+              className="dark:fill-[#EF4444]"
+              style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
+            />
+            <circle
+              cx="130"
+              cy="100"
+              r="6"
+              fill="#DC2626"
+              className="dark:fill-[#EF4444]"
+              style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
+            />
+            {performanceMode !== 'minimal' && (
+              <circle
+                cx="85"
+                cy="70"
+                r="5"
+                fill="#DC2626"
+                className="dark:fill-[#EF4444]"
+                style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
+              />
+            )}
+          </>
+        ) : (
+          // Animated ornaments for high/medium modes
+          <>
+            <motion.circle
+              cx="70"
+              cy="120"
+              r="6"
+              fill="#DC2626"
+              className="dark:fill-[#EF4444]"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0,
+              }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
+            />
+            <motion.circle
+              cx="130"
+              cy="100"
+              r="6"
+              fill="#DC2626"
+              className="dark:fill-[#EF4444]"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1,
+              }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
+            />
+            <motion.circle
+              cx="85"
+              cy="70"
+              r="5"
+              fill="#DC2626"
+              className="dark:fill-[#EF4444]"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5,
+              }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.8))' }}
+            />
+          </>
+        )}
 
         {/* Ornaments - Gold */}
-        <motion.circle
-          cx="115"
-          cy="130"
-          r="5"
-          fill="#F59E0B"
-          className="dark:fill-[#FBBF24]"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.7,
-          }}
-          style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.8))' }}
-        />
-        <motion.circle
-          cx="100"
-          cy="80"
-          r="5"
-          fill="#F59E0B"
-          className="dark:fill-[#FBBF24]"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1.2,
-          }}
-          style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.8))' }}
-        />
+        {(performanceMode === 'low' || performanceMode === 'minimal') ? (
+          // Static ornaments for lower modes
+          <>
+            <circle
+              cx="115"
+              cy="130"
+              r="5"
+              fill="#F59E0B"
+              className="dark:fill-[#FBBF24]"
+              style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.8))' }}
+            />
+            {performanceMode !== 'minimal' && (
+              <circle
+                cx="100"
+                cy="80"
+                r="5"
+                fill="#F59E0B"
+                className="dark:fill-[#FBBF24]"
+                style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.8))' }}
+              />
+            )}
+          </>
+        ) : (
+          // Animated ornaments for high/medium modes
+          <>
+            <motion.circle
+              cx="115"
+              cy="130"
+              r="5"
+              fill="#F59E0B"
+              className="dark:fill-[#FBBF24]"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.7,
+              }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.8))' }}
+            />
+            <motion.circle
+              cx="100"
+              cy="80"
+              r="5"
+              fill="#F59E0B"
+              className="dark:fill-[#FBBF24]"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.2,
+              }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.8))' }}
+            />
+          </>
+        )}
       </svg>
       </div>
     </div>

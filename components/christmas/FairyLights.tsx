@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { PerformanceMode } from "@/lib/christmas/use-performance-mode";
 
 interface LightString {
   id: number;
@@ -58,12 +59,32 @@ function calculateSemiCirclePosition(centerX: number, radius: number, angle: num
   return { x, y };
 }
 
-export default function FairyLights() {
+interface FairyLightsProps {
+  performanceMode?: PerformanceMode;
+}
+
+export default function FairyLights({ performanceMode = 'high' }: FairyLightsProps) {
   const [strings, setStrings] = useState<LightString[]>([]);
 
   useEffect(() => {
-    // Generate 5-6 strings of lights hanging from the top as semi-circles
-    const stringCount = 5;
+    // Determine string count and lights per string based on performance mode
+    const getStringConfig = () => {
+      switch (performanceMode) {
+        case 'high':
+          return { stringCount: 5, lightsPerString: { min: 15, max: 20 } };
+        case 'medium':
+          return { stringCount: 3, lightsPerString: { min: 10, max: 12 } };
+        case 'low':
+          return { stringCount: 2, lightsPerString: { min: 6, max: 8 } };
+        case 'minimal':
+          return { stringCount: 1, lightsPerString: { min: 4, max: 5 } };
+        default:
+          return { stringCount: 5, lightsPerString: { min: 15, max: 20 } };
+      }
+    };
+
+    const config = getStringConfig();
+    const stringCount = config.stringCount;
     
     const newStrings: LightString[] = Array.from({ length: stringCount }, (_, stringIndex) => {
       // Distribute strings evenly across the top with some margin
@@ -73,8 +94,8 @@ export default function FairyLights() {
       // Since bottom point is at radius * 2, radius should be around 16-17%
       const radius = 14 + Math.random() * 4; // 14-18% radius = 28-36% bottom point
       
-      // Each string has 15-20 lights for better coverage
-      const lightCount = Math.floor(Math.random() * 6) + 15;
+      // Each string has lights based on performance mode
+      const lightCount = Math.floor(Math.random() * (config.lightsPerString.max - config.lightsPerString.min + 1)) + config.lightsPerString.min;
       const lights = Array.from({ length: lightCount }, (_, lightIndex) => {
         // Distribute lights evenly along the full semi-circle (angle from 0 to π)
         // Start exactly at the left edge (angle 0) and go to the right edge (angle π)
@@ -109,7 +130,7 @@ export default function FairyLights() {
     });
     
     setStrings(newStrings);
-  }, []);
+  }, [performanceMode]);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[1]">
@@ -179,11 +200,20 @@ export default function FairyLights() {
               style={{
                 left: `${light.x}%`,
                 top: `${light.y}%`,
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, -50%) translateZ(0)',
+                willChange: performanceMode === 'high' || performanceMode === 'medium' ? 'transform, opacity' : 'opacity',
+                contain: 'layout style paint',
               }}
               animate={{
-                opacity: [0.7, 1, 0.7, 1, 0.7],
-                scale: [light.size * 0.9, light.size * 1.2, light.size * 1, light.size * 1.15, light.size * 0.9],
+                // Simplify animations for lower modes: reduce keyframe complexity
+                opacity: performanceMode === 'minimal' 
+                  ? [0.8, 1, 0.8]
+                  : performanceMode === 'low'
+                  ? [0.7, 1, 0.7, 1, 0.7]
+                  : [0.7, 1, 0.7, 1, 0.7],
+                scale: (performanceMode === 'low' || performanceMode === 'minimal')
+                  ? [light.size, light.size * 1.1, light.size]
+                  : [light.size * 0.9, light.size * 1.2, light.size * 1, light.size * 1.15, light.size * 0.9],
               }}
               transition={{
                 duration: light.duration,
