@@ -494,7 +494,6 @@ function renderBlockToHTML(
               ${address ? `<div style="margin-bottom: 5px;">${address}</div>` : ""}
               ${phone ? `<div style="margin-bottom: 5px;">${phone}</div>` : ""}
               ${email ? `<div style="margin-bottom: 10px;"><a href="mailto:${email}" style="color: ${textColor}; text-decoration: underline;">${email}</a></div>` : ""}
-              ${unsubscribeText ? `<div style="margin-top: 15px; margin-bottom: 10px;"><a href="${unsubscribeUrl}" style="color: ${textColor}; text-decoration: underline;">${unsubscribeText}</a></div>` : ""}
               ${copyrightText ? `<div style="margin-top: 10px; font-size: 11px; opacity: 0.8;">${copyrightText}</div>` : ""}
             </td>
           </tr>
