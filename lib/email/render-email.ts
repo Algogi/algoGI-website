@@ -138,31 +138,58 @@ function renderBlockToHTML(
       const subheading = personalizeText(block.props.subheading || "");
       const ctaText = personalizeText(block.props.ctaText || "");
       const ctaLink = wrapTrackingLink(block.props.ctaLink || "#", block.id, baseUrl);
-      const overlayOpacity = block.props.overlayOpacity || 0.4;
+      const overlayOpacity = Math.max(0, Math.min(1, block.props.overlayOpacity || 0.4));
       const textColor = block.props.textColor || "#ffffff";
       const headingSize = block.props.headingSize || "32px";
       const subheadingSize = block.props.subheadingSize || "18px";
       const align = block.props.align || "center";
       const height = block.props.height || "400px";
+      const fallbackBgColor = "#000000";
+      const overlayBackground = `rgba(0, 0, 0, ${overlayOpacity})`;
+      const alignment = align === "right" ? "right" : align === "left" ? "left" : "center";
+      const contentMargin = alignment === "center" ? "0 auto" : alignment === "right" ? "0 0 0 auto" : "0";
+      const backgroundStyles = imageUrl
+        ? `background-image: url('${imageUrl}'); background-size: cover; background-position: center; background-repeat: no-repeat;`
+        : `background-color: ${fallbackBgColor};`;
+      const vmlBackground = imageUrl
+        ? `<!--[if gte mso 9]>
+            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;height:${height};">
+              <v:fill type="frame" src="${imageUrl}" color="${fallbackBgColor}" />
+              <v:textbox inset="0,0,0,0">
+            <![endif]-->`
+        : "";
+      const vmlBackgroundEnd = imageUrl
+        ? `<!--[if gte mso 9]>
+              </v:textbox>
+            </v:rect>
+            <![endif]-->`
+        : "";
       
-      return `
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0;">
+      return wrapInTable(`
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; border-collapse: collapse; height: ${height}; ${backgroundStyles}">
           <tr>
-            <td style="position: relative; background-image: url(${imageUrl}); background-size: cover; background-position: center; height: ${height}; padding: 40px 20px; text-align: ${align};">
-              <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, ${overlayOpacity});"></div>
-              <div style="position: relative; z-index: 2; max-width: 600px; margin: 0 auto; color: ${textColor};">
-                <h1 style="font-size: ${headingSize}; font-weight: bold; margin: 0 0 ${subheading ? "10px" : "20px"} 0; color: ${textColor}; font-family: ${getFallbackFont()};">
-                  ${heading}
-                </h1>
-                ${subheading ? `<p style="font-size: ${subheadingSize}; margin: 0 0 20px 0; color: ${textColor}; opacity: 0.9; font-family: ${getFallbackFont()};">${subheading}</p>` : ""}
-                <a href="${ctaLink}" style="display: inline-block; padding: 12px 24px; background-color: #4a3aff; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; font-family: ${getFallbackFont()};">
-                  ${ctaText}
-                </a>
-              </div>
+            <td style="padding: 0; height: ${height}; ${backgroundStyles}">
+              ${vmlBackground}
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" height="${height}" style="border-collapse: collapse; background-color: ${overlayBackground};">
+                <tr>
+                  <td align="${alignment}" valign="middle" style="padding: 40px 20px;">
+                    <div style="max-width: 600px; margin: ${contentMargin}; color: ${textColor}; text-align: ${alignment}; font-family: ${getFallbackFont()};">
+                      <h1 style="font-size: ${headingSize}; font-weight: bold; margin: 0 0 ${subheading ? "10px" : "20px"} 0; color: ${textColor}; font-family: ${getFallbackFont()};">
+                        ${heading}
+                      </h1>
+                      ${subheading ? `<p style="font-size: ${subheadingSize}; margin: 0 0 20px 0; color: ${textColor}; opacity: 0.9; font-family: ${getFallbackFont()};">${subheading}</p>` : ""}
+                      <a href="${ctaLink}" style="display: inline-block; padding: 12px 24px; background-color: #4a3aff; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; font-family: ${getFallbackFont()};">
+                        ${ctaText}
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+              ${vmlBackgroundEnd}
             </td>
           </tr>
         </table>
-      `;
+      `);
     }
     
     case "gradient-header": {
@@ -171,18 +198,23 @@ function renderBlockToHTML(
         ? block.props.gradientColors
         : ["#4a3aff", "#7c3aed"];
       const gradientString = `linear-gradient(135deg, ${gradientColors.join(", ")})`;
+      const fallbackColor = gradientColors[0] || "#4a3aff";
       const fontSize = block.props.fontSize || "32px";
       const fontWeight = block.props.fontWeight || "bold";
       const align = block.props.align || "center";
       const padding = block.props.padding || "40px 20px";
       
-      return `
-        <div style="background: ${gradientString}; padding: ${padding}; text-align: ${align}; font-family: ${getFallbackFont()};">
-          <h2 style="font-size: ${fontSize}; font-weight: ${fontWeight}; color: #ffffff; margin: 0; font-family: ${getFallbackFont()};">
-            ${text}
-          </h2>
-        </div>
-      `;
+      return wrapInTable(`
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; background: ${gradientString}; background-color: ${fallbackColor};">
+          <tr>
+            <td style="padding: ${padding}; text-align: ${align}; font-family: ${getFallbackFont()};">
+              <h2 style="font-size: ${fontSize}; font-weight: ${fontWeight}; color: #ffffff; margin: 0; font-family: ${getFallbackFont()};">
+                ${text}
+              </h2>
+            </td>
+          </tr>
+        </table>
+      `);
     }
     
     case "rich-text": {
