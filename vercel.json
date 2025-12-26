@@ -3,27 +3,32 @@
     {
       "path": "/api/cron/warmup",
       "schedule": "0 * * * *",
-      "method": "POST",
-      "headers": {
-        "Authorization": "Bearer @CRON_SECRET"
+      "request": {
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer @CRON_SECRET"
+        }
       }
     },
     {
       "path": "/api/cron/campaign-warmup",
       "schedule": "0 * * * *",
-      "method": "POST",
-      "headers": {
-        "Authorization": "Bearer @CRON_SECRET"
+      "request": {
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer @CRON_SECRET"
+        }
       }
     },
     {
       "path": "/api/cron/send-queue",
       "schedule": "*/10 * * * *",
-      "method": "POST",
-      "headers": {
-        "Authorization": "Bearer @CRON_SECRET"
+      "request": {
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer @CRON_SECRET"
+        }
       }
     }
   ]
 }
-
