@@ -245,7 +245,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
     const { emails, source } = body as { emails?: string[]; source?: string };
-    const MAX_BATCH = 5000;
 
     const db = getDb();
     const adminEmail = (session as any)?.email || (session as any)?.user?.email;
@@ -300,13 +299,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         { error: 'No emails found to verify' },
         { status: 404 }
-      );
-    }
-
-    if (targetEmails.length > MAX_BATCH) {
-      return NextResponse.json(
-        { error: `Maximum ${MAX_BATCH} emails per batch` },
-        { status: 400 }
       );
     }
 
