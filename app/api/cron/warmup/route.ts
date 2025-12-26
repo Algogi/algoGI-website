@@ -4,21 +4,29 @@ import { getPlunkClient } from '@/lib/plunk/client';
 import { FieldValue } from 'firebase-admin/firestore';
 
 /**
- * POST /api/cron/warmup
+ * GET /api/cron/warmup
  * Iterate active warmup campaigns and send paced warmup emails
  * Configure in Vercel Cron: https://vercel.com/docs/cron-jobs
+ * Vercel Cron sends GET requests with x-vercel-cron header
  */
-export async function POST(request: NextRequest) {
+async function handleCron(request: NextRequest) {
   try {
-    // Verify cron secret if configured
-    const authHeader = request.headers.get('authorization');
+    // Verify Vercel cron header (sent automatically by Vercel Cron)
+    const cronHeader = request.headers.get('x-vercel-cron');
     const cronSecret = process.env.CRON_SECRET;
     
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // If CRON_SECRET is set, require either Vercel's cron header or the secret
+    if (cronSecret) {
+      const authHeader = request.headers.get('authorization');
+      const isValidVercelCron = cronHeader === '1';
+      const isValidSecret = authHeader === `Bearer ${cronSecret}`;
+      
+      if (!isValidVercelCron && !isValidSecret) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        );
+      }
     }
 
     const db = getDb();
@@ -187,13 +195,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-/**
- * GET /api/cron/warmup
- * Manual trigger for testing (admin only)
- */
 export async function GET(request: NextRequest) {
-  // For testing purposes, you can call this endpoint manually
-  // In production, use POST with cron secret
-  return POST(request);
+  return handleCron(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handleCron(request);
 }
 

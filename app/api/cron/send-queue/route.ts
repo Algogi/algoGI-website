@@ -13,13 +13,21 @@ import { FieldValue } from "firebase-admin/firestore";
 const MAX_ITEMS_PER_RUN = 10;
 const DOMAIN_BACKOFF_MINUTES = 30;
 
-export async function POST(request: NextRequest) {
+async function handleCron(request: NextRequest) {
   try {
-    // Optional cron auth
-    const authHeader = request.headers.get("authorization");
+    // Verify Vercel cron header (sent automatically by Vercel Cron)
+    const cronHeader = request.headers.get("x-vercel-cron");
     const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // If CRON_SECRET is set, require either Vercel's cron header or the secret
+    if (cronSecret) {
+      const authHeader = request.headers.get("authorization");
+      const isValidVercelCron = cronHeader === "1";
+      const isValidSecret = authHeader === `Bearer ${cronSecret}`;
+
+      if (!isValidVercelCron && !isValidSecret) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
     const items = await claimDueQueueItems(MAX_ITEMS_PER_RUN);
@@ -162,6 +170,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  return POST(request);
+  return handleCron(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handleCron(request);
 }
 

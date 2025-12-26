@@ -2,33 +2,15 @@
   "crons": [
     {
       "path": "/api/cron/warmup",
-      "schedule": "0 * * * *",
-      "request": {
-        "method": "POST",
-        "headers": {
-          "Authorization": "Bearer @CRON_SECRET"
-        }
-      }
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/cron/campaign-warmup",
-      "schedule": "0 * * * *",
-      "request": {
-        "method": "POST",
-        "headers": {
-          "Authorization": "Bearer @CRON_SECRET"
-        }
-      }
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/cron/send-queue",
-      "schedule": "*/10 * * * *",
-      "request": {
-        "method": "POST",
-        "headers": {
-          "Authorization": "Bearer @CRON_SECRET"
-        }
-      }
+      "schedule": "*/10 * * * *"
     }
   ]
 }

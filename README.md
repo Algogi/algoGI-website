@@ -169,7 +169,8 @@ Target keywords are naturally integrated into headings and copy:
 - `/api/cron/warmup` — hourly (`0 * * * *`), sends paced warmup emails.
 - `/api/cron/campaign-warmup` — hourly (`0 * * * *`), enqueues hourly campaign slices.
 - `/api/cron/send-queue` — every 10 minutes (`*/10 * * * *`), processes queued sends with domain limits.
-- All cron calls use `POST` with `Authorization: Bearer <CRON_SECRET>`. Add the secret in Vercel: `vercel env add CRON_SECRET <environment>`. Rotate by updating the value and redeploying.
+- Vercel Cron automatically sends GET requests with `x-vercel-cron: 1` header. Handlers verify this header for security.
+- Optional: Set `CRON_SECRET` environment variable for additional manual testing via `Authorization: Bearer <CRON_SECRET>` header.
 - View and debug cron runs in Vercel: Project → Cron Jobs.
 
 ### Other Platforms
