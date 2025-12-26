@@ -76,7 +76,7 @@ export async function POST(
     
     // Filter to only verified, non-unsubscribed contacts (eligible for sending)
     const eligibleContacts = matchingContacts.filter(
-      (c) => c.status === 'verified' && c.email
+      (c) => (c.status === 'verified' || c.status === 'verified_generic') && c.email
     );
 
     // Update campaign with new counts

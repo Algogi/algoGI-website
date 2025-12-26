@@ -208,8 +208,13 @@ export default function ContactsPage() {
           }, 5000);
           
           if (progress.status === 'completed' && progress.results) {
+            const generic = progress.results.valid_generic || 0;
+            const validMessage =
+              generic > 0
+                ? `${progress.results.valid} valid (${generic} generic)`
+                : `${progress.results.valid} valid`;
             toast.success(
-              `Verification complete: ${progress.results.valid} valid, ${progress.results.invalid} invalid`
+              `Verification complete: ${validMessage}, ${progress.results.invalid} invalid`
             );
           } else if (progress.status === 'failed') {
             toast.error(`Verification failed: ${progress.error || 'Unknown error'}`);
@@ -336,11 +341,24 @@ export default function ContactsPage() {
     if (selectedIds.size === 0) return;
 
     try {
-      // TODO: Implement bulk delete API
-      toast.success(`Deleted ${selectedIds.size} contact(s)`);
+      const contactIds = Array.from(selectedIds);
+      const response = await fetch("/admin/contacts/api/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactIds }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete contacts");
+      }
+
+      const result = await response.json();
+      toast.success(`Deleted ${result.deleted} contact(s)`);
       setSelectedIds(new Set());
       setBulkDeleteDialogOpen(false);
       fetchContacts();
+      fetchStats();
     } catch (err: any) {
       toast.error("Error deleting contacts: " + err.message);
     }
@@ -418,11 +436,16 @@ export default function ContactsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
-                {stats.verified}
+                {stats.verified + (stats.verified_generic || 0)}
               </div>
               <p className="text-xs text-gray-400 mt-1">
                 {stats.verifiedPercentage.toFixed(1)}% verified
               </p>
+              {stats.verified_generic > 0 && (
+                <p className="text-xs text-gray-400 mt-1">
+                  {stats.verified_generic} generic inboxes
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -494,7 +517,9 @@ export default function ContactsPage() {
                     variant="outline"
                     onClick={async () => {
                       const selectedContacts = contacts.filter((c) => selectedIds.has(c.id));
-                      const verifiedContacts = selectedContacts.filter((c) => c.status === 'verified');
+                      const verifiedContacts = selectedContacts.filter(
+                        (c) => c.status === 'verified' || c.status === 'verified_generic'
+                      );
                       
                       if (verifiedContacts.length === 0) {
                         toast.warning('No verified contacts selected for SMTP re-verification');
@@ -543,10 +568,23 @@ export default function ContactsPage() {
                         setVerifyingContacts(false);
                       }
                     }}
-                    disabled={verifyingContacts || contacts.filter((c) => selectedIds.has(c.id) && c.status === 'verified').length === 0}
+                    disabled={
+                      verifyingContacts ||
+                      contacts.filter(
+                        (c) =>
+                          selectedIds.has(c.id) &&
+                          (c.status === 'verified' || c.status === 'verified_generic')
+                      ).length === 0
+                    }
                   >
                     <Mail className="w-4 h-4 mr-2" />
-                    Re-verify SMTP ({contacts.filter((c) => selectedIds.has(c.id) && c.status === 'verified').length})
+                    Re-verify SMTP ({
+                      contacts.filter(
+                        (c) =>
+                          selectedIds.has(c.id) &&
+                          (c.status === 'verified' || c.status === 'verified_generic')
+                      ).length
+                    })
                   </Button>
                   <Button
                     variant="destructive"
@@ -630,6 +668,7 @@ export default function ContactsPage() {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="verified">Verified</SelectItem>
+                <SelectItem value="verified_generic">Verified (Generic)</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="bounced">Bounced</SelectItem>
                 <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
@@ -868,7 +907,7 @@ export default function ContactsPage() {
                     )}
                   </Button>
                 )}
-                {selectedContact.status === 'verified' && (
+                {(selectedContact.status === 'verified' || selectedContact.status === 'verified_generic') && (
                   <Button
                     variant="outline"
                     onClick={async () => {

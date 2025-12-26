@@ -120,17 +120,20 @@ export default function SegmentsPage() {
       if (!response.ok) throw new Error("Failed to fetch segment stats");
       const data = await response.json();
       
+      const verifiedGeneric = data.verificationStats.verified_generic || data.verificationStats.verifiedGeneric || 0;
+      const combinedVerified = (data.verificationStats.verified || 0) + verifiedGeneric;
       const stats: SegmentVerificationStats = {
         total: data.verificationStats.total,
         verified: data.verificationStats.verified,
+        verifiedGeneric,
         pending: data.verificationStats.pending,
         invalid: data.verificationStats.invalid,
         bounced: data.verificationStats.bounced,
         unsubscribed: data.verificationStats.unsubscribed,
         verifiedPercentage: data.verificationStats.total > 0
-          ? Math.round((data.verificationStats.verified / data.verificationStats.total) * 100)
+          ? Math.round((combinedVerified / data.verificationStats.total) * 100)
           : 0,
-        unverifiedCount: data.verificationStats.total - data.verificationStats.verified - data.verificationStats.unsubscribed,
+        unverifiedCount: data.verificationStats.pending,
       };
       
       setVerificationStats((prev) => ({ ...prev, [segmentId]: stats }));
@@ -477,16 +480,21 @@ export default function SegmentsPage() {
                       </div>
                     ) : stats ? (
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            <span className="text-muted-foreground">Verified:</span>
-                            <span className="font-medium">{stats.verified}</span>
-                          </div>
-                          <Badge variant={stats.verifiedPercentage >= 80 ? "default" : stats.verifiedPercentage >= 50 ? "secondary" : "outline"}>
-                            {stats.verifiedPercentage}%
-                          </Badge>
-                        </div>
+                        {(() => {
+                          const combinedVerified = stats.verified + (stats.verifiedGeneric || 0);
+                          return (
+                            <div className="flex items-center justify-between text-sm">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <span className="text-muted-foreground">Verified:</span>
+                                <span className="font-medium">{combinedVerified}</span>
+                              </div>
+                              <Badge variant={stats.verifiedPercentage >= 80 ? "default" : stats.verifiedPercentage >= 50 ? "secondary" : "outline"}>
+                                {stats.verifiedPercentage}%
+                              </Badge>
+                            </div>
+                          );
+                        })()}
                         
                         {/* Progress Bar */}
                         <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
@@ -508,6 +516,12 @@ export default function SegmentsPage() {
                             </div>
                           )}
                         </div>
+                        {stats.verifiedGeneric && stats.verifiedGeneric > 0 && (
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                            <span>Generic inboxes: {stats.verifiedGeneric}</span>
+                          </div>
+                        )}
 
                         {hasUnverified && (
                           <div className="w-full mt-2">
@@ -966,6 +980,7 @@ function CriteriaRuleEditor({
             <SelectContent>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="verified">Verified</SelectItem>
+              <SelectItem value="verified_generic">Verified (Generic)</SelectItem>
               <SelectItem value="bounced">Bounced</SelectItem>
               <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
               <SelectItem value="invalid">Invalid</SelectItem>

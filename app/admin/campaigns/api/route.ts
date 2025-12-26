@@ -6,6 +6,7 @@ import { Segment, SegmentInput, SegmentUpdate, SegmentPreview, SegmentCriteria, 
 import { Contact } from '@/lib/types/contact';
 import { EmailBlock } from '@/lib/types/email';
 import { matchesRule, getFieldValue } from '@/lib/utils/segment-matcher';
+import { EmailAnalytics } from '@/lib/types/email';
 
 /**
  * GET /admin/campaigns/api
@@ -324,7 +325,61 @@ export async function DELETE(request: NextRequest) {
     }
 
     const db = getDb();
+
+    // Fetch campaign data before deletion for snapshot
+    const campaignDoc = await db.collection('contact_segments').doc(id).get();
+    let campaignSnapshot: any = null;
+    if (campaignDoc.exists) {
+      const data = campaignDoc.data() as any;
+      // Fetch analytics if available
+      let analytics: EmailAnalytics | null = null;
+      try {
+        const analyticsDoc = await db.collection('email_analytics').doc(id).get();
+        analytics = analyticsDoc.exists ? (analyticsDoc.data() as EmailAnalytics) : null;
+      } catch (err) {
+        console.error('Error fetching campaign analytics for snapshot:', err);
+      }
+
+      campaignSnapshot = {
+        campaignId: id,
+        name: data.name || '',
+        description: data.description || '',
+        status: data.status || 'draft',
+        isActive: data.isActive || false,
+        totalContacts: data.totalContacts || data.contactCount || 0,
+        sentContacts: data.sentContacts || 0,
+        emailsPerHour: data.emailsPerHour || null,
+        startedAt: data.startedAt?.toDate?.()?.toISOString?.() || data.startedAt || null,
+        pausedAt: data.pausedAt?.toDate?.()?.toISOString?.() || data.pausedAt || null,
+        completedAt: data.completedAt?.toDate?.()?.toISOString?.() || data.completedAt || null,
+        createdAt: data.createdAt?.toDate?.()?.toISOString?.() || null,
+        updatedAt: data.updatedAt?.toDate?.()?.toISOString?.() || null,
+        criteria: data.criteria || null,
+        contactCount: data.contactCount || 0,
+        fromEmail: data.fromEmail || null,
+        subject: data.subject || null,
+        replyTo: data.replyTo || null,
+        templateId: data.templateId || null,
+        content: data.content || null,
+        htmlContent: data.htmlContent || null,
+        textContent: data.textContent || null,
+        analytics,
+        snapshotSource: 'deleted',
+        deletedAt: FieldValue.serverTimestamp(),
+        createdBy: data.createdBy || session.email || '',
+      };
+    }
+
     await db.collection('contact_segments').doc(id).delete();
+
+    // Persist snapshot for completed list even after deletion
+    if (campaignSnapshot) {
+      try {
+        await db.collection('campaign_runs').doc(id).set(campaignSnapshot);
+      } catch (err) {
+        console.error('Error writing campaign snapshot on delete:', err);
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
@@ -374,7 +429,7 @@ async function previewCampaign(criteria: SegmentCriteria): Promise<SegmentPrevie
 
   // Filter to only eligible contacts (verified, non-unsubscribed) for sending
   const eligibleContacts = filtered.filter(
-    (c: any) => c.status === 'verified' && c.email
+    (c: any) => (c.status === 'verified' || c.status === 'verified_generic') && c.email
   );
 
   return {

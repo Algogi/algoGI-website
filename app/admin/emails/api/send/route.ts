@@ -7,6 +7,7 @@ import { getPlunkClient } from "@/lib/plunk/client";
 import { renderEmailBlocksToHTML, addTrackingPixel, htmlToText, wrapTrackingLink, addCampaignFooter, wrapAllLinksForTracking } from "@/lib/email/render-email";
 import { replacePersonalizationTags, ContactData } from "@/lib/email/personalization";
 import { getBaseUrl } from "@/lib/email/base-url";
+import { enqueueSendBatches } from "@/lib/campaigns/send-queue";
 
 // Helper for safe debug logging (do not remove until post-fix verification)
 function logDebug(payload: Record<string, any>) {
@@ -287,118 +288,64 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Update campaign status
-    await db.collection("contact_segments").doc(campaignId).update({
-      status: "sending",
-      updatedAt: FieldValue.serverTimestamp(),
-    });
+    // Collect contact IDs for queueing (verified + not unsubscribed)
+    const contactIds: string[] = [];
+    const FIRESTORE_IN_LIMIT = 30;
+    for (let i = 0; i < recipients.length; i += FIRESTORE_IN_LIMIT) {
+      const chunk = recipients.slice(i, i + FIRESTORE_IN_LIMIT);
+      const snapshot = await db
+        .collection("contacts")
+        .where("email", "in", chunk)
+        .get();
 
-    // Initialize analytics
-    const analyticsData = {
-      campaignId,
-      totalSent: 0,
-      totalDelivered: 0,
-      totalOpened: 0,
-      uniqueOpened: 0,
-      totalClicked: 0,
-      uniqueClicked: 0,
-      totalBounced: 0,
-      totalUnsubscribed: 0,
-      openRate: 0,
-      clickRate: 0,
-      bounceRate: 0,
-      recipientAnalytics: recipients.map((email) => ({
-        email,
-        opened: false,
-        clicked: false,
-        clickedLinks: [],
-        bounced: false,
-        unsubscribed: false,
-      })),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    await db.collection("email_analytics").doc(campaignId).set(analyticsData);
-
-    // Send emails
-    const fromEmail = campaign.fromEmail || getSenderEmail("newsletter");
-    const results = {
-      sent: 0,
-      failed: 0,
-      errors: [] as string[],
-    };
-
-    // Require Plunk for all marketing campaigns
-    if (!process.env.PLUNK_API_KEY) {
-      throw new Error("PLUNK_API_KEY is required for campaign sending");
-    }
-
-    const plunk = getPlunkClient();
-    
-    // Build contacts data array for personalization
-    // If contactsMap is empty, fetch contact data for all recipients
-    const contactsData: Array<{ email: string; firstName?: string; lastName?: string; company?: string }> = [];
-    
-    for (const recipient of recipients) {
-      let contactData: ContactData | undefined = contactsMap.get(recipient);
-      if (!contactData) {
-        // Try to fetch from database
-        const contactQuery = await db.collection("contacts").where("email", "==", recipient).limit(1).get();
-        if (!contactQuery.empty) {
-          const contactDoc = contactQuery.docs[0].data();
-          contactData = {
-            firstName: contactDoc.firstName || "",
-            lastName: contactDoc.lastName || "",
-            email: contactDoc.email || "",
-            company: contactDoc.company || "",
-          };
-        } else {
-          // Use email as fallback
-          contactData = { email: recipient };
+      snapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        if (data.status === "verified" && data.status !== "unsubscribed" && data.email) {
+          contactIds.push(doc.id);
         }
-      }
-      
-      contactsData.push({
-        email: contactData.email || recipient,
-        firstName: contactData.firstName,
-        lastName: contactData.lastName,
-        company: contactData.company,
       });
     }
-    
-    // Use Plunk with personalization support
-    const sendResult = await plunk.sendCampaignWithTracking(
-      recipients,
-      campaign.subject || "",
-      baseHtmlContent,
-      campaignId,
-      baseUrl,
-      fromEmail,
-      contactsData
-    );
-    
-    results.sent = sendResult.sent;
-    results.failed = sendResult.failed;
-    results.errors = sendResult.errors || [];
 
-    // Update campaign and analytics
+    if (contactIds.length === 0) {
+      return NextResponse.json(
+        { error: "No eligible contacts to enqueue" },
+        { status: 400 }
+      );
+    }
+
+    // Enqueue paced batches (10-minute slices)
+    const sliceSize = Math.max(1, Math.min(50, Math.ceil(contactIds.length / 6)));
+    const now = Date.now();
+    const payloads = [];
+    for (let i = 0; i < contactIds.length; i += sliceSize) {
+      payloads.push({
+        campaignId,
+        contactIds: contactIds.slice(i, i + sliceSize),
+        subject: campaign.subject || "",
+        fromEmail: campaign.fromEmail || getSenderEmail("newsletter"),
+        replyTo: campaign.replyTo || campaign.fromEmail || getSenderEmail("newsletter"),
+        htmlContent: baseHtmlContent,
+        textContent: campaign.textContent || htmlToText(baseHtmlContent),
+        runAfter: new Date(now + (Math.floor(i / sliceSize) * 10 * 60 * 1000)),
+      });
+    }
+
+    const enqueued = await enqueueSendBatches(payloads);
+
+    // Mark campaign active and set next send time
     await db.collection("contact_segments").doc(campaignId).update({
-      status: "sent",
-      sentAt: new Date().toISOString(),
+      status: "active",
+      isActive: true,
+      nextSendTime: payloads[payloads.length - 1]?.runAfter || new Date(),
       updatedAt: FieldValue.serverTimestamp(),
-    });
-
-    await db.collection("email_analytics").doc(campaignId).update({
-      totalSent: results.sent,
-      updatedAt: new Date().toISOString(),
+      startedAt: campaign.startedAt || new Date().toISOString(),
     });
 
     return NextResponse.json({
       success: true,
-      sent: results.sent,
-      failed: results.failed,
-      errors: results.errors,
+      enqueued,
+      totalRecipients: recipients.length,
+      eligibleContacts: contactIds.length,
     });
   } catch (error: any) {
     console.error("Error sending email campaign:", error);

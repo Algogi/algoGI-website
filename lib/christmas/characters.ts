@@ -86,3 +86,4 @@ export function getCharacterById(id: string): ChristmasCharacter | undefined {
   return CHRISTMAS_CHARACTERS.find(char => char.id === id);
 }
 
+

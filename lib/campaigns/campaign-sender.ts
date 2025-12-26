@@ -2,7 +2,7 @@ import { getDb } from "@/lib/firebase/config";
 import { FieldValue } from "firebase-admin/firestore";
 import { getPlunkTransporter } from "@/lib/email/send-email";
 import { replacePersonalizationTags, replacePersonalizationTagsInHTML, ContactData } from "@/lib/email/personalization";
-import { wrapAllLinksForTracking, addCampaignFooter } from "@/lib/email/render-email";
+import { wrapAllLinksForTracking, addCampaignFooter, generateUnsubscribeUrl } from "@/lib/email/render-email";
 import { getBaseUrl } from "@/lib/email/base-url";
 
 /**
@@ -110,6 +110,8 @@ export async function sendCampaignBatch(
           baseUrl
         );
 
+        const unsubscribeUrl = generateUnsubscribeUrl(recipient, baseUrl, campaignId);
+
         await transporter.sendMail({
           from: `"AlgoGI" <${campaign.fromEmail}>`,
           to: recipient,
@@ -117,6 +119,10 @@ export async function sendCampaignBatch(
           subject: personalizedSubject,
           html: htmlWithTracking,
           text: campaign.textContent,
+          headers: {
+            "List-Unsubscribe": `<${unsubscribeUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         });
 
         sent++;

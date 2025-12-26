@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import AlgogiLogo from "@/components/logo/algogi-logo";
-import { LogOut, LayoutDashboard, Briefcase, MessageSquare, Download, ExternalLink, Image as ImageIcon, FileText, Mail, Users, Menu, X, BookOpen, Sun, Moon, UserCircle, ClipboardList, Gift, Gamepad2, BarChart3, ChevronDown, ChevronRight, Send } from "lucide-react";
+import { LogOut, LayoutDashboard, Briefcase, MessageSquare, Download, ExternalLink, Image as ImageIcon, FileText, Mail, Users, Menu, X, BookOpen, Sun, Moon, UserCircle, ClipboardList, Gift, Gamepad2, BarChart3, ChevronDown, ChevronRight, Send, Timer, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -67,6 +67,8 @@ export default function AdminLayoutClient({ children, session }: AdminLayoutClie
     { href: "/admin/application-forms", label: "Application Forms", icon: ClipboardList },
     { href: "/admin/emails", label: "Emails", icon: Mail },
     { href: "/admin/campaigns", label: "Campaigns", icon: Send },
+    { href: "/admin/warmup", label: "Warmup", icon: Flame },
+    { href: "/admin/processes", label: "Processes", icon: Timer },
     { href: "/admin/leads", label: "Leads", icon: Mail },
     { href: "/admin/contacts", label: "Contacts", icon: Users },
     { href: "/admin/newsletter", label: "Newsletter", icon: Users },

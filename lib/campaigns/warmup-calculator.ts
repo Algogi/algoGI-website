@@ -7,7 +7,12 @@ export function calculateEmailsPerHour(
   totalContacts: number,
   sentContacts: number,
   startedAt: string,
-  targetDurationHours?: number
+  targetDurationHours?: number,
+  metrics?: {
+    openRate?: number;
+    bounceRate?: number;
+    engagementScore?: number;
+  }
 ): number {
   const remainingContacts = totalContacts - sentContacts;
   
@@ -40,10 +45,35 @@ export function calculateEmailsPerHour(
     // Campaign has been running, calculate based on remaining time
     // Use at least 12 more hours to complete
     const remainingHours = Math.max(12, defaultHours - elapsedHours);
-    return Math.ceil(remainingContacts / remainingHours);
+    let baseRate = Math.ceil(remainingContacts / remainingHours);
+
+    // Engagement-aware adjustments
+    const openRate = metrics?.openRate ?? 0;
+    const bounceRate = metrics?.bounceRate ?? 0;
+    const engagementScore = metrics?.engagementScore ?? 0;
+
+    const bouncePenalty = Math.max(0.25, 1 - bounceRate * 2);
+    const openBoost =
+      openRate >= 0.4 ? 1.2 : openRate >= 0.2 ? 1 : 0.7;
+    const engagementBoost =
+      engagementScore >= 7 ? 1.2 : engagementScore >= 4 ? 1 : 0.8;
+
+    baseRate = Math.ceil(baseRate * bouncePenalty * openBoost * engagementBoost);
+    return Math.max(1, baseRate);
   }
 
   // Campaign just started, use default distribution
-  return Math.ceil(remainingContacts / defaultHours);
+  let baseRate = Math.ceil(remainingContacts / defaultHours);
+
+  const openRate = metrics?.openRate ?? 0;
+  const bounceRate = metrics?.bounceRate ?? 0;
+  const engagementScore = metrics?.engagementScore ?? 0;
+
+  const bouncePenalty = Math.max(0.25, 1 - bounceRate * 2);
+  const openBoost = openRate >= 0.4 ? 1.2 : openRate >= 0.2 ? 1 : 0.7;
+  const engagementBoost = engagementScore >= 7 ? 1.2 : engagementScore >= 4 ? 1 : 0.8;
+
+  baseRate = Math.ceil(baseRate * bouncePenalty * openBoost * engagementBoost);
+  return Math.max(1, baseRate);
 }
 

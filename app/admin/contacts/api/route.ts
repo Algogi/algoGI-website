@@ -142,7 +142,9 @@ export async function PUT(request: NextRequest) {
     const stats: ContactStats = {
       total: snapshot.size,
       verified: 0,
+      verified_generic: 0,
       pending: 0,
+      verifying: 0,
       bounced: 0,
       unsubscribed: 0,
       invalid: 0,
@@ -157,13 +159,14 @@ export async function PUT(request: NextRequest) {
       
       stats[status as keyof ContactStats]++;
       
-      if (status === 'verified' && status !== 'unsubscribed') {
+      if ((status === 'verified' || status === 'verified_generic') && status !== 'unsubscribed') {
         stats.readyToSend++;
       }
     });
 
+    const totalVerified = stats.verified + stats.verified_generic;
     stats.verifiedPercentage = stats.total > 0 
-      ? (stats.verified / stats.total) * 100 
+      ? (totalVerified / stats.total) * 100 
       : 0;
     stats.bounceRate = stats.total > 0 
       ? (stats.bounced / stats.total) * 100 

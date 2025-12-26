@@ -1,6 +1,8 @@
 import { getBucket } from "@/lib/firebase/storage";
 import { generateSignedUrl } from "@/lib/firebase/storage";
 import nodemailer from "nodemailer";
+import { generateUnsubscribeUrl } from "./render-email";
+import { getBaseUrl } from "./base-url";
 
 // Single transporter, backed by Plunk SMTP
 let transporter: nodemailer.Transporter | null = null;
@@ -256,6 +258,8 @@ export async function sendNewsletterConfirmationEmail(
   const fromEmail = getSenderEmail('newsletter');
 
   const subject = "Welcome to AlgoGI Newsletter!";
+  const baseUrl = getBaseUrl();
+  const unsubscribeUrl = generateUnsubscribeUrl(to, baseUrl);
   const html = `
     <!DOCTYPE html>
     <html>
@@ -308,6 +312,10 @@ export async function sendNewsletterConfirmationEmail(
       subject,
       text,
       html,
+      headers: {
+        "List-Unsubscribe": `<${unsubscribeUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
   } catch (error: any) {
     console.error("Error sending newsletter confirmation email:", error);

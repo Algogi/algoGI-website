@@ -164,6 +164,14 @@ Target keywords are naturally integrated into headings and copy:
 2. Import project in Vercel
 3. Deploy automatically
 
+### Cron jobs (Vercel)
+- Cron definitions live in `vercel.json`.
+- `/api/cron/warmup` — hourly (`0 * * * *`), sends paced warmup emails.
+- `/api/cron/campaign-warmup` — hourly (`0 * * * *`), enqueues hourly campaign slices.
+- `/api/cron/send-queue` — every 10 minutes (`*/10 * * * *`), processes queued sends with domain limits.
+- All cron calls use `POST` with `Authorization: Bearer <CRON_SECRET>`. Add the secret in Vercel: `vercel env add CRON_SECRET <environment>`. Rotate by updating the value and redeploying.
+- View and debug cron runs in Vercel: Project → Cron Jobs.
+
 ### Other Platforms
 
 Build the project and deploy the `.next` folder:

@@ -127,17 +127,20 @@ export default function CampaignsPage() {
       if (!response.ok) throw new Error("Failed to fetch campaign stats");
       const data = await response.json();
       
+      const verifiedGeneric = data.verificationStats.verified_generic || data.verificationStats.verifiedGeneric || 0;
+      const combinedVerified = (data.verificationStats.verified || 0) + verifiedGeneric;
       const stats: SegmentVerificationStats = {
         total: data.verificationStats.total,
         verified: data.verificationStats.verified,
+        verifiedGeneric,
         pending: data.verificationStats.pending,
         invalid: data.verificationStats.invalid,
         bounced: data.verificationStats.bounced,
         unsubscribed: data.verificationStats.unsubscribed,
         verifiedPercentage: data.verificationStats.total > 0
-          ? Math.round((data.verificationStats.verified / data.verificationStats.total) * 100)
+          ? Math.round((combinedVerified / data.verificationStats.total) * 100)
           : 0,
-        unverifiedCount: data.verificationStats.total - data.verificationStats.verified - data.verificationStats.unsubscribed,
+        unverifiedCount: data.verificationStats.pending,
       };
       
       setVerificationStats((prev) => ({ ...prev, [campaignId]: stats }));
@@ -576,16 +579,21 @@ export default function CampaignsPage() {
                       </div>
                     ) : stats ? (
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            <span className="text-muted-foreground">Verified:</span>
-                            <span className="font-medium">{stats.verified}</span>
-                          </div>
-                          <Badge variant={stats.verifiedPercentage >= 80 ? "default" : stats.verifiedPercentage >= 50 ? "secondary" : "outline"}>
-                            {stats.verifiedPercentage}%
-                          </Badge>
-                        </div>
+                        {(() => {
+                          const combinedVerified = stats.verified + (stats.verifiedGeneric || 0);
+                          return (
+                            <div className="flex items-center justify-between text-sm">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <span className="text-muted-foreground">Verified:</span>
+                                <span className="font-medium">{combinedVerified}</span>
+                              </div>
+                              <Badge variant={stats.verifiedPercentage >= 80 ? "default" : stats.verifiedPercentage >= 50 ? "secondary" : "outline"}>
+                                {stats.verifiedPercentage}%
+                              </Badge>
+                            </div>
+                          );
+                        })()}
                         
                         {/* Progress Bar */}
                         <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
@@ -607,6 +615,12 @@ export default function CampaignsPage() {
                             </div>
                           )}
                         </div>
+                        {stats.verifiedGeneric && stats.verifiedGeneric > 0 && (
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                            <span>Generic inboxes: {stats.verifiedGeneric}</span>
+                          </div>
+                        )}
 
                         {hasUnverified && (
                           <div className="w-full mt-2">
@@ -1165,6 +1179,7 @@ function CriteriaRuleEditor({
             <SelectContent>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="verified">Verified</SelectItem>
+              <SelectItem value="verified_generic">Verified (Generic)</SelectItem>
               <SelectItem value="bounced">Bounced</SelectItem>
               <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
               <SelectItem value="invalid">Invalid</SelectItem>
@@ -1389,6 +1404,7 @@ function PreviewDialog({
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'verified':
+      case 'verified_generic':
         return 'default';
       case 'pending':
       case 'verifying':
@@ -1433,8 +1449,17 @@ function PreviewDialog({
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
                     <span className="text-muted-foreground">Verified:</span>
-                    <span className="font-medium">{verificationStats.verified}</span>
+                      <span className="font-medium">
+                        {verificationStats.verified + (verificationStats.verifiedGeneric || 0)}
+                      </span>
                   </div>
+                    {verificationStats.verifiedGeneric && verificationStats.verifiedGeneric > 0 && (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        <span className="text-muted-foreground">Generic:</span>
+                        <span className="font-medium">{verificationStats.verifiedGeneric}</span>
+                      </div>
+                    )}
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-yellow-500" />
                     <span className="text-muted-foreground">Pending:</span>

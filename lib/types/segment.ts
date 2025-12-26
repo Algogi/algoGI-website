@@ -54,6 +54,7 @@ export interface SegmentCriteria {
 export interface SegmentVerificationStats {
   total: number;
   verified: number;
+  verifiedGeneric?: number;
   pending: number;
   invalid: number;
   bounced: number;

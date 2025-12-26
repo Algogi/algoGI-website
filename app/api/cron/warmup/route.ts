@@ -5,7 +5,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 
 /**
  * POST /api/cron/warmup
- * Daily warm-up scheduler - sends to most engaged contacts
+ * Iterate active warmup campaigns and send paced warmup emails
  * Configure in Vercel Cron: https://vercel.com/docs/cron-jobs
  */
 export async function POST(request: NextRequest) {
@@ -23,96 +23,160 @@ export async function POST(request: NextRequest) {
 
     const db = getDb();
 
-    // Get most engaged contacts (engagementScore >= 3, verified, not unsubscribed)
-    const contactsSnapshot = await db
-      .collection('contacts')
-      .where('status', '==', 'verified')
-      .where('engagementScore', '>=', 3)
-      .orderBy('engagementScore', 'desc')
-      .orderBy('lastSent', 'asc') // Prioritize contacts who haven't been sent to recently
-      .limit(200) // Start with 200 per day
+    const warmupSnap = await db
+      .collection('warmup_settings')
+      .where('active', '==', true)
       .get();
 
-    if (contactsSnapshot.empty) {
-      return NextResponse.json({
-        success: true,
-        message: 'No contacts to warm up',
-        sent: 0,
-      });
+    if (warmupSnap.empty) {
+      return NextResponse.json({ success: true, message: 'No active warmups', sent: 0 });
     }
 
-    const contacts = contactsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    // Filter out unsubscribed (double check)
-    const eligibleContacts = contacts.filter(
-      (contact: any) => contact.status !== 'unsubscribed' && contact.email
-    );
-
-    if (eligibleContacts.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No eligible contacts',
-        sent: 0,
-      });
-    }
-
-    // Rate limit: Max 500 per hour, but we're doing 200 per day for warm-up
-    const maxPerBatch = 200;
-    const contactsToSend = eligibleContacts.slice(0, maxPerBatch);
-
-    // Send warm-up email (you can customize this)
     const plunk = getPlunkClient();
-    const subject = 'Warm-up email from AlgoGI';
-    const body = `
-      <h1>Hello from AlgoGI</h1>
-      <p>This is a warm-up email to maintain sender reputation.</p>
-      <p>Thank you for being part of our community!</p>
-    `;
+    const results: any[] = [];
 
-    const recipients = contactsToSend.map((c: any) => c.email);
-    const sendResult = await plunk.sendCampaign(
-      recipients,
-      subject,
-      body
-    );
+    for (const warmupDoc of warmupSnap.docs) {
+      const warmupId = warmupDoc.id;
+      const settings = warmupDoc.data() as any;
 
-    // Update lastSent timestamps
-    const batch = db.batch();
-    let updateCount = 0;
-
-    for (const contact of contactsToSend) {
-      const contactRef = db.collection('contacts').doc(contact.id);
-      batch.update(contactRef, {
-        lastSent: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      updateCount++;
-    }
-
-    // Commit in batches of 500
-    if (updateCount > 0) {
-      for (let i = 0; i < updateCount; i += 500) {
-        const batchChunk = db.batch();
-        const chunk = contactsToSend.slice(i, i + 500);
-        chunk.forEach((contact) => {
-          const contactRef = db.collection('contacts').doc(contact.id);
-          batchChunk.update(contactRef, {
-            lastSent: FieldValue.serverTimestamp(),
-            updatedAt: FieldValue.serverTimestamp(),
-          });
-        });
-        await batchChunk.commit();
+      // Prefer configured contacts; fallback to engagement-based selection
+      let contacts: any[] = [];
+      if (settings?.contactIds && Array.isArray(settings.contactIds) && settings.contactIds.length > 0) {
+        const contactDocs = await Promise.all(
+          settings.contactIds.slice(0, 200).map((id: string) => db.collection('contacts').doc(id).get())
+        );
+        contacts = contactDocs
+          .filter((doc) => doc.exists)
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+      } else {
+        const contactsSnapshot = await db
+          .collection('contacts')
+          .where('status', '==', 'verified')
+          .where('engagementScore', '>=', 3)
+          .orderBy('engagementScore', 'desc')
+          .orderBy('lastSent', 'asc')
+          .limit(200)
+          .get();
+        contacts = contactsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
       }
+
+      const eligibleContacts = contacts.filter(
+        (contact: any) => contact.status !== 'unsubscribed' && contact.email
+      );
+
+      if (eligibleContacts.length === 0) {
+        results.push({ warmupId, sent: 0, failed: 0, total: 0 });
+        continue;
+      }
+
+      // Rate limit: Max 500 per hour, but we're doing 200 per day per warmup
+      const maxPerBatch = 200;
+      const contactsToSend = eligibleContacts.slice(0, maxPerBatch);
+
+      const templates = [
+        {
+          subject: 'Checking in from AlgoGI',
+          body: `
+            <h1>Hello from AlgoGI</h1>
+            <p>We’re keeping this inbox warm and will only send you relevant updates.</p>
+            <p>If you ever want fewer emails, you can adjust preferences on our site.</p>
+          `,
+        },
+        {
+          subject: 'Thanks for staying connected',
+          body: `
+            <h1>Thanks for being here</h1>
+            <p>We periodically check in to keep deliverability healthy.</p>
+            <p>More product news and case studies are coming soon.</p>
+          `,
+        },
+        {
+          subject: 'Quick hello from AlgoGI',
+          body: `
+            <h1>Quick hello</h1>
+            <p>Just a light touch to keep our line open.</p>
+            <p>Reply anytime if there’s a topic you want us to cover.</p>
+          `,
+        },
+      ];
+
+      const template =
+        settings?.subject && settings?.body
+          ? { subject: settings.subject, body: settings.body }
+          : templates[Math.floor(Math.random() * templates.length)];
+
+      const fromEmail =
+        settings?.fromEmail ||
+        process.env.EMAIL_NEWSLETTER ||
+        process.env.SMTP_FROM_EMAIL ||
+        'newsletters@algogi.com';
+
+      const recipients = contactsToSend.map((c: any) => c.email);
+
+      const chunkSize = 25;
+      let totalSent = 0;
+      let totalFailed = 0;
+
+      for (let i = 0; i < recipients.length; i += chunkSize) {
+        const chunk = recipients.slice(i, i + chunkSize);
+        const sendResult = await plunk.sendCampaign(
+          chunk,
+          template.subject,
+          template.body,
+          fromEmail
+        );
+        totalSent += sendResult.sent;
+        totalFailed += sendResult.failed;
+
+        const jitterMs = 500 + Math.floor(Math.random() * 2000);
+        await new Promise((resolve) => setTimeout(resolve, jitterMs));
+      }
+
+      // Update lastSent timestamps
+      const batch = db.batch();
+      for (const contact of contactsToSend) {
+        const contactRef = db.collection('contacts').doc(contact.id);
+        batch.update(contactRef, {
+          lastSent: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+      }
+      await batch.commit();
+
+      // Persist warmup stats
+      await db.collection('warmup_stats').doc(warmupId).set(
+        {
+          lastRunAt: FieldValue.serverTimestamp(),
+          lastRunSent: totalSent,
+          lastRunFailed: totalFailed,
+          lastRunTotal: contactsToSend.length,
+          lastRunSubject: template.subject,
+          lastRunFrom: fromEmail,
+          runCount: FieldValue.increment(1),
+          totalSent: FieldValue.increment(totalSent),
+          totalFailed: FieldValue.increment(totalFailed),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      results.push({
+        warmupId,
+        sent: totalSent,
+        failed: totalFailed,
+        total: contactsToSend.length,
+      });
     }
 
     return NextResponse.json({
       success: true,
-      sent: sendResult.sent,
-      failed: sendResult.failed,
-      total: contactsToSend.length,
+      results,
     });
   } catch (error: any) {
     console.error('Error in warm-up cron:', error);

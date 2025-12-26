@@ -94,7 +94,7 @@ export async function PUT(
 
         // Filter to only verified contacts with an email
         const eligibleContacts = matchingContacts.filter(
-          (c: any) => c.status === 'verified' && c.email
+      (c: any) => (c.status === 'verified' || c.status === 'verified_generic') && c.email
         );
         updateData.totalContacts = eligibleContacts.length;
         updateData.contactCount = matchingContacts.length; // Keep total count for reference

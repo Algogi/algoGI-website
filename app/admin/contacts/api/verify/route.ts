@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
-import { verifyEmailMXOnly, verifyEmailBatch } from '@/lib/utils/email-validation';
+import { verifyEmailMXOnly, verifyEmailBatch, isGenericInbox } from '@/lib/utils/email-validation';
 import { VerificationResult } from '@/lib/types/contact';
 import { getDb } from '@/lib/firebase/config';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -74,7 +74,7 @@ async function processBulkVerification(
       
       snapshot.docs.forEach((doc) => {
         const data = doc.data();
-        if (data.email) {
+        if (data.email && (data.status || 'pending') === 'pending') {
           emailToContactId.set(data.email.toLowerCase(), doc.id);
         }
       });
@@ -86,122 +86,75 @@ async function processBulkVerification(
       startedAt: FieldValue.serverTimestamp(),
     });
 
-    // Verify emails in batches with progress tracking
+    // Verify emails with per-email persistence and progress tracking
     let processedCount = 0;
-    const results = await verifyEmailBatch(emails, (progress) => {
-      processedCount = progress.completed;
-      // Update progress on every email for better UX (especially for small batches)
-      db.collection('verification_jobs').doc(jobId).update({
-        processed: progress.completed,
-        currentEmail: progress.current || null,
-      }).catch((err) => {
-        console.error('Error updating progress:', err);
-      });
-    });
+    let validCount = 0;
+    let invalidCount = 0;
+    let needsVerificationCount = 0;
+    let genericValidCount = 0;
+    const domainCache = new Map<string, { valid: boolean; mxRecords: string[] }>();
 
-    // Update contact statuses in Firestore
-    const validEmails = new Set(
-      results.valid.map((r) => r.email.toLowerCase())
-    );
-    const invalidEmails = new Set(
-      results.invalid.map((r) => r.email.toLowerCase())
-    );
-    const needsVerificationEmails = new Set(
-      results.needsVerification.map((r) => r.email.toLowerCase())
-    );
-
-    // Update valid contacts to 'verified'
-    const validContactIds: string[] = [];
-    validEmails.forEach((email) => {
-      const contactId = emailToContactId.get(email);
-      if (contactId) {
-        validContactIds.push(contactId);
-      }
-    });
-
-    // Update invalid contacts to 'invalid'
-    const invalidContactIds: string[] = [];
-    invalidEmails.forEach((email) => {
-      const contactId = emailToContactId.get(email);
-      if (contactId) {
-        invalidContactIds.push(contactId);
-      }
-    });
-
-    // Update needsVerification contacts to 'pending' (for manual review)
-    const needsVerificationContactIds: string[] = [];
-    needsVerificationEmails.forEach((email) => {
-      const contactId = emailToContactId.get(email);
-      if (contactId) {
-        needsVerificationContactIds.push(contactId);
-      }
-    });
-
-    // Batch update valid contacts
-    for (let i = 0; i < validContactIds.length; i += 500) {
-      const batch = db.batch();
-      const chunk = validContactIds.slice(i, i + 500);
-      
-      chunk.forEach((contactId) => {
-        const contactRef = db.collection('contacts').doc(contactId);
-        batch.update(contactRef, {
-          status: 'verified',
-          updatedAt: FieldValue.serverTimestamp(),
+    await verifyEmailBatch(emails, {
+      onProgress: (progress) => {
+        processedCount = progress.completed;
+        db.collection('verification_jobs').doc(jobId).update({
+          processed: progress.completed,
+          currentEmail: progress.current || null,
+        }).catch((err) => {
+          console.error('Error updating progress:', err);
         });
-      });
-      
-      await batch.commit();
-    }
+      },
+      onResult: async (result) => {
+        const emailLower = result.email.toLowerCase();
+        const contactId = emailToContactId.get(emailLower);
 
-    // Batch update invalid contacts
-    for (let i = 0; i < invalidContactIds.length; i += 500) {
-      const batch = db.batch();
-      const chunk = invalidContactIds.slice(i, i + 500);
-      
-      chunk.forEach((contactId) => {
-        const contactRef = db.collection('contacts').doc(contactId);
-        batch.update(contactRef, {
-          status: 'invalid',
-          updatedAt: FieldValue.serverTimestamp(),
-        });
-      });
-      
-      await batch.commit();
-    }
+        const nextStatus = result.valid
+          ? (isGenericInbox(result.email) ? 'verified_generic' : 'verified')
+          : 'invalid';
 
-    // Batch update needsVerification contacts to 'pending'
-    for (let i = 0; i < needsVerificationContactIds.length; i += 500) {
-      const batch = db.batch();
-      const chunk = needsVerificationContactIds.slice(i, i + 500);
-      
-      chunk.forEach((contactId) => {
-        const contactRef = db.collection('contacts').doc(contactId);
-        batch.update(contactRef, {
-          status: 'pending',
-          updatedAt: FieldValue.serverTimestamp(),
-        });
-      });
-      
-      await batch.commit();
-    }
+        if (contactId) {
+          try {
+            const contactRef = db.collection('contacts').doc(contactId);
+            await contactRef.update({
+              status: nextStatus,
+              updatedAt: FieldValue.serverTimestamp(),
+            });
+          } catch (err) {
+            console.error(`Error updating contact ${emailLower}:`, err);
+          }
+        }
+
+        if (nextStatus === 'verified_generic') {
+          genericValidCount += 1;
+        } else if (nextStatus === 'verified') {
+          validCount += 1;
+        } else {
+          // Currently MX-only flow, so invalid includes all failures
+          invalidCount += 1;
+        }
+      },
+      domainCache,
+    });
 
     // Update job status to completed
     await db.collection('verification_jobs').doc(jobId).update({
       status: 'completed',
       completedAt: FieldValue.serverTimestamp(),
-      processed: emails.length,
+      processed: processedCount || emails.length,
       results: {
-        valid: results.valid.length,
-        invalid: results.invalid.length,
-        needsVerification: results.needsVerification.length,
+        valid: validCount + genericValidCount,
+        valid_generic: genericValidCount,
+        invalid: invalidCount,
+        needsVerification: needsVerificationCount,
       },
     });
 
     // Send email report
     await sendVerificationReportEmail(adminEmail, {
       total: emails.length,
-      valid: results.valid.length,
-      invalid: results.invalid.length,
+      valid: validCount + genericValidCount,
+      generic: genericValidCount,
+      invalid: invalidCount,
     });
   } catch (error: any) {
     console.error('Error in background verification processing:', error);
@@ -276,7 +229,7 @@ export async function PUT(request: NextRequest) {
       sourceSnapshot.docs.forEach((doc) => {
         const data = doc.data();
         const email = data.email?.toLowerCase();
-        if (email) {
+        if (email && (data.status || 'pending') === 'pending') {
           emailToContactId.set(email, doc.id);
         }
       });
@@ -318,7 +271,7 @@ export async function PUT(request: NextRequest) {
         snapshot.docs.forEach((doc) => {
           const data = doc.data();
           const email = data.email?.toLowerCase();
-          if (email) {
+          if (email && (data.status || 'pending') === 'pending') {
             emailToContactId.set(email, doc.id);
           }
         });
@@ -327,12 +280,20 @@ export async function PUT(request: NextRequest) {
 
     // Set status to 'verifying' for all found contacts
     const contactIds: string[] = [];
+    targetEmails = targetEmails.filter((email) => emailToContactId.has(email.toLowerCase()));
     targetEmails.forEach((email) => {
       const contactId = emailToContactId.get(email.toLowerCase());
       if (contactId) {
         contactIds.push(contactId);
       }
     });
+
+    if (contactIds.length === 0) {
+      return NextResponse.json(
+        { error: 'No pending contacts found to verify' },
+        { status: 404 }
+      );
+    }
 
     // Update statuses in batches of 500
     for (let i = 0; i < contactIds.length; i += 500) {
@@ -359,6 +320,9 @@ export async function PUT(request: NextRequest) {
       processed: 0,
       status: 'pending',
       adminEmail,
+      jobType: 'mx_bulk',
+      source: source || null,
+      campaignId: null,
       createdAt: FieldValue.serverTimestamp(),
       startedAt: null,
       completedAt: null,

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebase/config";
 import { FieldValue } from "firebase-admin/firestore";
 import { calculateEmailsPerHour } from "@/lib/campaigns/warmup-calculator";
-import { sendCampaignBatch } from "@/lib/campaigns/campaign-sender";
 import { matchesRule } from "@/lib/utils/segment-matcher";
+import { enqueueSendBatches } from "@/lib/campaigns/send-queue";
 
 /**
  * POST /api/cron/campaign-warmup
@@ -55,13 +55,19 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Calculate emails to send this hour
+        // Pull recent analytics to make the rate engagement-aware
+        const analyticsDoc = await db.collection("email_analytics").doc(campaignId).get();
+        const analyticsData = analyticsDoc.exists ? analyticsDoc.data() : null;
         const emailsPerHour =
           campaign.emailsPerHour ||
           calculateEmailsPerHour(
             campaign.totalContacts,
             campaign.sentContacts || 0,
-            campaign.startedAt || new Date().toISOString()
+            campaign.startedAt || new Date().toISOString(),
+            {
+              openRate: analyticsData?.openRate ?? 0,
+              bounceRate: analyticsData?.bounceRate ?? 0,
+            }
           );
 
         // Get campaign contacts
@@ -122,34 +128,41 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Send emails
+        // Enqueue emails into paced batches (~10-minute slices)
         const contactIds = contacts.map((c) => c.id);
-        const sendResult = await sendCampaignBatch(campaignId, contactIds, {
-          subject: campaign.subject,
-          fromEmail: campaign.fromEmail,
-          replyTo: campaign.replyTo,
-          htmlContent: campaign.htmlContent || "",
-          textContent: campaign.textContent || "",
+        const sliceSize = Math.max(1, Math.min(50, Math.ceil(emailsPerHour / 6)));
+        const now = Date.now();
+        const payloads = [];
+
+        for (let i = 0; i < contactIds.length; i += sliceSize) {
+          const runAfter = new Date(now + (Math.floor(i / sliceSize) * 10 * 60 * 1000));
+          payloads.push({
+            campaignId,
+            contactIds: contactIds.slice(i, i + sliceSize),
+            subject: campaign.subject,
+            fromEmail: campaign.fromEmail,
+            replyTo: campaign.replyTo,
+            htmlContent: campaign.htmlContent || "",
+            textContent: campaign.textContent || "",
+            runAfter,
+          });
+        }
+
+        const enqueued = await enqueueSendBatches(payloads);
+
+        // Update nextSendTime so UI can show pacing
+        const lastRunAfter = payloads.length > 0 ? payloads[payloads.length - 1].runAfter : null;
+        await db.collection("contact_segments").doc(campaignId).update({
+          nextSendTime: lastRunAfter,
+          updatedAt: FieldValue.serverTimestamp(),
         });
 
         results.push({
           campaignId,
           campaignName: campaign.name,
-          sent: sendResult.sent,
-          failed: sendResult.failed,
+          enqueued,
+          emailsPerHour,
         });
-
-        // Check if campaign is now complete
-        const updatedCampaign = await db.collection("contact_segments").doc(campaignId).get();
-        const updatedData = updatedCampaign.data();
-        if (updatedData && updatedData.sentContacts >= updatedData.totalContacts) {
-          await db.collection("contact_segments").doc(campaignId).update({
-            status: "completed",
-            completedAt: new Date().toISOString(),
-            isActive: false,
-            updatedAt: FieldValue.serverTimestamp(),
-          });
-        }
       } catch (error: any) {
         console.error(`Error processing campaign ${campaignId}:`, error);
         results.push({

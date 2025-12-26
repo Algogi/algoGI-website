@@ -1,12 +1,19 @@
 /**
  * Contact status enum
  */
-export type ContactStatus = 'pending' | 'verifying' | 'verified' | 'bounced' | 'unsubscribed' | 'invalid';
+export type ContactStatus =
+  | 'pending'
+  | 'verifying'
+  | 'verified'
+  | 'verified_generic'
+  | 'bounced'
+  | 'unsubscribed'
+  | 'invalid';
 
 /**
  * Contact source enum
  */
-export type ContactSource = 'christmas-quiz' | 'csv-import' | 'manual' | 'api';
+export type ContactSource = 'christmas-quiz' | 'csv-import' | 'manual' | 'api' | 'warmup';
 
 /**
  * Contact metadata from Christmas quiz
@@ -19,6 +26,7 @@ export interface ContactMetadata {
   q5?: string; // Would you like a free AI Tools Analysis?
   companyWebsite?: string;
   phone?: string;
+  warmup?: boolean;
 }
 
 /**
@@ -108,7 +116,9 @@ export interface BatchVerificationResult {
 export interface ContactStats {
   total: number;
   verified: number;
+  verified_generic: number;
   pending: number;
+  verifying: number;
   bounced: number;
   unsubscribed: number;
   invalid: number;

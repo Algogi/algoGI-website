@@ -265,6 +265,7 @@ export function AddContactModal({ open, onOpenChange, onContactAdded }: AddConta
               <SelectContent>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="verified">Verified</SelectItem>
+                <SelectItem value="verified_generic">Verified (Generic)</SelectItem>
                 <SelectItem value="invalid">Invalid</SelectItem>
                 <SelectItem value="bounced">Bounced</SelectItem>
                 <SelectItem value="unsubscribed">Unsubscribed</SelectItem>

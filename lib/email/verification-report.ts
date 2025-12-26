@@ -9,6 +9,7 @@ export async function sendVerificationReportEmail(
     total: number;
     valid: number;
     invalid: number;
+    generic?: number;
   }
 ): Promise<void> {
   const emailTransporter = getEmailTransporter();
@@ -16,6 +17,7 @@ export async function sendVerificationReportEmail(
   const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   const contactsUrl = `${baseUrl}/admin/contacts`;
 
+  const generic = summary.generic || 0;
   const subject = `Email Verification Complete: ${summary.valid} of ${summary.total} verified`;
   
   const validPercentage = summary.total > 0 
@@ -23,6 +25,9 @@ export async function sendVerificationReportEmail(
     : '0.0';
   const invalidPercentage = summary.total > 0
     ? ((summary.invalid / summary.total) * 100).toFixed(1)
+    : '0.0';
+  const genericPercentage = summary.total > 0
+    ? ((generic / summary.total) * 100).toFixed(1)
     : '0.0';
 
   const html = `
@@ -47,6 +52,10 @@ export async function sendVerificationReportEmail(
               <tr>
                 <td style="padding: 10px 0; border-bottom: 1px solid #ddd;"><strong style="color: #22c55e;">Valid:</strong></td>
                 <td style="padding: 10px 0; border-bottom: 1px solid #ddd; text-align: right; color: #22c55e;">${summary.valid} (${validPercentage}%)</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; border-bottom: 1px solid #ddd;"><strong style="color: #16a34a;">Generic inboxes:</strong></td>
+                <td style="padding: 10px 0; border-bottom: 1px solid #ddd; text-align: right; color: #16a34a;">${generic} (${genericPercentage}%)</td>
               </tr>
               <tr>
                 <td style="padding: 10px 0;"><strong style="color: #ef4444;">Invalid:</strong></td>
@@ -79,6 +88,7 @@ export async function sendVerificationReportEmail(
     Summary:
     - Total Emails: ${summary.total}
     - Valid: ${summary.valid} (${validPercentage}%)
+    - Generic inboxes: ${generic} (${genericPercentage}%)
     - Invalid: ${summary.invalid} (${invalidPercentage}%)
     
     View contacts: ${contactsUrl}

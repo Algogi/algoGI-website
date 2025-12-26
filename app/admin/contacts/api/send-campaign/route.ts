@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import { getDb } from '@/lib/firebase/config';
 import { FieldValue } from 'firebase-admin/firestore';
-import { getPlunkClient } from '@/lib/plunk/client';
 import { matchesRule, getFieldValue } from '@/lib/utils/segment-matcher';
 import { getBaseUrl } from '@/lib/email/base-url';
+import { enqueueSendBatches } from '@/lib/campaigns/send-queue';
 
 /**
  * POST /admin/contacts/api/send-campaign
@@ -83,10 +83,10 @@ export async function POST(request: NextRequest) {
         }));
     }
 
-    // Filter to only verified, non-unsubscribed contacts
+    // Filter to only verified (including generic), non-unsubscribed contacts
     const eligibleContacts = contacts.filter(
       (contact) =>
-        contact.status === 'verified' &&
+        (contact.status === 'verified' || contact.status === 'verified_generic') &&
         contact.status !== 'unsubscribed' &&
         contact.email
     );
@@ -98,77 +98,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Rate limiting: Max 500 per hour for warm-up
-    // In production, implement proper rate limiting with Redis or similar
+    // Rate limiting: enqueue paced batches instead of immediate send
     const maxPerHour = 500;
-    const emailsToSend = eligibleContacts.slice(0, maxPerHour);
+    const contactsToQueue = eligibleContacts.slice(0, maxPerHour);
 
-    // Generate campaign ID for tracking
-    const campaignId = `campaign_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    
-    // Get base URL for tracking links
     const baseUrl = getBaseUrl();
+    const sliceSize = Math.max(1, Math.min(50, Math.ceil(contactsToQueue.length / 6)));
+    const now = Date.now();
+    const payloads = [];
 
-    // Send emails via Plunk with tracking
-    const plunk = getPlunkClient();
-    const recipients = emailsToSend.map((c) => c.email);
-    
-    // Prepare contacts data for personalization
-    const contactsData = emailsToSend.map((c) => ({
-      email: c.email,
-      firstName: c.firstName,
-      lastName: c.lastName,
-      company: c.company,
-    }));
-    
-    const sendResult = await plunk.sendCampaignWithTracking(
-      recipients,
-      subject,
-      emailBody,
-      campaignId,
-      baseUrl,
-      from,
-      contactsData
-    );
-
-    // Update lastSent timestamps for successfully sent emails
-    const now = new Date();
-    const batch = db.batch();
-    let updateCount = 0;
-
-    for (const contact of emailsToSend) {
-      if (sendResult.sent > 0) {
-        const contactRef = db.collection('contacts').doc(contact.id);
-        batch.update(contactRef, {
-          lastSent: FieldValue.serverTimestamp(),
-          updatedAt: FieldValue.serverTimestamp(),
-        });
-        updateCount++;
-      }
+    for (let i = 0; i < contactsToQueue.length; i += sliceSize) {
+      payloads.push({
+        campaignId: `campaign_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        contactIds: contactsToQueue.slice(i, i + sliceSize).map((c) => c.id),
+        subject,
+        fromEmail: from || process.env.SMTP_FROM_EMAIL || "",
+        replyTo: from || process.env.SMTP_FROM_EMAIL || "",
+        htmlContent: emailBody,
+        textContent: emailBody,
+        runAfter: new Date(now + (Math.floor(i / sliceSize) * 10 * 60 * 1000)),
+      });
     }
 
-    if (updateCount > 0) {
-      // Commit in batches of 500 (Firestore limit)
-      for (let i = 0; i < updateCount; i += 500) {
-        const batchChunk = db.batch();
-        const chunk = emailsToSend.slice(i, i + 500);
-        chunk.forEach((contact) => {
-          const contactRef = db.collection('contacts').doc(contact.id);
-          batchChunk.update(contactRef, {
-            lastSent: FieldValue.serverTimestamp(),
-            updatedAt: FieldValue.serverTimestamp(),
-          });
-        });
-        await batchChunk.commit();
-      }
-    }
+    await enqueueSendBatches(payloads);
 
     return NextResponse.json({
       success: true,
-      sent: sendResult.sent,
-      failed: sendResult.failed,
+      enqueued: payloads.length,
       total: eligibleContacts.length,
-      errors: sendResult.errors,
     });
   } catch (error: any) {
     console.error('Error sending campaign:', error);

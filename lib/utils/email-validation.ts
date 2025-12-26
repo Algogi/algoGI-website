@@ -103,6 +103,15 @@ const ROLE_BASED_PREFIXES = [
   'updates',
 ] as const;
 
+// Generic inboxes to treat separately (still valid but lower intent)
+const GENERIC_INBOX_PREFIXES = [
+  'info',
+  'contact',
+  'hello',
+  'support',
+  'sales',
+] as const;
+
 // Common domain typos
 const DOMAIN_TYPOS: Record<string, string> = {
   'gmial.com': 'gmail.com',
@@ -188,6 +197,21 @@ export function isRoleBasedEmail(email: string): boolean {
   
   return ROLE_BASED_PREFIXES.some(prefix => 
     localPart === prefix || 
+    localPart.startsWith(`${prefix}.`) ||
+    localPart.startsWith(`${prefix}_`) ||
+    localPart.startsWith(`${prefix}-`)
+  );
+}
+
+/**
+ * Detect generic catch-all inboxes (info@, contact@, etc.)
+ */
+export function isGenericInbox(email: string): boolean {
+  const localPart = email.split('@')[0]?.toLowerCase();
+  if (!localPart) return false;
+
+  return GENERIC_INBOX_PREFIXES.some(prefix =>
+    localPart === prefix ||
     localPart.startsWith(`${prefix}.`) ||
     localPart.startsWith(`${prefix}_`) ||
     localPart.startsWith(`${prefix}-`)
@@ -593,7 +617,10 @@ export async function verifyEmailEnhanced(email: string): Promise<{
  * Verify email up to MX records only (no SMTP)
  * Used for regular contact verification
  */
-export async function verifyEmailMXOnly(email: string): Promise<{
+export async function verifyEmailMXOnly(
+  email: string,
+  options?: { domainCache?: Map<string, { valid: boolean; mxRecords: string[] }> }
+): Promise<{
   valid: boolean;
   status: 'valid' | 'invalid' | 'disposable' | 'role_based' | 'typo';
   confidence: 'high' | 'medium' | 'low';
@@ -668,7 +695,17 @@ export async function verifyEmailMXOnly(email: string): Promise<{
   }
 
   // 6. MX records (STOP HERE - no SMTP verification)
-  const mxCheck = await checkMXRecords(domain);
+  const cacheKey = domain.toLowerCase();
+  const cache = options?.domainCache;
+  let mxCheck: { valid: boolean; mxRecords: string[] };
+
+  const cached = cache?.get(cacheKey);
+  if (cached) {
+    mxCheck = cached;
+  } else {
+    mxCheck = await checkMXRecords(domain);
+    cache?.set(cacheKey, mxCheck);
+  }
   details.mx = mxCheck.valid;
   if (!mxCheck.valid) {
     return {
@@ -745,28 +782,36 @@ export async function verifyEmailComprehensive(email: string): Promise<{
  * Batch verify emails with progress callback
  * Enhanced with rate limiting and improved error handling
  */
+type BatchCallbacks = {
+  onProgress?: (progress: { completed: number; total: number; current?: string }) => void;
+  onResult?: (result: { email: string; valid: boolean; reason?: string; mxRecords?: string[] }) => void | Promise<void>;
+  domainCache?: Map<string, { result: Awaited<ReturnType<typeof verifyEmailMXOnly>> }>;
+};
+
 export async function verifyEmailBatch(
   emails: string[],
-  onProgress?: (progress: { completed: number; total: number; current?: string }) => void
+  callbacks?: BatchCallbacks | ((progress: { completed: number; total: number; current?: string }) => void)
 ): Promise<{
   valid: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }>;
   invalid: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }>;
   needsVerification: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }>;
 }> {
+  const onProgress = typeof callbacks === 'function' ? callbacks : callbacks?.onProgress;
+  const onResult = typeof callbacks === 'function' ? undefined : callbacks?.onResult;
+  const domainCache =
+    callbacks && typeof callbacks === 'object'
+      ? callbacks.domainCache ?? new Map<string, { valid: boolean; mxRecords: string[] }>()
+      : new Map<string, { valid: boolean; mxRecords: string[] }>();
   const valid: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }> = [];
   const invalid: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }> = [];
   const needsVerification: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }> = [];
 
   for (let i = 0; i < emails.length; i++) {
     const email = emails[i];
-    
-    if (onProgress) {
-      onProgress({ completed: i + 1, total: emails.length, current: email });
-    }
 
     try {
       // Use MX-only verification (no SMTP)
-      const result = await verifyEmailMXOnly(email);
+      const result = await verifyEmailMXOnly(email, domainCache ? { domainCache } : undefined);
       
       const reasonText = result.reasons.length > 0 ? result.reasons.join('; ') : undefined;
       const emailResult = {
@@ -782,12 +827,26 @@ export async function verifyEmailBatch(
         // Invalid email (syntax invalid, MX invalid, disposable, or typo)
         invalid.push(emailResult);
       }
+
+      if (onResult) {
+        await onResult(emailResult);
+      }
     } catch (error: any) {
-      invalid.push({
+      const fallbackResult = {
         email,
         valid: false,
         reason: error.message || 'Verification failed',
-      });
+      };
+
+      invalid.push(fallbackResult);
+
+      if (onResult) {
+        await onResult(fallbackResult);
+      }
+    }
+
+    if (onProgress) {
+      onProgress({ completed: i + 1, total: emails.length, current: email });
     }
   }
 

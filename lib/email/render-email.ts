@@ -164,7 +164,7 @@ function renderBlockToHTML(
             </v:rect>
             <![endif]-->`
         : "";
-      
+      console.log(backgroundStyles, "bgstyler");
       return wrapInTable(`
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 0; border-collapse: collapse; height: ${height}; ${backgroundStyles}">
           <tr>

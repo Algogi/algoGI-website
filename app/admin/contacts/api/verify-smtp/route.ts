@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
     }
 
     const contactData = contactDoc.data();
-    if (contactData?.status !== 'verified') {
+    if (contactData?.status !== 'verified' && contactData?.status !== 'verified_generic') {
       return NextResponse.json(
         { error: 'Contact must be verified to re-verify with SMTP' },
         { status: 400 }
@@ -225,7 +225,7 @@ export async function POST(request: NextRequest) {
     const smtpResult = await verifySMTP(email, smtpTimeout);
 
     // Update contact status based on SMTP result
-    const newStatus = smtpResult.valid ? 'verified' : 'invalid';
+    const newStatus = smtpResult.valid ? (contactData?.status === 'verified_generic' ? 'verified_generic' : 'verified') : 'invalid';
     await db.collection('contacts').doc(contactId).update({
       status: newStatus,
       updatedAt: FieldValue.serverTimestamp(),
@@ -295,12 +295,11 @@ export async function PUT(request: NextRequest) {
       const snapshot = await db
         .collection('contacts')
         .where('email', 'in', emailChunk)
-        .where('status', '==', 'verified')
         .get();
       
       snapshot.docs.forEach((doc) => {
         const data = doc.data();
-        if (data.email) {
+        if (data.email && (data.status === 'verified' || data.status === 'verified_generic')) {
           emailToContactId.set(data.email.toLowerCase(), doc.id);
         }
       });
@@ -352,6 +351,9 @@ export async function PUT(request: NextRequest) {
       processed: 0,
       status: 'pending',
       adminEmail,
+      jobType: 'smtp_bulk',
+      source: 'verified_contacts',
+      campaignId: null,
       createdAt: FieldValue.serverTimestamp(),
       startedAt: null,
       completedAt: null,

@@ -9,3 +9,4 @@ export function hashEmail(email: string): string {
   return createHash('sha256').update(normalizedEmail).digest('hex');
 }
 
+

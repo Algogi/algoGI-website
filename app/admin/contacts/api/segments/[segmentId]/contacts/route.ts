@@ -85,6 +85,7 @@ export async function GET(
     const verificationStats = {
       total: filtered.length,
       verified: filtered.filter((c) => c.status === 'verified').length,
+      verified_generic: filtered.filter((c) => c.status === 'verified_generic').length,
       pending: filtered.filter((c) => c.status === 'pending').length,
       verifying: filtered.filter((c) => c.status === 'verifying').length,
       invalid: filtered.filter((c) => c.status === 'invalid').length,
@@ -92,10 +93,8 @@ export async function GET(
       unsubscribed: filtered.filter((c) => c.status === 'unsubscribed').length,
     };
 
-    // Get unverified contacts (for bulk verify) - exclude verified, unsubscribed, and verifying
-    const unverifiedContacts = filtered.filter(
-      (c) => c.status !== 'verified' && c.status !== 'unsubscribed' && c.status !== 'verifying'
-    );
+    // Get pending contacts only (bulk verify should not touch already verified/other statuses)
+    const unverifiedContacts = filtered.filter((c) => c.status === 'pending');
 
     return NextResponse.json({
       contacts: filtered,

@@ -25,7 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!status || !['pending', 'verifying', 'verified', 'bounced', 'unsubscribed', 'invalid'].includes(status)) {
+    if (
+      !status ||
+      !['pending', 'verifying', 'verified', 'verified_generic', 'bounced', 'unsubscribed', 'invalid'].includes(status)
+    ) {
       return NextResponse.json(
         { error: 'Valid status is required' },
         { status: 400 }
