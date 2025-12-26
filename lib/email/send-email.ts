@@ -23,11 +23,11 @@ export type EmailType =
  */
 export function getSenderEmail(type: EmailType): string {
   const emailMap: Record<EmailType, string> = {
-    newsletter: process.env.EMAIL_NEWSLETTER || process.env.SMTP_FROM_EMAIL || 'newsletters@algogi.com',
-    enquiry: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.com',
-    lead: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.com',
-    download: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.com',
-    job: process.env.EMAIL_JOBS || process.env.SMTP_FROM_EMAIL || 'jobs@algogi.com',
+    newsletter: process.env.EMAIL_NEWSLETTER || process.env.SMTP_FROM_EMAIL || 'newsletters@algogi.email',
+    enquiry: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.email',
+    lead: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.email',
+    download: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.email',
+    job: process.env.EMAIL_JOBS || process.env.SMTP_FROM_EMAIL || 'jobs@algogi.email',
   };
   
   return emailMap[type];

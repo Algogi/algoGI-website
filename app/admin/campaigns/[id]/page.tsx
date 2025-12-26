@@ -509,7 +509,7 @@ export default function CampaignDetailPage({
             type="email"
             value={campaign.fromEmail || ""}
             onChange={(e) => setCampaign({ ...campaign, fromEmail: e.target.value })}
-            placeholder="e.g., info@algogi.com"
+            placeholder="e.g., info@algogi.email"
             className="bg-dark-surface border-neon-blue/20 mt-1"
           />
         </div>
@@ -520,7 +520,7 @@ export default function CampaignDetailPage({
             type="email"
             value={campaign.replyTo || ""}
             onChange={(e) => setCampaign({ ...campaign, replyTo: e.target.value })}
-            placeholder="e.g., replies@algogi.com"
+            placeholder="e.g., replies@algogi.email"
             className="bg-dark-surface border-neon-blue/20 mt-1"
           />
         </div>
