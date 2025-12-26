@@ -75,13 +75,6 @@ export default function FooterBlock({
             ))}
           </div>
         )}
-        {unsubscribeText && (
-          <div style={{ marginTop: "15px", marginBottom: "10px" }}>
-            <a href={unsubscribeUrl} style={linkStyle}>
-              {unsubscribeText}
-            </a>
-          </div>
-        )}
         {copyrightText && <div style={{ marginTop: "10px", fontSize: "11px", opacity: 0.8 }}>{copyrightText}</div>}
       </div>
     );
