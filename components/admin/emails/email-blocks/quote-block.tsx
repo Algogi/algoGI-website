@@ -92,7 +92,7 @@ export default function QuoteBlock({
         <div style={{ display: "flex", alignItems: "flex-start" }}>
           {avatarUrl && <img src={avatarUrl} alt={author} style={avatarStyle} />}
           <div style={{ flex: 1 }}>
-            <p style={quoteStyle}>"{quote}"</p>
+            <p style={quoteStyle}>&ldquo;{quote}&rdquo;</p>
             <div style={{ textAlign: align }}>
               <div style={authorStyle}>{author}</div>
               {authorTitle && <div style={titleStyle}>{authorTitle}</div>}
@@ -125,7 +125,7 @@ export default function QuoteBlock({
             )
           )}
           <div style={{ flex: 1 }}>
-            <p style={quoteStyle}>"{quote}"</p>
+            <p style={quoteStyle}>&ldquo;{quote}&rdquo;</p>
             <div style={{ textAlign: align }}>
               <div style={authorStyle}>{author}</div>
               {authorTitle && <div style={titleStyle}>{authorTitle}</div>}

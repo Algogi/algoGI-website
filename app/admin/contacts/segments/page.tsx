@@ -22,7 +22,15 @@ import {
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Segment, SegmentInput, SegmentCriteria, SegmentCriteriaRule, SegmentVerificationStats } from "@/lib/types/segment";
+import {
+  Segment,
+  SegmentInput,
+  SegmentCriteria,
+  SegmentCriteriaRule,
+  SegmentVerificationStats,
+  SegmentField,
+  SegmentOperator,
+} from "@/lib/types/segment";
 import {
   Plus,
   Edit,
@@ -834,7 +842,7 @@ function SegmentDialog({
 
             {criteria.rules.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded">
-                No rules added. Click "Add Rule" to create your first condition.
+                {`No rules added. Click "Add Rule" to create your first condition.`}
               </div>
             )}
           </div>
@@ -1202,7 +1210,7 @@ function PreviewDialog({
         <DialogHeader>
           <DialogTitle>Segment Preview: {segment.name}</DialogTitle>
           <DialogDescription>
-            Preview contacts matching this segment's criteria
+            {`Preview contacts matching this segment's criteria`}
           </DialogDescription>
         </DialogHeader>
 

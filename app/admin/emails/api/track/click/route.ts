@@ -56,7 +56,8 @@ export async function GET(request: NextRequest) {
           // Update analytics
           const totalClicked = recipientAnalytics.filter((r: any) => r.clicked).length;
           const uniqueClicked = totalClicked;
-          const clickRate = analytics.totalSent > 0 ? (uniqueClicked / analytics.totalSent) * 100 : 0;
+          const totalSent = (analytics as any)?.totalSent || 0;
+          const clickRate = totalSent > 0 ? (uniqueClicked / totalSent) * 100 : 0;
           
           await db.collection("email_analytics").doc(campaignId).update({
             recipientAnalytics,

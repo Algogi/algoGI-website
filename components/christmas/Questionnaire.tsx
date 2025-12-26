@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { submitChristmasForm } from '@/app/christmas/actions';
-import { isWorkEmail, getWorkEmailErrorMessage } from '@/lib/utils/email-validation';
+import { isWorkEmail, getWorkEmailErrorMessage } from '@/lib/utils/work-email';
 import { trackQuestionnaireAbandoned, trackQuestionView } from '@/lib/analytics/ga4';
 import ProgressBar from './ProgressBar';
 import ChristmasBackground from './ChristmasBackground';

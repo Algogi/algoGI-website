@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     // Filter out unsubscribed (double check)
     const eligibleContacts = contacts.filter(
-      (contact) => contact.status !== 'unsubscribed' && contact.email
+      (contact: any) => contact.status !== 'unsubscribed' && contact.email
     );
 
     if (eligibleContacts.length === 0) {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       <p>Thank you for being part of our community!</p>
     `;
 
-    const recipients = contactsToSend.map((c) => c.email);
+    const recipients = contactsToSend.map((c: any) => c.email);
     const sendResult = await plunk.sendCampaign(
       recipients,
       subject,

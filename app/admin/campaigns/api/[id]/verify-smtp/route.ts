@@ -80,7 +80,10 @@ export async function POST(
     // Create verification job
     const jobRef = db.collection("verification_jobs").doc();
     const jobId = jobRef.id;
-    const adminEmail = session.email || session.user?.email || "";
+    const adminEmail =
+      (session as any)?.email ||
+      (session as any)?.user?.email ||
+      "";
 
     await jobRef.set({
       id: jobId,

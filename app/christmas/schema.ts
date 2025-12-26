@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isWorkEmail, getWorkEmailErrorMessage } from '@/lib/utils/email-validation';
+import { isWorkEmail, getWorkEmailErrorMessage } from '@/lib/utils/work-email';
 
 export const christmasFormSchema = z.object({
   // Questions 1-5 (optional radio buttons)

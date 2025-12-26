@@ -92,9 +92,9 @@ export async function PUT(
           }
         });
 
-        // Filter to only verified, non-unsubscribed contacts
+        // Filter to only verified contacts with an email
         const eligibleContacts = matchingContacts.filter(
-          (c) => c.status === 'verified' && c.status !== 'unsubscribed' && c.email
+          (c: any) => c.status === 'verified' && c.email
         );
         updateData.totalContacts = eligibleContacts.length;
         updateData.contactCount = matchingContacts.length; // Keep total count for reference

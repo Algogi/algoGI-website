@@ -374,7 +374,7 @@ async function previewCampaign(criteria: SegmentCriteria): Promise<SegmentPrevie
 
   // Filter to only eligible contacts (verified, non-unsubscribed) for sending
   const eligibleContacts = filtered.filter(
-    (c) => c.status === 'verified' && c.status !== 'unsubscribed' && c.email
+    (c: any) => c.status === 'verified' && c.email
   );
 
   return {

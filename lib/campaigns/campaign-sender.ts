@@ -31,13 +31,13 @@ export async function sendCampaignBatch(
       id: doc.id,
       ...doc.data(),
     }))
-    .filter((c) => c.status === "verified" && c.status !== "unsubscribed" && c.email);
+    .filter((c: any) => c.status === "verified" && c.email);
 
   if (contacts.length === 0) {
     return { sent: 0, failed: 0 };
   }
 
-  const recipients = contacts.map((c) => c.email);
+  const recipients = contacts.map((c: any) => c.email as string);
   let sent = 0;
   let failed = 0;
 
@@ -83,11 +83,12 @@ export async function sendCampaignBatch(
       const contact = contacts[i];
 
       try {
+        const contactAny: any = contact;
         const contactData: ContactData = {
-          firstName: contact.firstName || "",
-          lastName: contact.lastName || "",
-          email: contact.email || recipient,
-          company: contact.company || "",
+          firstName: contactAny.firstName || "",
+          lastName: contactAny.lastName || "",
+          email: contactAny.email || recipient,
+          company: contactAny.company || "",
         };
         const personalizedSubject = replacePersonalizationTags(campaign.subject, contactData);
 
@@ -133,7 +134,7 @@ export async function sendCampaignBatch(
       const recipientAnalytics = analytics?.recipientAnalytics || [];
       
       // Add new recipients to analytics
-      const newRecipients = contacts.slice(0, sent).map((contact) => ({
+      const newRecipients = contacts.slice(0, sent).map((contact: any) => ({
         email: contact.email,
         opened: false,
         clicked: false,

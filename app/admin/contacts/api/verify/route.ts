@@ -261,7 +261,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const db = getDb();
-    const adminEmail = session.email || session.user?.email;
+    const adminEmail = (session as any)?.email || (session as any)?.user?.email;
     
     if (!adminEmail) {
       return NextResponse.json(

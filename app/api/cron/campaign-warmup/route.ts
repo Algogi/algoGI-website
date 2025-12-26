@@ -101,9 +101,9 @@ export async function POST(request: NextRequest) {
             }
           });
 
-          // Filter to only verified, non-unsubscribed contacts
+          // Filter to only verified contacts with an email
           const eligibleContacts = matchingContacts.filter(
-            (c) => c.status === "verified" && c.status !== "unsubscribed" && c.email
+            (c: any) => c.status === "verified" && c.email
           );
 
           // Get next batch (skip already sent)

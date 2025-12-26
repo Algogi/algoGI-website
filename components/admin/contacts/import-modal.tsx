@@ -289,7 +289,7 @@ export function ImportModal({ open, onOpenChange, onImportComplete }: ImportModa
         <DialogHeader>
           <DialogTitle>Import Contacts</DialogTitle>
           <DialogDescription>
-            Upload a CSV or JSON file to import contacts. CSV must have an "email" column.
+            Upload a CSV or JSON file to import contacts. CSV must have an &quot;email&quot; column.
           </DialogDescription>
         </DialogHeader>
 

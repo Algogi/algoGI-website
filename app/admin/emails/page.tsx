@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { EmailTemplate } from "@/lib/types/email";
+import { EmailTemplate, EmailCampaignStatus } from "@/lib/types/email";
 
 export default function EmailsPage() {
   const router = useRouter();

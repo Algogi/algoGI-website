@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     const db = getDb();
-    let query = db.collection('contacts');
+    let query: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = db.collection('contacts');
 
     // Firestore composite index issue: When filtering by status/source and ordering,
     // we need a composite index. To avoid this, we'll fetch all and filter/sort client-side

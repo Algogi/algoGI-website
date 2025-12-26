@@ -1,12 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+
+export default function EmailPreferencesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+            <p className="text-gray-600 dark:text-gray-400">Loading preferences...</p>
+          </div>
+        </div>
+      }
+    >
+      <EmailPreferencesContent />
+    </Suspense>
+  );
+}
 
 interface EmailPreferences {
   newsletter: boolean;
@@ -15,7 +32,7 @@ interface EmailPreferences {
   lastUpdated: string;
 }
 
-export default function EmailPreferencesPage() {
+function EmailPreferencesContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
 

@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
           id: doc.id,
           ...doc.data(),
         }))
-        .filter((contact) => {
+        .filter((contact: any) => {
           if (contact.status !== "verified" || contact.status === "unsubscribed") {
             return false;
           }
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
         });
       
       recipients = matchingContacts
-        .map((contact) => contact.email)
+        .map((contact: any) => contact.email)
         .filter((email) => email);
     } else {
       if (campaign.recipientType === "manual" && campaign.recipientEmails) {
@@ -188,8 +188,14 @@ export async function POST(request: NextRequest) {
         );
         recipients = contactDocs
           .filter((doc) => doc.exists)
-          .map((doc) => doc.data()?.email)
-          .filter((email) => email && doc.data()?.status === "verified" && doc.data()?.status !== "unsubscribed");
+          .map((doc) => doc.data())
+          .filter(
+            (data: any) =>
+              data?.status === "verified" &&
+              data?.status !== "unsubscribed" &&
+              data?.email
+          )
+          .map((data: any) => data.email as string);
       } else if (campaign.recipientType === "segments" && campaign.recipientIds) {
         // Get contacts from segments
         for (const segId of campaign.recipientIds) {
@@ -204,7 +210,7 @@ export async function POST(request: NextRequest) {
                 id: doc.id,
                 ...doc.data(),
               }))
-              .filter((contact) => {
+              .filter((contact: any) => {
                 if (contact.status !== "verified" || contact.status === "unsubscribed") {
                   return false;
                 }
@@ -221,7 +227,7 @@ export async function POST(request: NextRequest) {
               });
             
             const segmentEmails = matchingContacts
-              .map((contact) => contact.email)
+              .map((contact: any) => contact.email)
               .filter((email) => email);
             recipients.push(...segmentEmails);
           }

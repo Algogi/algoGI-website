@@ -85,7 +85,7 @@ export default function RecipientSelector({
   const filteredContacts = contacts.filter(
     (c) =>
       c.status === "verified" &&
-      c.status !== "unsubscribed" &&
+    c.email &&
       (search === "" ||
         c.email.toLowerCase().includes(search.toLowerCase()) ||
         c.firstName?.toLowerCase().includes(search.toLowerCase()) ||

@@ -42,7 +42,8 @@ export async function GET(
           // Update analytics
           const totalOpened = recipientAnalytics.filter((r: any) => r.opened).length;
           const uniqueOpened = totalOpened;
-          const openRate = analytics.totalSent > 0 ? (uniqueOpened / analytics.totalSent) * 100 : 0;
+          const totalSent = (analytics as any)?.totalSent || 0;
+          const openRate = totalSent > 0 ? (uniqueOpened / totalSent) * 100 : 0;
           
           await db.collection("email_analytics").doc(campaignId).update({
             recipientAnalytics,

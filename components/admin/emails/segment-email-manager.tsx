@@ -214,12 +214,12 @@ export default function SegmentEmailManager({
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="text-white font-medium">{email.name}</h4>
-                    {getStatusBadge(email.status)}
+                      {getStatusBadge(email.status || "draft")}
                   </div>
                   <p className="text-sm text-gray-400">{email.subject}</p>
-                  {email.sentAt && (
+                  {((email as any)?.sentAt) && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Sent: {new Date(email.sentAt).toLocaleDateString()}
+                      Sent: {new Date((email as any).sentAt).toLocaleDateString()}
                     </p>
                   )}
                 </div>
@@ -255,7 +255,7 @@ export default function SegmentEmailManager({
           <DialogHeader>
             <DialogTitle className="text-white">Attach Email to Segment</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Select an email campaign to attach to "{segmentName}"
+              {`Select an email campaign to attach to "${segmentName}"`}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
