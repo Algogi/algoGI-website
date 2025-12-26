@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getPlunkTransporter } from "@/lib/email/send-email";
 import { replacePersonalizationTags, replacePersonalizationTagsInHTML, ContactData } from "@/lib/email/personalization";
 import { wrapAllLinksForTracking, addCampaignFooter } from "@/lib/email/render-email";
+import { getBaseUrl } from "@/lib/email/base-url";
 
 /**
  * Send a batch of emails for a campaign
@@ -41,9 +42,7 @@ export async function sendCampaignBatch(
   let sent = 0;
   let failed = 0;
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+  const baseUrl = getBaseUrl();
 
   // Initialize or update analytics
   const analyticsDoc = await db.collection("email_analytics").doc(campaignId).get();

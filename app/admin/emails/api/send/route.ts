@@ -6,6 +6,7 @@ import { getEmailTransporter, getSenderEmail } from "@/lib/email/send-email";
 import { getPlunkClient } from "@/lib/plunk/client";
 import { renderEmailBlocksToHTML, addTrackingPixel, htmlToText, wrapTrackingLink, addCampaignFooter, wrapAllLinksForTracking } from "@/lib/email/render-email";
 import { replacePersonalizationTags, ContactData } from "@/lib/email/personalization";
+import { getBaseUrl } from "@/lib/email/base-url";
 
 // Helper for safe debug logging (do not remove until post-fix verification)
 function logDebug(payload: Record<string, any>) {
@@ -84,9 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Handle test email with direct content (no campaign save required)
     if (testEmail && testContent) {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}` 
-        : "http://localhost:3000";
+      const baseUrl = getBaseUrl();
       
       // Generate test subject if not provided
       const subject = testSubject || `Test Email - ${new Date().toLocaleString()}`;
@@ -240,9 +239,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Render email HTML (base template - will be personalized per recipient)
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : "http://localhost:3000";
+    const baseUrl = getBaseUrl();
     
     // Get contacts for personalization
     const contactsMap = new Map<string, ContactData>();

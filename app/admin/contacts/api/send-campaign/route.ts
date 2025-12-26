@@ -4,6 +4,7 @@ import { getDb } from '@/lib/firebase/config';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getPlunkClient } from '@/lib/plunk/client';
 import { matchesRule, getFieldValue } from '@/lib/utils/segment-matcher';
+import { getBaseUrl } from '@/lib/email/base-url';
 
 /**
  * POST /admin/contacts/api/send-campaign
@@ -106,8 +107,7 @@ export async function POST(request: NextRequest) {
     const campaignId = `campaign_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     
     // Get base URL for tracking links
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    const baseUrl = getBaseUrl();
 
     // Send emails via Plunk with tracking
     const plunk = getPlunkClient();

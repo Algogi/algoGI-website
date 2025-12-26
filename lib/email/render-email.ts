@@ -8,6 +8,7 @@ import {
   sanitizeEmailHTML,
 } from "./email-css-utils";
 import { replacePersonalizationTags, replacePersonalizationTagsInHTML, SAMPLE_CONTACT, ContactData } from "./personalization";
+import { getBaseUrl, resolveMediaUrl } from "./base-url";
 
 /**
  * Render email blocks to HTML
@@ -44,6 +45,7 @@ function renderBlockToHTML(
   preserveTags: boolean = false
 ): string {
   const contactData = contact || SAMPLE_CONTACT;
+  const mediaBaseUrl = baseUrl || getBaseUrl();
   const personalizeText = (value: string) =>
     preserveTags ? value || "" : replacePersonalizationTags(value || "", contactData);
   const personalizeHtml = (value: string) =>
@@ -58,7 +60,7 @@ function renderBlockToHTML(
       </div>`;
     
     case "image":
-      const imgSrc = block.props.src || "https://via.placeholder.com/600x300";
+      const imgSrc = resolveMediaUrl(block.props.src, mediaBaseUrl) || "https://via.placeholder.com/600x300";
       const imgTag = `<img src="${imgSrc}" alt="${block.props.alt || ""}" style="max-width: 100%; height: auto; display: block; margin: ${block.props.align === "center" ? "0 auto" : "0"};" />`;
       if (block.props.link) {
         return `<div style="padding: ${block.props.padding || "10px"}; text-align: ${block.props.align || "center"};">
@@ -131,7 +133,7 @@ function renderBlockToHTML(
       return sanitizeEmailHTML(htmlContent);
     
     case "hero-banner": {
-      const imageUrl = block.props.imageUrl || "";
+      const imageUrl = resolveMediaUrl(block.props.imageUrl, mediaBaseUrl);
       const heading = personalizeText(block.props.heading || "");
       const subheading = personalizeText(block.props.subheading || "");
       const ctaText = personalizeText(block.props.ctaText || "");
@@ -222,7 +224,7 @@ function renderBlockToHTML(
       const quote = personalizeText(block.props.quote || "");
       const author = personalizeText(block.props.author || "");
       const authorTitle = block.props.authorTitle || "";
-      const avatarUrl = block.props.avatarUrl || "";
+      const avatarUrl = resolveMediaUrl(block.props.avatarUrl, mediaBaseUrl);
       const backgroundColor = block.props.backgroundColor || "#f5f5f5";
       const textColor = block.props.textColor || "#333333";
       const borderColor = block.props.borderColor || "#4a3aff";
@@ -269,7 +271,7 @@ function renderBlockToHTML(
         return `
         <tr>
           <td width="30" style="padding-right: 10px; vertical-align: top; padding-bottom: ${spacing};">
-            ${item.icon ? `<img src="${item.icon}" alt="" width="${iconSize}" height="${iconSize}" />` : `<span style="color: ${iconColor}; font-size: ${iconSize};">✓</span>`}
+            ${item.icon ? `<img src="${resolveMediaUrl(item.icon, mediaBaseUrl)}" alt="" width="${iconSize}" height="${iconSize}" />` : `<span style="color: ${iconColor}; font-size: ${iconSize};">✓</span>`}
           </td>
           <td style="vertical-align: top; padding-bottom: ${spacing}; color: ${textColor}; font-size: ${fontSize}; font-family: ${getFallbackFont()};">
             ${personalizedText}
@@ -297,7 +299,7 @@ function renderBlockToHTML(
       const columnWidth = Math.floor(100 / columns);
       const statsHTML = stats.map((stat: any) => `
         <td width="${columnWidth}%" style="text-align: center; padding: 20px;">
-          ${stat.icon ? `<img src="${stat.icon}" alt="" width="30" height="30" style="margin-bottom: 10px;" />` : ""}
+          ${stat.icon ? `<img src="${resolveMediaUrl(stat.icon, mediaBaseUrl)}" alt="" width="30" height="30" style="margin-bottom: 10px;" />` : ""}
           <div style="font-size: ${valueSize}; font-weight: bold; color: ${valueColor}; margin-bottom: 5px; font-family: ${getFallbackFont()};">
             ${stat.value || ""}
           </div>
@@ -324,7 +326,7 @@ function renderBlockToHTML(
       
       const columnWidth = Math.floor(100 / columns);
       const imagesHTML = images.map((image: any, index: number) => {
-        const imgTag = `<img src="${image.src || ""}" alt="${image.alt || ""}" style="max-width: 100%; height: auto; display: block;" />`;
+        const imgTag = `<img src="${resolveMediaUrl(image.src, mediaBaseUrl)}" alt="${image.alt || ""}" style="max-width: 100%; height: auto; display: block;" />`;
         const wrappedImg = image.link ? `<a href="${wrapTrackingLink(image.link, `${block.id}-img-${index}`, baseUrl)}">${imgTag}</a>` : imgTag;
         const caption = showCaptions && image.caption ? `<p style="font-size: 12px; color: #666; margin-top: 5px; text-align: center; font-family: ${getFallbackFont()};">${image.caption}</p>` : "";
         
@@ -427,7 +429,7 @@ function renderBlockToHTML(
       
       const linksHTML = links.map((link: any) => {
         const iconContent = link.iconUrl
-          ? `<img src="${link.iconUrl}" alt="${link.label || link.platform}" width="${iconSize}" height="${iconSize}" />`
+          ? `<img src="${resolveMediaUrl(link.iconUrl, mediaBaseUrl)}" alt="${link.label || link.platform}" width="${iconSize}" height="${iconSize}" />`
           : `<span style="color: ${iconColor}; font-size: ${iconSize};">${link.platform}</span>`;
         
         return `<a href="${link.url || "#"}" target="_blank" rel="noopener noreferrer" style="margin: 0 ${spacing}; text-decoration: none;">${iconContent}</a>`;
