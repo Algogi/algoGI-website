@@ -226,7 +226,7 @@ export default function WarmupSettingsPage() {
               <div className="text-xs text-muted-foreground">Updated {formatTimestamp(w.updatedAt)}</div>
               <div className="flex gap-2 mt-2">
                 <Button
-                  size="xs"
+                  size="sm"
                   variant="outline"
                   onClick={(e) => {
                     e.stopPropagation();

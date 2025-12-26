@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
             campaign.totalContacts,
             campaign.sentContacts || 0,
             campaign.startedAt || new Date().toISOString(),
+            undefined,
             {
               openRate: analyticsData?.openRate ?? 0,
               bounceRate: analyticsData?.bounceRate ?? 0,

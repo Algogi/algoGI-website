@@ -112,7 +112,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const validEmails = contactEmails.filter((e) => EMAIL_REGEX.test(e));
   const invalidFormat = contactEmails.filter((e) => !EMAIL_REGEX.test(e));
-  const personalDomains = new Set(PERSONAL_EMAIL_PROVIDERS);
+  const personalDomains = new Set<string>(PERSONAL_EMAIL_PROVIDERS);
   const personal = validEmails.filter((e) => personalDomains.has(e.split("@")[1]?.toLowerCase() || ""));
   const toVerify = validEmails.filter((e) => !personal.includes(e));
 

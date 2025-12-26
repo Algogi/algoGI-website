@@ -617,9 +617,11 @@ export async function verifyEmailEnhanced(email: string): Promise<{
  * Verify email up to MX records only (no SMTP)
  * Used for regular contact verification
  */
+type DomainCacheEntry = { valid: boolean; mxRecords: string[] };
+
 export async function verifyEmailMXOnly(
   email: string,
-  options?: { domainCache?: Map<string, { valid: boolean; mxRecords: string[] }> }
+  options?: { domainCache?: Map<string, DomainCacheEntry> }
 ): Promise<{
   valid: boolean;
   status: 'valid' | 'invalid' | 'disposable' | 'role_based' | 'typo';
@@ -697,7 +699,7 @@ export async function verifyEmailMXOnly(
   // 6. MX records (STOP HERE - no SMTP verification)
   const cacheKey = domain.toLowerCase();
   const cache = options?.domainCache;
-  let mxCheck: { valid: boolean; mxRecords: string[] };
+  let mxCheck: DomainCacheEntry;
 
   const cached = cache?.get(cacheKey);
   if (cached) {
@@ -785,7 +787,7 @@ export async function verifyEmailComprehensive(email: string): Promise<{
 type BatchCallbacks = {
   onProgress?: (progress: { completed: number; total: number; current?: string }) => void;
   onResult?: (result: { email: string; valid: boolean; reason?: string; mxRecords?: string[] }) => void | Promise<void>;
-  domainCache?: Map<string, { result: Awaited<ReturnType<typeof verifyEmailMXOnly>> }>;
+  domainCache?: Map<string, DomainCacheEntry>;
 };
 
 export async function verifyEmailBatch(
@@ -800,8 +802,8 @@ export async function verifyEmailBatch(
   const onResult = typeof callbacks === 'function' ? undefined : callbacks?.onResult;
   const domainCache =
     callbacks && typeof callbacks === 'object'
-      ? callbacks.domainCache ?? new Map<string, { valid: boolean; mxRecords: string[] }>()
-      : new Map<string, { valid: boolean; mxRecords: string[] }>();
+      ? callbacks.domainCache ?? new Map<string, DomainCacheEntry>()
+      : new Map<string, DomainCacheEntry>();
   const valid: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }> = [];
   const invalid: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }> = [];
   const needsVerification: Array<{ email: string; valid: boolean; reason?: string; mxRecords?: string[] }> = [];

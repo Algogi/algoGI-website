@@ -139,7 +139,7 @@ export async function PUT(request: NextRequest) {
 
     // Verify emails (MX-only)
     // Personal providers (e.g., gmail) are allowed for warmup; mark them as verified after MX check.
-    const personalDomains = new Set(PERSONAL_EMAIL_PROVIDERS);
+    const personalDomains = new Set<string>(PERSONAL_EMAIL_PROVIDERS);
     const personalEmails = validEmails.filter((e) => {
       const domain = e.split("@")[1]?.toLowerCase();
       return domain && personalDomains.has(domain);
