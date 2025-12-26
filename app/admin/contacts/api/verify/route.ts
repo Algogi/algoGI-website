@@ -244,21 +244,8 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { emails } = body;
-
-    if (!Array.isArray(emails) || emails.length === 0) {
-      return NextResponse.json(
-        { error: 'Emails array is required' },
-        { status: 400 }
-      );
-    }
-
-    if (emails.length > 1000) {
-      return NextResponse.json(
-        { error: 'Maximum 1000 emails per batch' },
-        { status: 400 }
-      );
-    }
+    const { emails, source } = body as { emails?: string[]; source?: string };
+    const MAX_BATCH = 5000;
 
     const db = getDb();
     const adminEmail = (session as any)?.email || (session as any)?.user?.email;
@@ -270,31 +257,85 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Find contacts by email and set status to 'verifying'
+    // Determine target emails: either explicit list or by source
+    let targetEmails: string[] = [];
     const emailToContactId = new Map<string, string>();
-    const FIRESTORE_IN_LIMIT = 30;
-    
-    // Find all contacts first
-    for (let i = 0; i < emails.length; i += FIRESTORE_IN_LIMIT) {
-      const emailChunk = emails.slice(i, i + FIRESTORE_IN_LIMIT).map(e => e.toLowerCase());
-      if (emailChunk.length === 0) continue;
-      
-      const snapshot = await db
+
+    if (source && typeof source === 'string') {
+      const sourceSnapshot = await db
         .collection('contacts')
-        .where('email', 'in', emailChunk)
+        .where('source', '==', source)
         .get();
-      
-      snapshot.docs.forEach((doc) => {
+
+      if (sourceSnapshot.empty) {
+        return NextResponse.json(
+          { error: `No contacts found for source '${source}'` },
+          { status: 404 }
+        );
+      }
+
+      sourceSnapshot.docs.forEach((doc) => {
         const data = doc.data();
-        if (data.email) {
-          emailToContactId.set(data.email.toLowerCase(), doc.id);
+        const email = data.email?.toLowerCase();
+        if (email) {
+          emailToContactId.set(email, doc.id);
         }
       });
+
+      targetEmails = Array.from(emailToContactId.keys());
+    } else {
+      if (!Array.isArray(emails) || emails.length === 0) {
+        return NextResponse.json(
+          { error: 'Emails array is required' },
+          { status: 400 }
+        );
+      }
+      targetEmails = emails.map((e) => String(e).toLowerCase());
+    }
+
+    // De-duplicate
+    targetEmails = Array.from(new Set(targetEmails));
+
+    if (targetEmails.length === 0) {
+      return NextResponse.json(
+        { error: 'No emails found to verify' },
+        { status: 404 }
+      );
+    }
+
+    if (targetEmails.length > MAX_BATCH) {
+      return NextResponse.json(
+        { error: `Maximum ${MAX_BATCH} emails per batch` },
+        { status: 400 }
+      );
+    }
+
+    // If emails were provided (not source), fetch contactIds for them
+    if (emailToContactId.size === 0) {
+      const FIRESTORE_IN_LIMIT = 30;
+      
+      for (let i = 0; i < targetEmails.length; i += FIRESTORE_IN_LIMIT) {
+        const emailChunk = targetEmails.slice(i, i + FIRESTORE_IN_LIMIT);
+        if (emailChunk.length === 0) continue;
+        
+        const snapshot = await db
+          .collection('contacts')
+          .where('email', 'in', emailChunk)
+          .get();
+        
+        snapshot.docs.forEach((doc) => {
+          const data = doc.data();
+          const email = data.email?.toLowerCase();
+          if (email) {
+            emailToContactId.set(email, doc.id);
+          }
+        });
+      }
     }
 
     // Set status to 'verifying' for all found contacts
     const contactIds: string[] = [];
-    emails.forEach((email) => {
+    targetEmails.forEach((email) => {
       const contactId = emailToContactId.get(email.toLowerCase());
       if (contactId) {
         contactIds.push(contactId);
@@ -322,7 +363,7 @@ export async function PUT(request: NextRequest) {
     const jobId = jobRef.id;
     await jobRef.set({
       id: jobId,
-      total: emails.length,
+      total: targetEmails.length,
       processed: 0,
       status: 'pending',
       adminEmail,
@@ -337,7 +378,7 @@ export async function PUT(request: NextRequest) {
     // Trigger background processing (non-blocking)
     // Use Promise.resolve().then() to start background work without blocking response
     Promise.resolve().then(() => {
-      processBulkVerification(emails, adminEmail, jobId).catch((error) => {
+      processBulkVerification(targetEmails, adminEmail, jobId).catch((error) => {
         console.error('Background verification failed:', error);
       });
     });
@@ -346,7 +387,8 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Verification started',
-      total: emails.length,
+      total: targetEmails.length,
+      source: source || undefined,
       jobId,
     });
   } catch (error: any) {

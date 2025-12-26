@@ -283,6 +283,55 @@ export default function ContactsPage() {
     }
   };
 
+  const handleVerifyBySource = async () => {
+    if (!sourceFilter) {
+      toast.warning("Select a source first to verify all contacts from it.");
+      return;
+    }
+
+    try {
+      setVerifyingContacts(true);
+
+      const verifyResponse = await fetch("/admin/contacts/api/verify", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source: sourceFilter }),
+      });
+
+      if (!verifyResponse.ok) {
+        const errorData = await verifyResponse.json();
+        throw new Error(errorData.error || "Verification failed to start");
+      }
+
+      const verifyResult = await verifyResponse.json();
+
+      if (verifyResult.jobId) {
+        setVerificationJob({
+          jobId: verifyResult.jobId,
+          total: verifyResult.total || 0,
+          processed: 0,
+          status: "pending",
+          currentEmail: null,
+          progressPercentage: 0,
+        });
+
+        startProgressPolling(verifyResult.jobId);
+      }
+
+      toast.success(
+        `Verification started for ${verifyResult.total || 0} contact(s) from source "${sourceFilter}".`
+      );
+
+      setTimeout(() => {
+        fetchContacts();
+        fetchStats();
+      }, 1000);
+    } catch (err: any) {
+      toast.error(`Verification failed: ${err.message}`);
+      setVerifyingContacts(false);
+    }
+  };
+
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
 
@@ -512,6 +561,14 @@ export default function ContactsPage() {
               <Button variant="outline" onClick={handleExport}>
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleVerifyBySource}
+                disabled={verifyingContacts || !sourceFilter}
+              >
+                <CheckSquare className="w-4 h-4 mr-2" />
+                Verify Source
               </Button>
               <Button onClick={() => setImportModalOpen(true)}>
                 <Upload className="w-4 h-4 mr-2" />
