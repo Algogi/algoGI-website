@@ -78,7 +78,7 @@ export async function sendNewApplicationNotificationEmail(
 ): Promise<void> {
   const emailTransporter = getEmailTransporter();
   const fromEmail = getSenderEmail('job');
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || fromEmail;
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_FROM_EMAIL || process.env.EMAIL_JOBS || fromEmail;
 
   const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const applicationUrl = `${baseUrl}/admin/careers/${jobId}/applicants/${applicationId}`;

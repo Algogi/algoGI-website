@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Briefcase, MessageSquare, Download, TrendingUp, Plus, UserCheck, Mail, UserCircle } from "lucide-react";
+import { Briefcase, MessageSquare, Download, TrendingUp, Plus, UserCheck, Mail, UserCircle, Send } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -14,19 +14,21 @@ export default function AdminDashboard() {
     leads: 0,
     newsletter: 0,
     careers: 0,
+    emails: 0,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [portfolioRes, testimonialsRes, downloadsRes, leadsRes, newsletterRes, careersRes] = await Promise.all([
+        const [portfolioRes, testimonialsRes, downloadsRes, leadsRes, newsletterRes, careersRes, emailsRes] = await Promise.all([
           fetch("/api/cms/portfolio"),
           fetch("/api/cms/testimonials"),
           fetch("/api/cms/downloads"),
           fetch("/api/cms/leads"),
           fetch("/api/cms/newsletter"),
           fetch("/api/cms/careers"),
+          fetch("/admin/campaigns/api?pageSize=1"),
         ]);
 
         const portfolio = await portfolioRes.json();
@@ -35,6 +37,7 @@ export default function AdminDashboard() {
         const leads = await leadsRes.json();
         const newsletter = await newsletterRes.json();
         const careers = await careersRes.json();
+        const emails = await emailsRes.json();
 
         setStats({
           portfolio: portfolio.length || 0,
@@ -43,6 +46,7 @@ export default function AdminDashboard() {
           leads: leads.length || 0,
           newsletter: newsletter.length || 0,
           careers: careers.length || 0,
+          emails: emails.total || 0,
         });
       } catch (error) {
         console.error("Error fetching stats:", error);
@@ -73,7 +77,7 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-6 mb-8">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-7 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">Portfolio Items</CardTitle>
@@ -163,6 +167,21 @@ export default function AdminDashboard() {
             </p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">Email Campaigns</CardTitle>
+            <Send className="h-4 w-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{stats.emails}</div>
+            <p className="text-xs text-gray-400 mt-1">
+              <Link href="/admin/campaigns" className="text-neon-blue hover:underline">
+                View all →
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
@@ -209,6 +228,20 @@ export default function AdminDashboard() {
                 <div className="text-left">
                   <p className="text-sm font-medium text-white">Create Job</p>
                   <p className="text-xs text-gray-400">Post a new job opening</p>
+                </div>
+              </Link>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="h-auto p-6 justify-start border-neon-blue/30 hover:border-neon-blue/50"
+              asChild
+            >
+              <Link href="/admin/campaigns/new">
+                <Plus className="h-6 w-6 mr-3 text-neon-blue" />
+                <div className="text-left">
+                  <p className="text-sm font-medium text-white">Create Campaign</p>
+                  <p className="text-xs text-gray-400">Build a new email campaign</p>
                 </div>
               </Link>
             </Button>

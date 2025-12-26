@@ -2,7 +2,9 @@ import { getBucket } from "@/lib/firebase/storage";
 import { generateSignedUrl } from "@/lib/firebase/storage";
 import nodemailer from "nodemailer";
 
+// Single transporter, backed by Plunk SMTP
 let transporter: nodemailer.Transporter | null = null;
+let plunkTransporter: nodemailer.Transporter | null = null;
 
 /**
  * Email type for determining sender address
@@ -37,75 +39,43 @@ export function getEmailTransporter(): nodemailer.Transporter {
     return transporter;
   }
 
-  // Check for required environment variables
-  const missingVars: string[] = [];
-  const emptyVars: string[] = [];
-  
-  if (!process.env.SMTP_HOST) {
-    missingVars.push("SMTP_HOST");
-  } else if (process.env.SMTP_HOST.trim() === "") {
-    emptyVars.push("SMTP_HOST");
-  }
-  
-  if (!process.env.SMTP_PORT) {
-    missingVars.push("SMTP_PORT");
-  } else if (process.env.SMTP_PORT.trim() === "") {
-    emptyVars.push("SMTP_PORT");
-  }
-  
-  if (!process.env.SMTP_USER) {
-    missingVars.push("SMTP_USER");
-  } else if (process.env.SMTP_USER.trim() === "") {
-    emptyVars.push("SMTP_USER");
-  }
-  
-  if (!process.env.SMTP_PASSWORD) {
-    missingVars.push("SMTP_PASSWORD");
-  } else if (process.env.SMTP_PASSWORD.trim() === "") {
-    emptyVars.push("SMTP_PASSWORD");
+  const smtpHost = process.env.SMTP_HOST || "next-smtp.useplunk.com";
+  const smtpPort = process.env.SMTP_PORT || "2587";
+  const smtpUser = process.env.SMTP_USER || "plunk";
+  const smtpPassword = process.env.PLUNK_API_KEY;
+
+  if (!smtpPassword) {
+    throw new Error("PLUNK_API_KEY is not configured for SMTP sending");
   }
 
-  if (missingVars.length > 0 || emptyVars.length > 0) {
-    let errorMessage = "SMTP email credentials not configured. ";
-    if (emptyVars.length > 0) {
-      errorMessage += `Empty values found for: ${emptyVars.join(", ")}. `;
-    }
-    if (missingVars.length > 0) {
-      errorMessage += `Missing: ${missingVars.join(", ")}. `;
-    }
-    errorMessage += "Please set these in your .env.local file. For Gmail, use SMTP settings with an app password.";
-    
-    console.error("SMTP configuration error:", {
-      missing: missingVars,
-      empty: emptyVars,
-      available: {
-        SMTP_HOST: process.env.SMTP_HOST ? `SET (${process.env.SMTP_HOST})` : "NOT SET",
-        SMTP_PORT: process.env.SMTP_PORT ? `SET (${process.env.SMTP_PORT})` : "NOT SET",
-        SMTP_USER: process.env.SMTP_USER ? `SET (${process.env.SMTP_USER.length} chars)` : "NOT SET",
-        SMTP_PASSWORD: process.env.SMTP_PASSWORD ? `SET (${process.env.SMTP_PASSWORD.length} chars)` : "NOT SET",
-      }
-    });
-    
-    throw new Error(errorMessage);
-  }
-
-  // At this point, we know all env vars are defined (validation above throws if not)
-  const smtpHost = process.env.SMTP_HOST!;
-  const smtpPort = process.env.SMTP_PORT!;
-  const smtpUser = process.env.SMTP_USER!;
-  const smtpPassword = process.env.SMTP_PASSWORD!;
+  const port = parseInt(smtpPort, 10);
 
   transporter = nodemailer.createTransport({
     host: smtpHost,
-    port: parseInt(smtpPort, 10),
-    secure: smtpPort === "465", // true for 465, false for other ports
+    port,
+    secure: port === 465, // true for 465, false for other ports
     auth: {
       user: smtpUser,
       pass: smtpPassword,
     },
   });
 
+  // Keep both references aligned
+  plunkTransporter = transporter;
+
   return transporter;
+}
+
+/**
+ * Initialize Plunk SMTP transporter (for campaign emails)
+ */
+export function getPlunkTransporter(): nodemailer.Transporter {
+  if (plunkTransporter) {
+    return plunkTransporter;
+  }
+
+  plunkTransporter = getEmailTransporter();
+  return plunkTransporter;
 }
 
 /**
@@ -359,7 +329,7 @@ export async function sendLeadNotificationEmail(
 ): Promise<void> {
   const emailTransporter = getEmailTransporter();
   const fromEmail = getSenderEmail('lead');
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || fromEmail;
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_FROM_EMAIL || process.env.EMAIL_ENQUIRY || fromEmail;
 
   const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const leadsUrl = `${baseUrl}/admin/leads`;
