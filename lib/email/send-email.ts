@@ -24,9 +24,10 @@ export type EmailType =
 export function getSenderEmail(type: EmailType): string {
   const emailMap: Record<EmailType, string> = {
     newsletter: process.env.EMAIL_NEWSLETTER || process.env.SMTP_FROM_EMAIL || 'newsletters@algogi.email',
-    enquiry: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.email',
-    lead: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.email',
-    download: process.env.EMAIL_ENQUIRY || process.env.SMTP_FROM_EMAIL || 'info@algogi.email',
+    // Admin-facing notices should default to info@ even if SMTP_FROM_EMAIL is different
+    enquiry: process.env.EMAIL_ENQUIRY || 'info@algogi.email',
+    lead: process.env.EMAIL_ENQUIRY || 'info@algogi.email',
+    download: process.env.EMAIL_ENQUIRY || 'info@algogi.email',
     job: process.env.EMAIL_JOBS || process.env.SMTP_FROM_EMAIL || 'jobs@algogi.email',
   };
   
