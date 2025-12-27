@@ -146,7 +146,7 @@ export default function EmailBuilder({
   const createBlock = useCallback((type: EmailBlockType): EmailBlock => {
     const id = `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
-    const defaultProps: Record<EmailBlockType, Record<string, any>> = {
+    const defaultProps: Partial<Record<EmailBlockType, Record<string, any>>> = {
       text: { text: "New text block" },
       image: { src: "", alt: "Image" },
       button: { text: "Button", link: "#" },
@@ -174,14 +174,6 @@ export default function EmailBuilder({
         fontWeight: "bold",
         align: "center",
         padding: "40px 20px",
-      },
-      "rich-text": {
-        content: "<p>Rich text content</p>",
-        columns: 1,
-        fontSize: "16px",
-        fontFamily: "Arial, sans-serif",
-        color: "#333333",
-        lineHeight: "1.6",
       },
       quote: {
         quote: "This is a testimonial quote from a satisfied customer.",

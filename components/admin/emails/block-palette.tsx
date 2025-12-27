@@ -56,13 +56,6 @@ const blockDefinitions: BlockDefinition[] = [
   },
   // Text & Content
   {
-    type: "rich-text",
-    label: "Rich Text",
-    icon: <Type className="w-4 h-4" />,
-    description: "WYSIWYG editor, columns 1/2/3",
-    category: "Text & Content",
-  },
-  {
     type: "text",
     label: "Text",
     icon: <Type className="w-4 h-4" />,

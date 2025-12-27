@@ -11,7 +11,6 @@ import LinkBlock from "./email-blocks/link-block";
 import HtmlBlock from "./email-blocks/html-block";
 import HeroBannerBlock from "./email-blocks/hero-banner-block";
 import GradientHeaderBlock from "./email-blocks/gradient-header-block";
-import RichTextBlock from "./email-blocks/rich-text-block";
 import QuoteBlock from "./email-blocks/quote-block";
 import FeatureListBlock from "./email-blocks/feature-list-block";
 import StatsRowBlock from "./email-blocks/stats-row-block";
@@ -65,8 +64,6 @@ export default function BlockRenderer({
       return <HeroBannerBlock {...commonProps} />;
     case "gradient-header":
       return <GradientHeaderBlock {...commonProps} />;
-    case "rich-text":
-      return <RichTextBlock {...commonProps} />;
     case "quote":
       return <QuoteBlock {...commonProps} />;
     case "feature-list":

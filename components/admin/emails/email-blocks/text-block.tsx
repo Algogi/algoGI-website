@@ -49,7 +49,7 @@ export default function TextBlock({
   if (isPreview) {
     const personalizedText = replacePersonalizationTags(text);
     return (
-      <div style={style} dangerouslySetInnerHTML={{ __html: personalizedText.replace(/\n/g, "<br>") }} />
+      <div style={style} dangerouslySetInnerHTML={{ __html: personalizedText }} />
     );
   }
 
@@ -63,7 +63,7 @@ export default function TextBlock({
       }`}
       style={style}
     >
-      <div dangerouslySetInnerHTML={{ __html: text.replace(/\n/g, "<br>") || "Click to edit text" }} />
+      <div dangerouslySetInnerHTML={{ __html: text || "Click to edit text" }} />
     </div>
   );
 }

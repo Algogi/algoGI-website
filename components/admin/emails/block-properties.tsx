@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { X, Plus } from "lucide-react";
 import MediaSelector from "@/components/admin/media-selector";
 import PersonalizedTextInput from "./personalized-text-input";
+import SimpleTextEditor from "./simple-text-editor";
 
 interface BlockPropertiesProps {
   block: EmailBlock | null;
@@ -49,14 +50,12 @@ export default function BlockProperties({ block, onUpdate, onClose }: BlockPrope
       <div className="space-y-4">
         {block.type === "text" && (
           <>
-            <div>
-              <PersonalizedTextInput
-                label="Text Content"
+            <div className="space-y-1">
+              <Label className="text-white">Text Content</Label>
+              <SimpleTextEditor
                 value={block.props.text || ""}
-                onChange={(value) => handlePropChange("text", value)}
-                type="textarea"
-                rows={5}
-                className="bg-dark-card border-neon-blue/20 text-white mt-1"
+                onChange={(html) => handlePropChange("text", html)}
+                placeholder="Write your email text..."
               />
             </div>
             <div>
@@ -428,40 +427,6 @@ export default function BlockProperties({ block, onUpdate, onClose }: BlockPrope
                 <option value="center">Center</option>
                 <option value="right">Right</option>
               </select>
-            </div>
-          </>
-        )}
-
-        {block.type === "rich-text" && (
-          <>
-            <div>
-              <Label className="text-white">Columns</Label>
-              <select
-                value={block.props.columns || 1}
-                onChange={(e) => handlePropChange("columns", parseInt(e.target.value))}
-                className="w-full mt-1 px-3 py-2 bg-dark-card border border-neon-blue/20 rounded-md text-white"
-              >
-                <option value={1}>1 Column</option>
-                <option value={2}>2 Columns</option>
-                <option value={3}>3 Columns</option>
-              </select>
-            </div>
-            <div>
-              <Label className="text-white">Font Size</Label>
-              <Input
-                value={block.props.fontSize || "16px"}
-                onChange={(e) => handlePropChange("fontSize", e.target.value)}
-                className="bg-dark-card border-neon-blue/20 text-white mt-1"
-              />
-            </div>
-            <div>
-              <Label className="text-white">Text Color</Label>
-              <Input
-                type="color"
-                value={block.props.color || "#333333"}
-                onChange={(e) => handlePropChange("color", e.target.value)}
-                className="bg-dark-card border-neon-blue/20 mt-1 h-10"
-              />
             </div>
           </>
         )}

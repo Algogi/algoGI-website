@@ -53,8 +53,8 @@ function renderBlockToHTML(
   switch (block.type) {
     case "text":
       const textContent = block.props.text || "";
-      const personalizedText = personalizeText(textContent);
-      const textHTML = String(personalizedText).replace(/\n/g, "<br>");
+      const personalizedText = personalizeHtml(textContent);
+      const textHTML = sanitizeEmailHTML(personalizedText);
       return `<div style="padding: ${block.props.padding || "10px"}; text-align: ${block.props.align || "left"}; color: ${block.props.color || "#333"}; font-size: ${block.props.fontSize || "16px"}; line-height: ${block.props.lineHeight || "1.6"};">
         ${textHTML}
       </div>`;
@@ -215,41 +215,6 @@ function renderBlockToHTML(
           </tr>
         </table>
       `);
-    }
-    
-    case "rich-text": {
-      const content = personalizeHtml(block.props.content || "");
-      const columns = block.props.columns || 1;
-      const fontSize = block.props.fontSize || "16px";
-      const fontFamily = getFallbackFont(block.props.fontFamily);
-      const color = block.props.color || "#333333";
-      const lineHeight = block.props.lineHeight || "1.6";
-      
-      if (columns === 1) {
-        return `<div style="font-size: ${fontSize}; font-family: ${fontFamily}; color: ${color}; line-height: ${lineHeight}; padding: 20px;">
-          ${sanitizeEmailHTML(content)}
-        </div>`;
-      }
-      
-      // Multi-column layout using tables
-      const columnContent = sanitizeEmailHTML(content);
-      const columnWidth = Math.floor(600 / columns) - 10;
-      let cells = "";
-      for (let i = 0; i < columns; i++) {
-        cells += `
-          <td width="${columnWidth}" style="padding: 0 10px; vertical-align: top; font-size: ${fontSize}; font-family: ${fontFamily}; color: ${color}; line-height: ${lineHeight};">
-            ${columnContent}
-          </td>
-        `;
-      }
-      
-      return `
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 0; padding: 20px;">
-          <tr>
-            ${cells}
-          </tr>
-        </table>
-      `;
     }
     
     case "quote": {
