@@ -285,9 +285,15 @@ export async function GET(request: NextRequest) {
         campaignId: data.campaignId,
         status: data.status,
         contactCount: (data.contactIds || []).length,
+      subject: data.subject || null,
+      fromEmail: data.fromEmail || null,
         runAfter: safeTimestampToISO(data.runAfter),
         createdAt: safeTimestampToISO(data.createdAt),
+      startedAt: safeTimestampToISO(data.startedAt),
+      completedAt: safeTimestampToISO(data.completedAt),
         attempts: data.attempts || 0,
+      sent: data.sent || 0,
+      failed: data.failed || 0,
         error: data.error || null,
       };
     });
@@ -343,6 +349,7 @@ export async function GET(request: NextRequest) {
         sendQueuePending: queueSummary.pending,
         sendQueueProcessing: queueSummary.processing,
         sendQueueFailed: queueSummary.failed,
+      sendQueueRecent: queueSummary.recent,
         warmupActive: warmups.some((w) => w.active),
       },
     };

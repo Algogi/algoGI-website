@@ -82,15 +82,37 @@ type WarmupStatus = {
   progress?: number | null;
 };
 
+type SendQueueItem = {
+  id: string;
+  campaignId: string;
+  status: string;
+  contactCount: number;
+  subject?: string | null;
+  fromEmail?: string | null;
+  runAfter: string | null;
+  createdAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  attempts: number;
+  sent?: number;
+  failed?: number;
+  error?: string | null;
+};
+
 type ProcessesResponse = {
   verificationJobs: VerificationJob[];
   campaigns: CampaignProcess[];
+  sendQueue: SendQueueItem[];
   completedVerificationJobs?: VerificationJob[];
   completedCampaigns?: CompletedCampaign[];
   warmups?: WarmupStatus[];
   summary: {
     activeVerificationJobs: number;
     activeCampaigns: number;
+    sendQueuePending?: number;
+    sendQueueProcessing?: number;
+    sendQueueFailed?: number;
+    sendQueueRecent?: number;
     warmupActive?: boolean;
   };
 };
@@ -179,6 +201,7 @@ export default function ProcessesPage() {
 
   const activeJobs = data?.verificationJobs || [];
   const activeCampaigns = data?.campaigns || [];
+  const queueItems = data?.sendQueue || [];
 
   return (
     <div className="space-y-6">
@@ -213,7 +236,7 @@ export default function ProcessesPage() {
       )}
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="flex items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Verification Jobs</CardTitle>
@@ -233,6 +256,22 @@ export default function ProcessesPage() {
           <CardContent>
             <div className="text-3xl font-bold text-white">{data?.summary.activeCampaigns ?? 0}</div>
             <p className="text-xs text-muted-foreground mt-1">Active or sending</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Send Queue</CardTitle>
+            <Send className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-white">{data?.summary.sendQueuePending ?? 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Processing: {data?.summary.sendQueueProcessing ?? 0} · Failed: {data?.summary.sendQueueFailed ?? 0}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Recent items: {data?.summary.sendQueueRecent ?? queueItems.length}
+            </p>
           </CardContent>
         </Card>
 
@@ -266,6 +305,72 @@ export default function ProcessesPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Send queue */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Send className="w-4 h-4" />
+            Send Queue
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading && !data ? (
+            <div className="flex items-center justify-center py-8 text-muted-foreground">
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Loading...
+            </div>
+          ) : queueItems.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No recent send queue items.</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Queue Item</TableHead>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Contacts</TableHead>
+                  <TableHead>Attempts</TableHead>
+                  <TableHead>Timing</TableHead>
+                  <TableHead>Result / Error</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {queueItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <div className="font-semibold text-white">ID: {item.id}</div>
+                      <div className="text-xs text-muted-foreground">Campaign: {item.campaignId || "—"}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-semibold text-white line-clamp-2">{item.subject || "—"}</div>
+                      <div className="text-xs text-muted-foreground">{item.fromEmail || "—"}</div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={statusBadgeVariant(item.status)} className="capitalize">
+                        {item.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-white">{item.contactCount}</TableCell>
+                    <TableCell className="text-sm text-white">{item.attempts}</TableCell>
+                    <TableCell className="text-sm text-white">
+                      <div>Run after: {formatDate(item.runAfter)}</div>
+                      <div className="text-xs text-muted-foreground">Started: {formatDate(item.startedAt)}</div>
+                      <div className="text-xs text-muted-foreground">Completed: {formatDate(item.completedAt)}</div>
+                    </TableCell>
+                    <TableCell className="text-sm text-white">
+                      <div>
+                        Sent: {item.sent ?? "—"} · Failed: {item.failed ?? "—"}
+                      </div>
+                      {item.error && <div className="text-xs text-destructive mt-1 break-words">{item.error}</div>}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Verification jobs */}
       <Card>
